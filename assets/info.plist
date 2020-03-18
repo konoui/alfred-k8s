@@ -8,11 +8,37 @@
 	<string>Tools</string>
 	<key>connections</key>
 	<dict>
+		<key>8AB15D23-A549-4BBD-929D-8AD74B6506D2</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>B31FD45E-50C3-43A9-88A7-5C3FA4CD6390</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
 		<key>DD52ECA5-18F0-4E97-B560-0AD43B904DFF</key>
 		<array>
 			<dict>
 				<key>destinationuid</key>
 				<string>3636C62A-AA3C-474E-8BB8-01949B6E1C56</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
+		<key>F61F1DD4-C140-44EF-B9E4-C447F5A12A76</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>14547DC8-A05F-451A-B970-5FC5556FEAB6</string>
 				<key>modifiers</key>
 				<integer>0</integer>
 				<key>modifiersubtext</key>
@@ -35,6 +61,23 @@
 		<dict>
 			<key>config</key>
 			<dict>
+				<key>autopaste</key>
+				<false/>
+				<key>clipboardtext</key>
+				<string>{query}</string>
+				<key>transient</key>
+				<false/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.output.clipboard</string>
+			<key>uid</key>
+			<string>3636C62A-AA3C-474E-8BB8-01949B6E1C56</string>
+			<key>version</key>
+			<integer>3</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
 				<key>alfredfiltersresults</key>
 				<true/>
 				<key>alfredfiltersresultsmatchmode</key>
@@ -48,7 +91,7 @@
 				<key>escaping</key>
 				<integer>102</integer>
 				<key>keyword</key>
-				<string>krs</string>
+				<string>kube pod</string>
 				<key>queuedelaycustom</key>
 				<integer>3</integer>
 				<key>queuedelayimmediatelyinitially</key>
@@ -60,7 +103,7 @@
 				<key>runningsubtext</key>
 				<string></string>
 				<key>script</key>
-				<string>./alfred-k8s</string>
+				<string>./alfred-k8s pod</string>
 				<key>scriptargtype</key>
 				<integer>1</integer>
 				<key>scriptfile</key>
@@ -68,7 +111,7 @@
 				<key>subtext</key>
 				<string></string>
 				<key>title</key>
-				<string>krs</string>
+				<string>kube pod</string>
 				<key>type</key>
 				<integer>5</integer>
 				<key>withspace</key>
@@ -78,6 +121,55 @@
 			<string>alfred.workflow.input.scriptfilter</string>
 			<key>uid</key>
 			<string>DD52ECA5-18F0-4E97-B560-0AD43B904DFF</string>
+			<key>version</key>
+			<integer>3</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>alfredfiltersresults</key>
+				<true/>
+				<key>alfredfiltersresultsmatchmode</key>
+				<integer>0</integer>
+				<key>argumenttreatemptyqueryasnil</key>
+				<false/>
+				<key>argumenttrimmode</key>
+				<integer>1</integer>
+				<key>argumenttype</key>
+				<integer>1</integer>
+				<key>escaping</key>
+				<integer>102</integer>
+				<key>keyword</key>
+				<string>kube ctx</string>
+				<key>queuedelaycustom</key>
+				<integer>3</integer>
+				<key>queuedelayimmediatelyinitially</key>
+				<true/>
+				<key>queuedelaymode</key>
+				<integer>1</integer>
+				<key>queuemode</key>
+				<integer>1</integer>
+				<key>runningsubtext</key>
+				<string></string>
+				<key>script</key>
+				<string>./alfred-k8s context</string>
+				<key>scriptargtype</key>
+				<integer>1</integer>
+				<key>scriptfile</key>
+				<string></string>
+				<key>subtext</key>
+				<string></string>
+				<key>title</key>
+				<string>kube context</string>
+				<key>type</key>
+				<integer>5</integer>
+				<key>withspace</key>
+				<true/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.input.scriptfilter</string>
+			<key>uid</key>
+			<string>8AB15D23-A549-4BBD-929D-8AD74B6506D2</string>
 			<key>version</key>
 			<integer>3</integer>
 		</dict>
@@ -94,7 +186,73 @@
 			<key>type</key>
 			<string>alfred.workflow.output.clipboard</string>
 			<key>uid</key>
-			<string>3636C62A-AA3C-474E-8BB8-01949B6E1C56</string>
+			<string>B31FD45E-50C3-43A9-88A7-5C3FA4CD6390</string>
+			<key>version</key>
+			<integer>3</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>alfredfiltersresults</key>
+				<true/>
+				<key>alfredfiltersresultsmatchmode</key>
+				<integer>0</integer>
+				<key>argumenttreatemptyqueryasnil</key>
+				<false/>
+				<key>argumenttrimmode</key>
+				<integer>1</integer>
+				<key>argumenttype</key>
+				<integer>1</integer>
+				<key>escaping</key>
+				<integer>102</integer>
+				<key>keyword</key>
+				<string>kube ns</string>
+				<key>queuedelaycustom</key>
+				<integer>3</integer>
+				<key>queuedelayimmediatelyinitially</key>
+				<true/>
+				<key>queuedelaymode</key>
+				<integer>1</integer>
+				<key>queuemode</key>
+				<integer>1</integer>
+				<key>runningsubtext</key>
+				<string></string>
+				<key>script</key>
+				<string>./alfred-k8s namespace</string>
+				<key>scriptargtype</key>
+				<integer>1</integer>
+				<key>scriptfile</key>
+				<string></string>
+				<key>subtext</key>
+				<string></string>
+				<key>title</key>
+				<string>kube namespace</string>
+				<key>type</key>
+				<integer>5</integer>
+				<key>withspace</key>
+				<true/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.input.scriptfilter</string>
+			<key>uid</key>
+			<string>F61F1DD4-C140-44EF-B9E4-C447F5A12A76</string>
+			<key>version</key>
+			<integer>3</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>autopaste</key>
+				<false/>
+				<key>clipboardtext</key>
+				<string>{query}</string>
+				<key>transient</key>
+				<false/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.output.clipboard</string>
+			<key>uid</key>
+			<string>14547DC8-A05F-451A-B970-5FC5556FEAB6</string>
 			<key>version</key>
 			<integer>3</integer>
 		</dict>
@@ -103,19 +261,47 @@
 	<string></string>
 	<key>uidata</key>
 	<dict>
+		<key>14547DC8-A05F-451A-B970-5FC5556FEAB6</key>
+		<dict>
+			<key>xpos</key>
+			<integer>335</integer>
+			<key>ypos</key>
+			<integer>360</integer>
+		</dict>
 		<key>3636C62A-AA3C-474E-8BB8-01949B6E1C56</key>
 		<dict>
 			<key>xpos</key>
-			<integer>340</integer>
+			<integer>335</integer>
 			<key>ypos</key>
-			<integer>190</integer>
+			<integer>70</integer>
+		</dict>
+		<key>8AB15D23-A549-4BBD-929D-8AD74B6506D2</key>
+		<dict>
+			<key>xpos</key>
+			<integer>80</integer>
+			<key>ypos</key>
+			<integer>225</integer>
+		</dict>
+		<key>B31FD45E-50C3-43A9-88A7-5C3FA4CD6390</key>
+		<dict>
+			<key>xpos</key>
+			<integer>335</integer>
+			<key>ypos</key>
+			<integer>230</integer>
 		</dict>
 		<key>DD52ECA5-18F0-4E97-B560-0AD43B904DFF</key>
 		<dict>
 			<key>xpos</key>
+			<integer>75</integer>
+			<key>ypos</key>
+			<integer>70</integer>
+		</dict>
+		<key>F61F1DD4-C140-44EF-B9E4-C447F5A12A76</key>
+		<dict>
+			<key>xpos</key>
 			<integer>85</integer>
 			<key>ypos</key>
-			<integer>185</integer>
+			<integer>360</integer>
 		</dict>
 	</dict>
 	<key>webaddress</key>

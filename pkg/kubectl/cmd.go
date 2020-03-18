@@ -4,15 +4,12 @@ import (
 	"bufio"
 	"bytes"
 	"context"
-	"fmt"
 	"os"
 	"os/exec"
 	"time"
 
 	"github.com/mattn/go-shellwords"
 )
-
-var timeout = 10 * time.Second
 
 // CmdResponse is command execution response
 type CmdResponse struct {
@@ -22,50 +19,71 @@ type CmdResponse struct {
 	stderr   []byte
 }
 
-func generateKubectlCmd(arg string) string {
-	return fmt.Sprintf("%s %s", findKubeclt(), arg)
+// Kubectl configuration of kubectl command
+type Kubectl struct {
+	bin        string
+	pluginPath string
 }
 
-func findKubeclt() string {
-	// FIXME
-	return "/usr/local/bin/kubectl"
+// Option is the type to replace default parameters.
+type Option func(k *Kubectl) error
+
+// OptionBinary is configuration of kubectl absolute path
+func OptionBinary(bin string) Option {
+	return func(k *Kubectl) error {
+		if _, err := exec.LookPath(bin); err != nil {
+			return err
+		}
+		k.bin = bin
+		return nil
+	}
 }
 
-// Readline return stdout chan
-func (c *CmdResponse) Readline() <-chan string {
-	s := bytes.NewReader(c.stdout)
-	scanner := bufio.NewScanner(s)
-	var outStream = make(chan string)
+// OptionPluginPath is configuration of kubectl plugin path.
+// e.g.) authentication command path
+func OptionPluginPath(path string) Option {
+	return func(k *Kubectl) error {
+		k.pluginPath = path
+		return nil
+	}
+}
 
-	go func() {
-		defer close(outStream)
-		for scanner.Scan() {
-			outStream <- scanner.Text()
+// OptionNone noop
+func OptionNone() Option {
+	return func(k *Kubectl) error {
+		return nil
+	}
+}
+
+// New create kubectl instance
+func New(opts ...Option) *Kubectl {
+	k := &Kubectl{
+		bin:        "/usr/local/bin/kubectl",
+		pluginPath: "/usr/local/bin/",
+	}
+
+	for _, opt := range opts {
+		if err := opt(k); err != nil {
+			panic(err)
 		}
+	}
 
-		if err := scanner.Err(); err != nil {
-			outStream <- err.Error()
-		}
-	}()
-
-	return outStream
+	return k
 }
 
 // Execute run command
-func Execute(command string) *CmdResponse {
-	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+func (k *Kubectl) Execute(arg string) *CmdResponse {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	cmds, err := shellwords.Parse(command)
+	args, err := shellwords.Parse(arg)
 	if err != nil {
 		return &CmdResponse{}
 	}
 
 	var stdout, stderr bytes.Buffer
-	// FIXME check length of cmds[1:]
-	cmd := exec.CommandContext(ctx, cmds[0], cmds[1:]...)
+	cmd := exec.CommandContext(ctx, k.bin, args...)
 	cmd.Env = os.Environ()
-	// FIXME
-	cmd.Env = append(cmd.Env, "PATH=/usr/local/bin/")
+	cmd.Env = append(cmd.Env, "PATH="+k.pluginPath)
 	cmd.Stdout = &stdout
 	cmd.Stderr = &stderr
 
@@ -89,4 +107,24 @@ func Execute(command string) *CmdResponse {
 		stdout:   stdout.Bytes(),
 		stderr:   stderr.Bytes(),
 	}
+}
+
+// Readline return stdout chan
+func (c *CmdResponse) Readline() <-chan string {
+	s := bytes.NewReader(c.stdout)
+	scanner := bufio.NewScanner(s)
+	var outStream = make(chan string)
+
+	go func() {
+		defer close(outStream)
+		for scanner.Scan() {
+			outStream <- scanner.Text()
+		}
+
+		if err := scanner.Err(); err != nil {
+			outStream <- err.Error()
+		}
+	}()
+
+	return outStream
 }

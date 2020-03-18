@@ -1,13 +1,10 @@
 package cmd
 
 import (
-	"fmt"
 	"io"
 	"log"
 	"os"
 
-	"github.com/konoui/alfred-k8s/pkg/kubectl"
-	"github.com/konoui/go-alfred"
 	"github.com/spf13/cobra"
 )
 
@@ -26,40 +23,17 @@ func Execute(rootCmd *cobra.Command) {
 	}
 }
 
-// NewRootCmd create a new cmd for root
-func NewRootCmd() *cobra.Command {
-	rootCmd := &cobra.Command{
-		Use:   "alfred-k8s <query>",
-		Short: "operate k8s resources",
-		Args:  cobra.MinimumNArgs(0),
-		Run: func(cmd *cobra.Command, args []string) {
-			run()
-		},
-		SilenceUsage: true,
-	}
-
+// NewCmd create sub commands
+func NewCmd() *cobra.Command {
+	rootCmd := NewRootCmd()
+	rootCmd.AddCommand(NewPodCmd())
+	rootCmd.AddCommand(NewContextCmd())
+	rootCmd.AddCommand(NewNamespaceCmd())
 	return rootCmd
 }
 
-func run() {
-	awf := alfred.NewWorkflow()
-	// alfred script filter read from only stdout
-	awf.SetStreams(outStream, outStream)
-	awf.EmptyWarning("There are no resources", "No matching")
-	pods, err := kubectl.GetAllPods()
-	if err != nil {
-		awf.Fatal("fatal error occurs", err.Error())
-		return
-	}
-
-	for _, p := range pods {
-		awf.Append(&alfred.Item{
-			Title:        p.Name,
-			Subtitle:     fmt.Sprintf("ready [%s] status [%s] restarts [%s] ", p.Ready, p.Status, p.Restarts),
-			Autocomplete: p.Name,
-			Arg:          p.Name,
-		})
-	}
-
-	awf.Output()
+// NewRootCmd create a new cmd for root
+func NewRootCmd() *cobra.Command {
+	rootCmd := &cobra.Command{}
+	return rootCmd
 }

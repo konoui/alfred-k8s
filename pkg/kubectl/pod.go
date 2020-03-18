@@ -5,29 +5,30 @@ import (
 	"strings"
 )
 
-// Pod presents `kubectl get pod -o wide`
+// Pod is kubectl get pod information
 type Pod struct {
-	Name     string
-	Ready    string
-	Status   string
-	Restarts string
-	Age      string
-	Node     string
+	Namespace string
+	Name      string
+	Ready     string
+	Status    string
+	Restarts  string
+	Age       string
 }
 
 // GetPods return pods in specific namespace
-func GetPods(ns string) ([]*Pod, error) {
-	return getPods(fmt.Sprintf("--namespace=%s", ns))
+func (k *Kubectl) GetPods(ns string) ([]*Pod, error) {
+	return k.getPods(fmt.Sprintf("--namespace=%s", ns))
 }
 
 // GetAllPods return pods in all namespaces
-func GetAllPods() ([]*Pod, error) {
-	return getPods("--all-namespaces")
+func (k *Kubectl) GetAllPods() ([]*Pod, error) {
+	return k.getPods("--all-namespaces")
 }
 
-func getPods(ns string) ([]*Pod, error) {
-	cmd := generateKubectlCmd(fmt.Sprintf("get pod %s", ns))
-	resp := Execute(cmd)
+func (k *Kubectl) getPods(ns string) ([]*Pod, error) {
+	// Note: NAME READY STATUS RESTARTS AGE
+	// Note: NAMESPACE NAME READY STATUS RESTARTS AGE
+	resp := k.Execute(fmt.Sprintf("get pod %s", ns))
 	header := <-resp.Readline()
 	words := strings.Fields(header)
 
@@ -48,6 +49,9 @@ func getPods(ns string) ([]*Pod, error) {
 func generatePod(podInfo, headers []string) *Pod {
 	var pod Pod
 	for i := range podInfo {
+		if strings.EqualFold(headers[i], "NAMESPACE") {
+			pod.Namespace = podInfo[i]
+		}
 		if strings.EqualFold(headers[i], "NAME") {
 			pod.Name = podInfo[i]
 		}
