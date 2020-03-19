@@ -29,6 +29,8 @@ func NewCmd() *cobra.Command {
 	rootCmd.AddCommand(NewPodCmd())
 	rootCmd.AddCommand(NewContextCmd())
 	rootCmd.AddCommand(NewNamespaceCmd())
+	rootCmd.AddCommand(NewDeploymentCmd())
+	rootCmd.AddCommand(NewServiceCmd())
 	return rootCmd
 }
 
