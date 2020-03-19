@@ -17,9 +17,9 @@ type Pod struct {
 	Age       string
 }
 
-// GetPods return pods in specific namespace
-func (k *Kubectl) GetPods(ns string) ([]*Pod, error) {
-	return k.getPods(fmt.Sprintf("--namespace=%s", ns))
+// GetPods return pods in current namespace
+func (k *Kubectl) GetPods() ([]*Pod, error) {
+	return k.getPods("")
 }
 
 // GetAllPods return pods in all namespaces
