@@ -29,8 +29,12 @@ func listPods() {
 		return
 	}
 	for _, p := range pods {
+		title := p.Name
+		if p.Namespace != "" {
+			title = fmt.Sprintf("[%s] %s", p.Namespace, p.Name)
+		}
 		awf.Append(&alfred.Item{
-			Title:        p.Name,
+			Title:        title,
 			Subtitle:     fmt.Sprintf("ready [%s] status [%s] restarts [%s] ", p.Ready, p.Status, p.Restarts),
 			Autocomplete: p.Name,
 			Arg:          p.Name,

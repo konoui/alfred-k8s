@@ -3,6 +3,8 @@ package kubectl
 import (
 	"fmt"
 	"strings"
+
+	"github.com/pkg/errors"
 )
 
 // Pod is kubectl get pod information
@@ -43,7 +45,7 @@ func (k *Kubectl) getPods(ns string) ([]*Pod, error) {
 		pods = append(pods, pod)
 	}
 
-	return pods, resp.err
+	return pods, errors.Wrapf(resp.err, string(resp.stderr))
 }
 
 func generatePod(podInfo, headers []string) *Pod {

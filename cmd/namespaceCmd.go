@@ -14,22 +14,26 @@ func NewNamespaceCmd() *cobra.Command {
 		Use:   "ns",
 		Short: "list namespaces in current context",
 		Args:  cobra.MinimumNArgs(0),
-		RunE: func(cmd *cobra.Command, args []string) error {
+		Run: func(cmd *cobra.Command, args []string) {
 			if ns == "" {
 				listNamespaces()
-				return nil
+				return
 			}
-			return setNamespace(ns)
+			setNamespace(ns)
 		},
 		SilenceUsage: true,
 	}
-	cmd.PersistentFlags().StringVarP(&ns, "name", "n", "", "namespace name")
+	cmd.PersistentFlags().StringVarP(&ns, "name", "n", "", "namespace name to switch")
 
 	return cmd
 }
 
-func setNamespace(ns string) error {
-	return k.SetNamespace(ns)
+func setNamespace(ns string) {
+	if err := k.SetNamespace(ns); err != nil {
+		fmt.Fprintf(errStream, "Failed due to %s\n", err)
+		return
+	}
+	fmt.Fprintf(outStream, "Success!! switched %s namespace\n", ns)
 }
 
 func listNamespaces() {
@@ -48,6 +52,15 @@ func listNamespaces() {
 			Subtitle:     fmt.Sprintf("status [%s] age [%s]", ns.Status, ns.Age),
 			Autocomplete: ns.Name,
 			Arg:          ns.Name,
+			Mods: map[alfred.ModKey]alfred.Mod{
+				alfred.ModCtrl: alfred.Mod{
+					Subtitle: "switch to specific namespace",
+					Arg:      fmt.Sprintf("ns --name %s", ns.Name),
+					Variables: map[string]string{
+						nextActionKey: nextActionCmd,
+					},
+				},
+			},
 		})
 	}
 

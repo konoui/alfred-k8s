@@ -12,25 +12,28 @@ func NewContextCmd() *cobra.Command {
 	var context string
 	cmd := &cobra.Command{
 		Use:   "context",
-		Short: "list context",
+		Short: "list contexts",
 		Args:  cobra.MinimumNArgs(0),
-		RunE: func(cmd *cobra.Command, args []string) error {
+		Run: func(cmd *cobra.Command, args []string) {
 			if context == "" {
 				listContexts()
-				return nil
+				return
 			}
-			return setContext(context)
+			setContext(context)
 		},
 		SilenceUsage: true,
 	}
 
-	cmd.PersistentFlags().StringVarP(&context, "name", "n", "", "context name")
+	cmd.PersistentFlags().StringVarP(&context, "name", "n", "", "context name to switch")
 	return cmd
 }
 
-func setContext(context string) error {
-	return k.SetContext(context)
-
+func setContext(context string) {
+	if err := k.SetContext(context); err != nil {
+		fmt.Fprintf(errStream, "Failed due to %s\n", err)
+		return
+	}
+	fmt.Fprintln(outStream, "Success!! switched context")
 }
 
 func listContexts() {
@@ -48,6 +51,15 @@ func listContexts() {
 			Title:        title,
 			Autocomplete: c.Name,
 			Arg:          c.Name,
+			Mods: map[alfred.ModKey]alfred.Mod{
+				alfred.ModCtrl: alfred.Mod{
+					Subtitle: "switch to specific context",
+					Arg:      fmt.Sprintf("context --name %s", c.Name),
+					Variables: map[string]string{
+						nextActionKey: nextActionCmd,
+					},
+				},
+			},
 		})
 	}
 

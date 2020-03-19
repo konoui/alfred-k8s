@@ -10,6 +10,12 @@ import (
 var k *kubectl.Kubectl
 var awf *alfred.Workflow
 
+// decide next action for workflow filter
+const (
+	nextActionKey = "nextAction"
+	nextActionCmd = "cmd"
+)
+
 func init() {
 	awf = alfred.NewWorkflow()
 	// alfred script filter read from only stdout
