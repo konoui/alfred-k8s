@@ -1,14 +1,12 @@
 package kubectl
 
 import (
+	"context"
+	"fmt"
 	"strings"
-)
 
-// GetCurrentContext return current configuration
-func (k *Kubectl) GetCurrentContext() (string, error) {
-	resp := k.Execute("config current-context")
-	return <-resp.Readline(), resp.err
-}
+	"github.com/pkg/errors"
+)
 
 // Context is kubectl get-contexts information
 type Context struct {
@@ -28,7 +26,7 @@ func (k *Kubectl) GetContexts() ([]*Context, error) {
 		contexts = append(contexts, c)
 	}
 
-	return contexts, resp.err
+	return contexts, errors.Wrapf(resp.err, string(resp.stderr))
 }
 
 func generateContext(cInfo []string) *Context {
@@ -57,4 +55,19 @@ func generateContext(cInfo []string) *Context {
 		c.Namespace = cInfo[3]
 	}
 	return &c
+}
+
+// GetCurrentContext return current configuration
+func (k *Kubectl) GetCurrentContext() (string, error) {
+	resp := k.Execute("config current-context")
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	return <-resp.ReadlineContext(ctx), errors.Wrapf(resp.err, string(resp.stderr))
+}
+
+// SetContext configure context
+func (k *Kubectl) SetContext(c string) error {
+	arg := fmt.Sprintf("config use-context %s", c)
+	resp := k.Execute(arg)
+	return errors.Wrapf(resp.err, string(resp.stderr))
 }

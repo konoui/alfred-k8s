@@ -140,7 +140,7 @@
 				<key>escaping</key>
 				<integer>102</integer>
 				<key>keyword</key>
-				<string>kube ctx</string>
+				<string>kube context</string>
 				<key>queuedelaycustom</key>
 				<integer>3</integer>
 				<key>queuedelayimmediatelyinitially</key>
@@ -226,7 +226,7 @@
 				<key>subtext</key>
 				<string></string>
 				<key>title</key>
-				<string>kube namespace</string>
+				<string>kube ns</string>
 				<key>type</key>
 				<integer>5</integer>
 				<key>withspace</key>

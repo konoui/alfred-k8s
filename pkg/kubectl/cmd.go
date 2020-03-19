@@ -111,20 +111,33 @@ func (k *Kubectl) Execute(arg string) *CmdResponse {
 
 // Readline return stdout chan
 func (c *CmdResponse) Readline() <-chan string {
+	return c.ReadlineContext(context.Background())
+}
+
+// ReadlineContext return stdout chan
+func (c *CmdResponse) ReadlineContext(ctx context.Context) <-chan string {
 	s := bytes.NewReader(c.stdout)
 	scanner := bufio.NewScanner(s)
 	var outStream = make(chan string)
 
-	go func() {
+	go func(ctx context.Context) {
 		defer close(outStream)
 		for scanner.Scan() {
-			outStream <- scanner.Text()
+			select {
+			case outStream <- scanner.Text():
+			case <-ctx.Done():
+				return
+			}
 		}
 
 		if err := scanner.Err(); err != nil {
-			outStream <- err.Error()
+			select {
+			case outStream <- err.Error():
+			case <-ctx.Done():
+				return
+			}
 		}
-	}()
+	}(ctx)
 
 	return outStream
 }

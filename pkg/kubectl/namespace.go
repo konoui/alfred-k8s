@@ -3,6 +3,8 @@ package kubectl
 import (
 	"fmt"
 	"strings"
+
+	"github.com/pkg/errors"
 )
 
 // Namespace is kubectl get ns information
@@ -39,7 +41,7 @@ func (k *Kubectl) GetNamespaces() ([]*Namespace, error) {
 		namespaces = append(namespaces, &ns)
 	}
 
-	return namespaces, resp.err
+	return namespaces, errors.Wrapf(resp.err, string(resp.stderr))
 }
 
 // GetCurrentNamespace return current namespace name
@@ -63,9 +65,14 @@ func (k *Kubectl) GetCurrentNamespace() (string, error) {
 	return "", fmt.Errorf("found no namespace")
 }
 
-// SetNamespace configure namepsace
-func (k *Kubectl) SetNamespace(context, ns string) error {
+// SetNamespace configure namepsace in current context
+func (k *Kubectl) SetNamespace(ns string) error {
+	context, err := k.GetCurrentContext()
+	if err != nil {
+		return err
+	}
+
 	arg := fmt.Sprintf("config set-context %s --namespace=%s", context, ns)
 	resp := k.Execute(arg)
-	return resp.err
+	return errors.Wrapf(resp.err, string(resp.stderr))
 }
