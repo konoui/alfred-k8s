@@ -19,7 +19,7 @@ func NewContextCmd() *cobra.Command {
 				listContexts()
 				return
 			}
-			setContext(context)
+			useContext(context)
 		},
 		SilenceUsage: true,
 	}
@@ -28,8 +28,8 @@ func NewContextCmd() *cobra.Command {
 	return cmd
 }
 
-func setContext(context string) {
-	if err := k.SetContext(context); err != nil {
+func useContext(context string) {
+	if err := k.UseContext(context); err != nil {
 		fmt.Fprintf(errStream, "Failed due to %s\n", err)
 		return
 	}

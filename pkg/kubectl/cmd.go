@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"context"
+	"fmt"
 	"os"
 	"os/exec"
 	"time"
@@ -56,7 +57,7 @@ func OptionNone() Option {
 }
 
 // New create kubectl instance
-func New(opts ...Option) *Kubectl {
+func New(opts ...Option) (*Kubectl, error) {
 	k := &Kubectl{
 		bin:        "/usr/local/bin/kubectl",
 		pluginPath: "/usr/local/bin/",
@@ -64,11 +65,20 @@ func New(opts ...Option) *Kubectl {
 
 	for _, opt := range opts {
 		if err := opt(k); err != nil {
-			panic(err)
+			return nil, err
 		}
 	}
 
-	return k
+	return k, nil
+}
+
+func overridePathEnv(addPath string) {
+	path := os.Getenv("PATH")
+	if path == "" {
+		os.Setenv("PATH", addPath)
+		return
+	}
+	os.Setenv("PATH", fmt.Sprintf("%s:%s", addPath, path))
 }
 
 // Execute run command
@@ -82,8 +92,8 @@ func (k *Kubectl) Execute(arg string) *CmdResponse {
 
 	var stdout, stderr bytes.Buffer
 	cmd := exec.CommandContext(ctx, k.bin, args...)
+	overridePathEnv(k.pluginPath)
 	cmd.Env = os.Environ()
-	cmd.Env = append(cmd.Env, "PATH="+k.pluginPath)
 	cmd.Stdout = &stdout
 	cmd.Stderr = &stderr
 

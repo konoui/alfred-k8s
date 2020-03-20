@@ -19,7 +19,7 @@ func NewNamespaceCmd() *cobra.Command {
 				listNamespaces()
 				return
 			}
-			setNamespace(ns)
+			useNamespace(ns)
 		},
 		SilenceUsage: true,
 	}
@@ -28,8 +28,8 @@ func NewNamespaceCmd() *cobra.Command {
 	return cmd
 }
 
-func setNamespace(ns string) {
-	if err := k.SetNamespace(ns); err != nil {
+func useNamespace(ns string) {
+	if err := k.UseNamespace(ns); err != nil {
 		fmt.Fprintf(errStream, "Failed due to %s\n", err)
 		return
 	}

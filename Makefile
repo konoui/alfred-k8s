@@ -34,13 +34,16 @@ darwin:
 test:
 	go test -v ./...
 
+preinstall:
+	cp ./*.tpl ./${ASSETS_DIR}/
+
 ## Install Binary and Assets to Workflow Directory
-install: build
+install: build preinstall
 	@(cp ${BINARY} ${WORKFLOW_DIR}/)
 	@(cp ${ASSETS_DIR}/*  ${WORKFLOW_DIR}/)
 
 ## GitHub Release and uploads artifacts
-release: darwin
+release: darwin preinstall
 	@(if ! type ghr >/dev/null 2>&1; then go get -u github.com/tcnksm/ghr ;fi)
 	@(if [ ! -e ${ARTIFACT_DIR} ]; then mkdir ${ARTIFACT_DIR} ; fi)
 	@(cp ${BINARY} ${ARTIFACT_DIR})

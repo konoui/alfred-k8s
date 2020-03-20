@@ -1,6 +1,6 @@
 module github.com/konoui/alfred-k8s
 
-go 1.13
+go 1.14
 
 require (
 	github.com/konoui/go-alfred v0.0.0-20200317124537-9070ed816207

@@ -23,11 +23,7 @@ func init() {
 	awf.EmptyWarning("There are no resources", "No matching")
 
 	c, err := newConfig()
-	if err != nil {
-		awf.Fatal("fatal error occurs", err.Error())
-		awf.Output()
-		os.Exit(255)
-	}
+	checkWithExit(err)
 
 	binOpt, pluginPathOpt := kubectl.OptionNone(), kubectl.OptionNone()
 	if c.kubectl.bin != "" {
@@ -37,5 +33,16 @@ func init() {
 		pluginPathOpt = kubectl.OptionPluginPath(c.kubectl.pluginPath)
 	}
 
-	k = kubectl.New(binOpt, pluginPathOpt)
+	k, err = kubectl.New(binOpt, pluginPathOpt)
+	if err != nil {
+		checkWithExit(err)
+	}
+}
+
+func checkWithExit(err error) {
+	if err != nil {
+		awf.Fatal("fatal error occurs", err.Error())
+		awf.Output()
+		os.Exit(255)
+	}
 }

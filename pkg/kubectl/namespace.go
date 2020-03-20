@@ -17,14 +17,15 @@ type Namespace struct {
 
 // GetNamespaces return namespaces in current context
 func (k *Kubectl) GetNamespaces() ([]*Namespace, error) {
+	// Note: NAME STATUS AGE
+	arg := fmt.Sprintf("get namespace --no-headers")
+	resp := k.Execute(arg)
+
 	current, err := k.GetCurrentNamespace()
 	if err != nil {
 		return nil, err
 	}
 
-	// Note: NAME STATUS AGE
-	arg := fmt.Sprintf("get namespace --no-headers")
-	resp := k.Execute(arg)
 	var namespaces []*Namespace
 	for line := range resp.Readline() {
 		nsInfo := strings.Fields(line)
@@ -46,27 +47,23 @@ func (k *Kubectl) GetNamespaces() ([]*Namespace, error) {
 
 // GetCurrentNamespace return current namespace name
 func (k *Kubectl) GetCurrentNamespace() (string, error) {
-	current, err := k.GetCurrentContext()
-	if err != nil {
-		return "", err
-	}
-
 	contexts, err := k.GetContexts()
 	if err != nil {
 		return "", err
 	}
 
 	for _, c := range contexts {
-		if c.Name == current {
+		if c.Current {
 			return c.Namespace, nil
 		}
 	}
 
-	return "", fmt.Errorf("found no namespace")
+	// namespace will be empty if namespace does not set in kubeconfig
+	return "", nil
 }
 
-// SetNamespace configure namepsace in current context
-func (k *Kubectl) SetNamespace(ns string) error {
+// UseNamespace configure namepsace in current context
+func (k *Kubectl) UseNamespace(ns string) error {
 	context, err := k.GetCurrentContext()
 	if err != nil {
 		return err
