@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/konoui/alfred-k8s/pkg/executor"
 	"go.uber.org/goleak"
 )
 
@@ -13,41 +14,17 @@ const (
 	knownBinPath = "/bin"
 )
 
-func TestNewKubectl(t *testing.T) {
-	tests := []struct {
-		name      string
-		options   []Option
-		want      *Kubectl
-		expectErr bool
-	}{
-		{
-			name: "default value",
-			want: &Kubectl{
-				bin:        "/usr/local/bin/kubectl",
-				pluginPath: "/usr/local/bin/",
-			},
-		},
-		{
-			name: "options value",
-			options: []Option{
-				OptionBinary(knownBinary),
-				OptionPluginPath(knownBinPath),
-			},
-			want: &Kubectl{
-				bin:        knownBinary,
-				pluginPath: knownBinPath,
-			},
-			// TODO unexptected bin path case.
-		},
+// OptionExecutor is configuration of kubectl execution function for test
+// If this option is set, OptionBinary must not set.
+func OptionExecutor(e executor.Executor) Option {
+	return func(k *Kubectl) error {
+		k.cmd = e
+		return nil
 	}
+}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if _, err := New(tt.options...); err != nil {
-				t.Error(err)
-			}
-		})
-	}
+func TestExec(t *testing.T) {
+
 }
 
 func TestExecute(t *testing.T) {
@@ -97,12 +74,12 @@ func TestExecute(t *testing.T) {
 func TestReadLineContext(t *testing.T) {
 	tests := []struct {
 		name      string
-		cmdResp   *CmdResponse
+		cmdResp   *Response
 		expectErr bool
 	}{
 		{
 			name: "multi lines",
-			cmdResp: &CmdResponse{
+			cmdResp: &Response{
 				stdout:   []byte(fmt.Sprintln("stdout\nstdout\nstdout")),
 				err:      nil,
 				exitCode: 0,
@@ -110,8 +87,8 @@ func TestReadLineContext(t *testing.T) {
 		},
 		{
 			name: "one line",
-			cmdResp: &CmdResponse{
-				stdout:   []byte(fmt.Sprintf("stdout")),
+			cmdResp: &Response{
+				stdout:   []byte("stdout"),
 				err:      nil,
 				exitCode: 0,
 			},
@@ -119,7 +96,7 @@ func TestReadLineContext(t *testing.T) {
 		{
 			name:      "no stdout",
 			expectErr: true,
-			cmdResp:   &CmdResponse{},
+			cmdResp:   &Response{},
 		},
 	}
 
@@ -140,13 +117,13 @@ func TestReadLineContext(t *testing.T) {
 func TestReadLine(t *testing.T) {
 	tests := []struct {
 		name      string
-		cmdResp   *CmdResponse
+		cmdResp   *Response
 		expectErr bool
 	}{
 		{
 			name: "one line",
-			cmdResp: &CmdResponse{
-				stdout:   []byte(fmt.Sprintf("stdout")),
+			cmdResp: &Response{
+				stdout:   []byte("stdout\n"),
 				err:      nil,
 				exitCode: 0,
 			},

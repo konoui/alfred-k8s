@@ -33,8 +33,8 @@ func (k *Kubectl) GetContexts() ([]*Context, error) {
 
 	var contexts []*Context
 	for line := range resp.Readline() {
-		cInfo := strings.Fields(strings.Replace(line, noValue, dummyValue, -1))
-		c := generateContext(cInfo, current)
+		rawData := strings.Fields(strings.Replace(line, noValue, dummyValue, -1))
+		c := generateContext(rawData, current)
 		contexts = append(contexts, c)
 	}
 
