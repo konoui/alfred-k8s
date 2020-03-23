@@ -8,33 +8,15 @@ import (
 	"github.com/konoui/alfred-k8s/pkg/executor"
 )
 
-type fakeNamespaceExecutor struct {
-	namespaces      *executor.Response
-	namespacesErr   error
-	contextExecutor executor.Executor
-}
-
-func (e *fakeNamespaceExecutor) Exec(args ...string) (*executor.Response, error) {
-	if len(args) >= 2 {
-		if args[1] == "namespace" {
-			return e.namespaces, e.namespacesErr
-		}
-		// Note: get current namespace  and namespaces call context function
-		return e.contextExecutor.Exec(args...)
-
-	}
-	return nil, fmt.Errorf("match no command args")
-}
-
-const (
-	testCurrentNamespace = "test3-namespace"
-	testNamespaceInputs  = `test1-namepsace	Active	11d
-	test2-namepsace	Active	11d
-	test3-namespace	Active	11d
-	default	Active	11d`
+var (
+	testCurrentNamespace  = "test3-namespace"
+	testNamespacesRawData = `test1-namepsace	Active	11d
+test2-namepsace	Active	11d
+test3-namespace	Active	11d
+default	Active	11d`
 )
 
-var testNamespaceOutputs = []*Namespace{
+var testNamespaces = []*Namespace{
 	&Namespace{
 		Name:   "test1-namepsace",
 		Status: "Active",
@@ -58,11 +40,17 @@ var testNamespaceOutputs = []*Namespace{
 	},
 }
 
-var testNamespaceExecutor = &fakeNamespaceExecutor{
-	namespaces: &executor.Response{
-		Stdout: []byte(testNamespaceInputs),
-	},
-	contextExecutor: testContextExecutor,
+var FakeNamespaceFunc = func(args ...string) (*executor.Response, error) {
+	if len(args) >= 2 {
+		if args[1] == "namespace" {
+			return &executor.Response{
+				Stdout: []byte(testNamespacesRawData),
+			}, nil
+		}
+		// Note: get current namespace and namespaces call context function
+		return FakeContextFunc(args...)
+	}
+	return nil, fmt.Errorf("match no command args")
 }
 
 func TestGetCurrentNamespace(t *testing.T) {
@@ -73,14 +61,14 @@ func TestGetCurrentNamespace(t *testing.T) {
 	}{
 		{
 			name:         "get current namespace",
-			fakeExecutor: testContextExecutor,
+			fakeExecutor: NewFakeExecutor(FakeNamespaceFunc),
 			want:         testCurrentNamespace,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			k := testSetupKubectl(t, tt.fakeExecutor)
+			k := SetupKubectl(t, tt.fakeExecutor)
 			got, err := k.GetCurrentNamespace()
 			if err != nil {
 				t.Fatal(err)
@@ -101,14 +89,14 @@ func TestGetNamespaces(t *testing.T) {
 	}{
 		{
 			name:         "list namespaces",
-			fakeExecutor: testNamespaceExecutor,
-			want:         testNamespaceOutputs,
+			fakeExecutor: NewFakeExecutor(FakeNamespaceFunc),
+			want:         testNamespaces,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			k := testSetupKubectl(t, tt.fakeExecutor)
+			k := SetupKubectl(t, tt.fakeExecutor)
 			got, err := k.GetNamespaces()
 			if err != nil {
 				t.Fatal(err)

@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/konoui/alfred-k8s/pkg/executor"
 	"go.uber.org/goleak"
 )
 
@@ -13,15 +12,6 @@ const (
 	knownBinary  = "/bin/ls"
 	knownBinPath = "/bin"
 )
-
-// OptionExecutor is configuration of kubectl execution function for test
-// If this option is set, OptionBinary must not set.
-func OptionExecutor(e executor.Executor) Option {
-	return func(k *Kubectl) error {
-		k.cmd = e
-		return nil
-	}
-}
 
 func TestExec(t *testing.T) {
 

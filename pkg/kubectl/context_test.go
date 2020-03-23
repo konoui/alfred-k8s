@@ -8,33 +8,14 @@ import (
 	"github.com/konoui/alfred-k8s/pkg/executor"
 )
 
-type fakeContextExecutor struct {
-	current     *executor.Response
-	currentErr  error
-	contexts    *executor.Response
-	contextsErr error
-}
-
-func (e *fakeContextExecutor) Exec(args ...string) (*executor.Response, error) {
-	if len(args) >= 2 {
-		if args[1] == "current-context" {
-			return e.current, e.currentErr
-		}
-		if args[1] == "view" {
-			return e.contexts, e.contextsErr
-		}
-	}
-	return nil, fmt.Errorf("match no command args")
-}
-
-const (
-	testCurrentContext = "test3-name"
-	testContextInputs  = `*	test1-name  test1-cluster   test1-authinfo	<no value>
+var (
+	testCurrentContext  = "test3-name"
+	testContextsRawData = `*	test1-name  test1-cluster   test1-authinfo	<no value>
 *	test2-name  test2-cluster   test2-authinfo	<no value>
 *	test3-name  test3-cluster   test3-authinfo  test3-namespace`
 )
 
-var testContextOutputs = []*Context{
+var testContexts = []*Context{
 	&Context{
 		Name:      "test1-name",
 		Namespace: "",
@@ -50,22 +31,20 @@ var testContextOutputs = []*Context{
 	},
 }
 
-var testContextExecutor = &fakeContextExecutor{
-	current: &executor.Response{
-		Stdout: []byte(testCurrentContext),
-	},
-	contexts: &executor.Response{
-		Stdout: []byte(testContextInputs),
-	},
-}
-
-func testSetupKubectl(t *testing.T, fake executor.Executor) *Kubectl {
-	t.Helper()
-	k, err := New(OptionExecutor(fake))
-	if err != nil {
-		t.Fatal(err)
+var FakeContextFunc = func(args ...string) (*executor.Response, error) {
+	if len(args) >= 2 {
+		if args[1] == "current-context" {
+			return &executor.Response{
+				Stdout: []byte(testCurrentContext),
+			}, nil
+		}
+		if args[1] == "view" {
+			return &executor.Response{
+				Stdout: []byte(testContextsRawData),
+			}, nil
+		}
 	}
-	return k
+	return nil, fmt.Errorf("match no command args")
 }
 
 func TestGetCurrentContext(t *testing.T) {
@@ -76,15 +55,14 @@ func TestGetCurrentContext(t *testing.T) {
 	}{
 		{
 			name:         "get current context",
-			fakeExecutor: testContextExecutor,
+			fakeExecutor: NewFakeExecutor(FakeContextFunc),
 			want:         testCurrentContext,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			k := testSetupKubectl(t, tt.fakeExecutor)
-
+			k := SetupKubectl(t, tt.fakeExecutor)
 			got, err := k.GetCurrentContext()
 			if err != nil {
 				t.Fatal(err)
@@ -99,21 +77,20 @@ func TestGetCurrentContext(t *testing.T) {
 
 func TestGetContexts(t *testing.T) {
 	tests := []struct {
-		name                string
-		fakeContextExecutor executor.Executor
-		want                []*Context
+		name         string
+		fakeExecutor executor.Executor
+		want         []*Context
 	}{
 		{
-			name:                "view contexts",
-			fakeContextExecutor: testContextExecutor,
-			want:                testContextOutputs,
+			name:         "view contexts",
+			fakeExecutor: NewFakeExecutor(FakeContextFunc),
+			want:         testContexts,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			k := testSetupKubectl(t, tt.fakeContextExecutor)
-
+			k := SetupKubectl(t, tt.fakeExecutor)
 			got, err := k.GetContexts()
 			if err != nil {
 				t.Fatal(err)
