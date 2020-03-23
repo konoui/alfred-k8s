@@ -36,8 +36,8 @@ func (k *Kubectl) getPods(ns string) ([]*Pod, error) {
 
 	var pods []*Pod
 	for line := range resp.Readline() {
-		podInfo := strings.Fields(line)
-		pod := generatePod(podInfo, words)
+		rawData := strings.Fields(line)
+		pod := generatePod(rawData, words)
 		// FIXME I don't understand why read repeated header from for-range.
 		if pod.Name == "NAME" {
 			continue
@@ -48,26 +48,26 @@ func (k *Kubectl) getPods(ns string) ([]*Pod, error) {
 	return pods, errors.Wrapf(resp.err, string(resp.stderr))
 }
 
-func generatePod(podInfo, headers []string) *Pod {
+func generatePod(rawData, headers []string) *Pod {
 	var pod Pod
-	for i := range podInfo {
+	for i := range rawData {
 		if strings.EqualFold(headers[i], "NAMESPACE") {
-			pod.Namespace = podInfo[i]
+			pod.Namespace = rawData[i]
 		}
 		if strings.EqualFold(headers[i], "NAME") {
-			pod.Name = podInfo[i]
+			pod.Name = rawData[i]
 		}
 		if strings.EqualFold(headers[i], "READY") {
-			pod.Ready = podInfo[i]
+			pod.Ready = rawData[i]
 		}
 		if strings.EqualFold(headers[i], "STATUS") {
-			pod.Status = podInfo[i]
+			pod.Status = rawData[i]
 		}
 		if strings.EqualFold(headers[i], "RESTARTS") {
-			pod.Restarts = podInfo[i]
+			pod.Restarts = rawData[i]
 		}
 		if strings.EqualFold(headers[i], "AGE") {
-			pod.Age = podInfo[i]
+			pod.Age = rawData[i]
 		}
 	}
 

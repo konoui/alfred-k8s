@@ -35,38 +35,38 @@ func (k *Kubectl) getServices(ns string) ([]*Service, error) {
 	resp := k.Execute(arg)
 	var svcs []*Service
 	for line := range resp.Readline() {
-		sInfo := strings.Fields(line)
-		svc := generateService(sInfo)
+		rawData := strings.Fields(line)
+		svc := generateService(rawData)
 		svcs = append(svcs, svc)
 	}
 
 	return svcs, errors.Wrapf(resp.err, string(resp.stderr))
 }
 
-func generateService(sInfo []string) *Service {
-	if len(sInfo) == 6 {
+func generateService(rawData []string) *Service {
+	if len(rawData) == 6 {
 		return &Service{
-			Name:       sInfo[0],
-			Type:       sInfo[1],
-			ClusterIP:  sInfo[2],
-			ExternalIP: sInfo[3],
-			Ports:      sInfo[4],
-			Age:        sInfo[5],
+			Name:       rawData[0],
+			Type:       rawData[1],
+			ClusterIP:  rawData[2],
+			ExternalIP: rawData[3],
+			Ports:      rawData[4],
+			Age:        rawData[5],
 		}
 	}
 
-	if len(sInfo) == 7 {
+	if len(rawData) == 7 {
 		return &Service{
-			Namespace:  sInfo[0],
-			Name:       sInfo[1],
-			Type:       sInfo[2],
-			ClusterIP:  sInfo[3],
-			ExternalIP: sInfo[4],
-			Ports:      sInfo[5],
-			Age:        sInfo[6],
+			Namespace:  rawData[0],
+			Name:       rawData[1],
+			Type:       rawData[2],
+			ClusterIP:  rawData[3],
+			ExternalIP: rawData[4],
+			Ports:      rawData[5],
+			Age:        rawData[6],
 		}
 	}
 
-	msg := fmt.Sprintf("we assume that service information have 6 or 7 elements. but got %d elements", len(sInfo))
+	msg := fmt.Sprintf("we assume that service information have 6 or 7 elements. but got %d elements", len(rawData))
 	panic(msg)
 }

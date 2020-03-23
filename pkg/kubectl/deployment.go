@@ -34,36 +34,36 @@ func (k *Kubectl) getDeployments(ns string) ([]*Deployment, error) {
 	resp := k.Execute(arg)
 	var deps []*Deployment
 	for line := range resp.Readline() {
-		dInfo := strings.Fields(line)
-		dep := generateDeployment(dInfo)
+		rawData := strings.Fields(line)
+		dep := generateDeployment(rawData)
 		deps = append(deps, dep)
 	}
 
 	return deps, errors.Wrapf(resp.err, string(resp.stderr))
 }
 
-func generateDeployment(dInfo []string) *Deployment {
-	if len(dInfo) == 5 {
+func generateDeployment(rawData []string) *Deployment {
+	if len(rawData) == 5 {
 		return &Deployment{
-			Name:      dInfo[0],
-			Ready:     dInfo[1],
-			UpToDate:  dInfo[2],
-			Available: dInfo[3],
-			Age:       dInfo[4],
+			Name:      rawData[0],
+			Ready:     rawData[1],
+			UpToDate:  rawData[2],
+			Available: rawData[3],
+			Age:       rawData[4],
 		}
 	}
 
-	if len(dInfo) == 6 {
+	if len(rawData) == 6 {
 		return &Deployment{
-			Namespace: dInfo[0],
-			Name:      dInfo[1],
-			Ready:     dInfo[2],
-			UpToDate:  dInfo[3],
-			Available: dInfo[4],
-			Age:       dInfo[5],
+			Namespace: rawData[0],
+			Name:      rawData[1],
+			Ready:     rawData[2],
+			UpToDate:  rawData[3],
+			Available: rawData[4],
+			Age:       rawData[5],
 		}
 	}
 
-	msg := fmt.Sprintf("we assume that deployment information have 5 or 6 elements. but got %d elements", len(dInfo))
+	msg := fmt.Sprintf("we assume that deployment information have 5 or 6 elements. but got %d elements", len(rawData))
 	panic(msg)
 }

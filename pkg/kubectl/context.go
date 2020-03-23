@@ -41,22 +41,22 @@ func (k *Kubectl) GetContexts() ([]*Context, error) {
 	return contexts, errors.Wrapf(resp.err, string(resp.stderr))
 }
 
-func generateContext(info []string, current string) *Context {
-	if len(info) != 5 {
-		msg := fmt.Sprintf("we assume that context information have 5 elements. but got %d. values: %v", len(info), info)
+func generateContext(rawData []string, current string) *Context {
+	if len(rawData) != 5 {
+		msg := fmt.Sprintf("we assume that context information have 5 elements. but got %d. values: %v", len(rawData), rawData)
 		panic(msg)
 	}
 
-	for i := range info {
-		if info[i] == dummyValue {
-			info[i] = ""
+	for i := range rawData {
+		if rawData[i] == dummyValue {
+			rawData[i] = ""
 		}
 	}
 
 	c := Context{
 		Current:   false,
-		Name:      info[1],
-		Namespace: info[4],
+		Name:      rawData[1],
+		Namespace: rawData[4],
 	}
 	if c.Name == current {
 		c.Current = true

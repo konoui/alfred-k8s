@@ -28,14 +28,14 @@ func (k *Kubectl) GetNamespaces() ([]*Namespace, error) {
 
 	var namespaces []*Namespace
 	for line := range resp.Readline() {
-		nsInfo := strings.Fields(line)
+		rawData := strings.Fields(line)
 		ns := Namespace{
-			Name:   nsInfo[0],
-			Status: nsInfo[1],
-			Age:    nsInfo[2],
+			Name:   rawData[0],
+			Status: rawData[1],
+			Age:    rawData[2],
 		}
 
-		if nsInfo[0] == current {
+		if rawData[0] == current {
 			ns.Current = true
 		}
 

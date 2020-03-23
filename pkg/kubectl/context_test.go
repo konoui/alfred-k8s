@@ -138,13 +138,13 @@ func TestGetContexts(t *testing.T) {
 func TestGenerateContext(t *testing.T) {
 	tests := []struct {
 		name           string
-		contextInfo    []string
+		rawData        []string
 		currentContext string
 		want           *Context
 	}{
 		{
 			name:           "generate current context",
-			contextInfo:    []string{"CURRENT", "NAME", "CLUSTER", "AUTHINFO", "NAMESPACE"},
+			rawData:        []string{"CURRENT", "NAME", "CLUSTER", "AUTHINFO", "NAMESPACE"},
 			currentContext: "NAME",
 			want: &Context{
 				Current:   true,
@@ -154,7 +154,7 @@ func TestGenerateContext(t *testing.T) {
 		},
 		{
 			name:           "generate not current context",
-			contextInfo:    []string{"CURRENT", "NAME", "CLUSTER", "AUTHINFO", "NAMESPACE"},
+			rawData:        []string{"CURRENT", "NAME", "CLUSTER", "AUTHINFO", "NAMESPACE"},
 			currentContext: "NOT CURRENT CONTEXT",
 			want: &Context{
 				Current:   false,
@@ -166,7 +166,7 @@ func TestGenerateContext(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := generateContext(tt.contextInfo, tt.currentContext)
+			got := generateContext(tt.rawData, tt.currentContext)
 			if diff := cmp.Diff(got, tt.want); diff != "" {
 				t.Errorf("+want -got\n%+v", diff)
 			}
