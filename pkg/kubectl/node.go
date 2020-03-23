@@ -29,7 +29,6 @@ func (k *Kubectl) GetNodes() ([]*Node, error) {
 			Age:     rawData[3],
 			Version: rawData[4],
 		}
-
 		nodes = append(nodes, n)
 	}
 

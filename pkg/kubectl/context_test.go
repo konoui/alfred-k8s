@@ -8,15 +8,6 @@ import (
 	"github.com/konoui/alfred-k8s/pkg/executor"
 )
 
-// type fakeExecutor struct {
-// 	response *executor.Response
-// 	err      error
-// }
-
-// func (e *fakeExecutor) Exec(args ...string) (*executor.Response, error) {
-// 	return e.response, e.err
-// }
-
 type fakeContextExecutor struct {
 	current     *executor.Response
 	currentErr  error
