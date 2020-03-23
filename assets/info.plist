@@ -34,11 +34,37 @@
 				<false/>
 			</dict>
 		</array>
+		<key>195E1B07-A993-4904-8F57-A8FB8B35607C</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>B31FD45E-50C3-43A9-88A7-5C3FA4CD6390</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
 		<key>45B26143-DA66-43B9-9F8C-F803CD49108E</key>
 		<array>
 			<dict>
 				<key>destinationuid</key>
 				<string>18180AFE-8CC9-4842-92E9-6A4299BAD61D</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
+		<key>4AA9105C-7A69-49D5-B613-B75651E8B98D</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>B31FD45E-50C3-43A9-88A7-5C3FA4CD6390</string>
 				<key>modifiers</key>
 				<integer>0</integer>
 				<key>modifiersubtext</key>
@@ -123,6 +149,19 @@
 			</dict>
 		</array>
 		<key>E9326CE5-0512-4DDA-A5C4-3CDB99A44CFF</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>B31FD45E-50C3-43A9-88A7-5C3FA4CD6390</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
+		<key>EE22E5EB-FEF9-4ADB-BA83-7A631C1137F2</key>
 		<array>
 			<dict>
 				<key>destinationuid</key>
@@ -705,6 +744,104 @@
 				<key>escaping</key>
 				<integer>102</integer>
 				<key>keyword</key>
+				<string>kube ingress</string>
+				<key>queuedelaycustom</key>
+				<integer>3</integer>
+				<key>queuedelayimmediatelyinitially</key>
+				<true/>
+				<key>queuedelaymode</key>
+				<integer>1</integer>
+				<key>queuemode</key>
+				<integer>1</integer>
+				<key>runningsubtext</key>
+				<string></string>
+				<key>script</key>
+				<string>./alfred-k8s ingress</string>
+				<key>scriptargtype</key>
+				<integer>1</integer>
+				<key>scriptfile</key>
+				<string></string>
+				<key>subtext</key>
+				<string></string>
+				<key>title</key>
+				<string>kube ingress</string>
+				<key>type</key>
+				<integer>5</integer>
+				<key>withspace</key>
+				<true/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.input.scriptfilter</string>
+			<key>uid</key>
+			<string>4AA9105C-7A69-49D5-B613-B75651E8B98D</string>
+			<key>version</key>
+			<integer>3</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>alfredfiltersresults</key>
+				<true/>
+				<key>alfredfiltersresultsmatchmode</key>
+				<integer>0</integer>
+				<key>argumenttreatemptyqueryasnil</key>
+				<false/>
+				<key>argumenttrimmode</key>
+				<integer>1</integer>
+				<key>argumenttype</key>
+				<integer>1</integer>
+				<key>escaping</key>
+				<integer>102</integer>
+				<key>keyword</key>
+				<string>kube ingressa</string>
+				<key>queuedelaycustom</key>
+				<integer>3</integer>
+				<key>queuedelayimmediatelyinitially</key>
+				<true/>
+				<key>queuedelaymode</key>
+				<integer>1</integer>
+				<key>queuemode</key>
+				<integer>1</integer>
+				<key>runningsubtext</key>
+				<string></string>
+				<key>script</key>
+				<string>./alfred-k8s ingress --all</string>
+				<key>scriptargtype</key>
+				<integer>1</integer>
+				<key>scriptfile</key>
+				<string></string>
+				<key>subtext</key>
+				<string></string>
+				<key>title</key>
+				<string>kube ingressa</string>
+				<key>type</key>
+				<integer>5</integer>
+				<key>withspace</key>
+				<true/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.input.scriptfilter</string>
+			<key>uid</key>
+			<string>EE22E5EB-FEF9-4ADB-BA83-7A631C1137F2</string>
+			<key>version</key>
+			<integer>3</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>alfredfiltersresults</key>
+				<true/>
+				<key>alfredfiltersresultsmatchmode</key>
+				<integer>0</integer>
+				<key>argumenttreatemptyqueryasnil</key>
+				<false/>
+				<key>argumenttrimmode</key>
+				<integer>1</integer>
+				<key>argumenttype</key>
+				<integer>1</integer>
+				<key>escaping</key>
+				<integer>102</integer>
+				<key>keyword</key>
 				<string>kube node</string>
 				<key>queuedelaycustom</key>
 				<integer>3</integer>
@@ -771,6 +908,13 @@
 			<key>ypos</key>
 			<integer>615</integer>
 		</dict>
+		<key>4AA9105C-7A69-49D5-B613-B75651E8B98D</key>
+		<dict>
+			<key>xpos</key>
+			<integer>85</integer>
+			<key>ypos</key>
+			<integer>670</integer>
+		</dict>
 		<key>5CD0AE96-5658-45D2-8619-02CE4583707A</key>
 		<dict>
 			<key>xpos</key>
@@ -795,9 +939,9 @@
 		<key>8BCE0EFE-635E-4952-B48D-046636EF0A90</key>
 		<dict>
 			<key>xpos</key>
-			<integer>85</integer>
+			<integer>80</integer>
 			<key>ypos</key>
-			<integer>675</integer>
+			<integer>920</integer>
 		</dict>
 		<key>B31FD45E-50C3-43A9-88A7-5C3FA4CD6390</key>
 		<dict>
@@ -833,6 +977,13 @@
 			<integer>80</integer>
 			<key>ypos</key>
 			<integer>230</integer>
+		</dict>
+		<key>EE22E5EB-FEF9-4ADB-BA83-7A631C1137F2</key>
+		<dict>
+			<key>xpos</key>
+			<integer>85</integer>
+			<key>ypos</key>
+			<integer>770</integer>
 		</dict>
 		<key>F61F1DD4-C140-44EF-B9E4-C447F5A12A76</key>
 		<dict>

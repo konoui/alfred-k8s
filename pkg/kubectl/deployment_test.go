@@ -57,7 +57,8 @@ var FakeDeploymentFunc = func(args ...string) (*executor.Response, error) {
 				Stdout: []byte(testAllDeploymentsRawData),
 			}, nil
 		}
-	} else if len(args) >= 2 {
+	}
+	if len(args) >= 2 {
 		if args[1] == "deployment" {
 			return &executor.Response{
 				Stdout: []byte(testDeploymentsRawData),

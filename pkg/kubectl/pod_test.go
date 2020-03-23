@@ -61,7 +61,8 @@ var FakePodFunc = func(args ...string) (*executor.Response, error) {
 				Stdout: []byte(testAllPodsRawData),
 			}, nil
 		}
-	} else if len(args) >= 2 {
+	}
+	if len(args) >= 2 {
 		if args[1] == "pod" {
 			return &executor.Response{
 				Stdout: []byte(testPodsRawData),

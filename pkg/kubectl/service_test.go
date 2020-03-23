@@ -62,7 +62,8 @@ var FakeServiceFunc = func(args ...string) (*executor.Response, error) {
 				Stdout: []byte(testAllServicesRawData),
 			}, nil
 		}
-	} else if len(args) >= 2 {
+	}
+	if len(args) >= 2 {
 		if args[1] == "service" {
 			return &executor.Response{
 				Stdout: []byte(testServicesRawData),
