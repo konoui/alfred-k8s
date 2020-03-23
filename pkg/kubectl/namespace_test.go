@@ -50,7 +50,7 @@ var FakeNamespaceFunc = func(args ...string) (*executor.Response, error) {
 		// Note: get current namespace and namespaces call context function
 		return FakeContextFunc(args...)
 	}
-	return nil, fmt.Errorf("match no command args")
+	return &executor.Response{}, fmt.Errorf("match no command args")
 }
 
 func TestGetCurrentNamespace(t *testing.T) {

@@ -25,13 +25,13 @@ func (k *Kubectl) GetServices() ([]*Service, error) {
 
 // GetAllServices return services in current context
 func (k *Kubectl) GetAllServices() ([]*Service, error) {
-	return k.getServices("--all-namespaces")
+	return k.getServices(allNamespaceFlag)
 }
 
 func (k *Kubectl) getServices(ns string) ([]*Service, error) {
 	// Note: NAME TYPE CLUSTER-IP EXTERNAL-IP PORT(S) AGE
 	// Note: NAMESPACE NAME TYPE CLUSTER-IP EXTERNAL-IP PORT(S) AGE
-	arg := fmt.Sprintf("get service --no-headers %s", ns)
+	arg := fmt.Sprintf("get service %s --no-headers", ns)
 	resp := k.Execute(arg)
 	var svcs []*Service
 	for line := range resp.Readline() {

@@ -44,7 +44,7 @@ var FakeContextFunc = func(args ...string) (*executor.Response, error) {
 			}, nil
 		}
 	}
-	return nil, fmt.Errorf("match no command args")
+	return &executor.Response{}, fmt.Errorf("match no command args")
 }
 
 func TestGetCurrentContext(t *testing.T) {

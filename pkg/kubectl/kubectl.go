@@ -6,6 +6,8 @@ import (
 	"github.com/konoui/alfred-k8s/pkg/executor"
 )
 
+const allNamespaceFlag = "--all-namespaces"
+
 // Kubectl is configuration of binary paths
 type Kubectl struct {
 	cmd        executor.Executor

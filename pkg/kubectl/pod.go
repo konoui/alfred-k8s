@@ -24,7 +24,7 @@ func (k *Kubectl) GetPods() ([]*Pod, error) {
 
 // GetAllPods return pods in all namespaces
 func (k *Kubectl) GetAllPods() ([]*Pod, error) {
-	return k.getPods("--all-namespaces")
+	return k.getPods(allNamespaceFlag)
 }
 
 func (k *Kubectl) getPods(ns string) ([]*Pod, error) {

@@ -24,13 +24,13 @@ func (k *Kubectl) GetDeployments() ([]*Deployment, error) {
 
 // GetAllDeployments return all deployments in current context
 func (k *Kubectl) GetAllDeployments() ([]*Deployment, error) {
-	return k.getDeployments("--all-namespaces")
+	return k.getDeployments(allNamespaceFlag)
 }
 
 func (k *Kubectl) getDeployments(ns string) ([]*Deployment, error) {
 	// Note: NAME READY UP-TO-DATE AVAILABLE AGE
 	// Note: NAMESPACE NAME READY UP-TO-DATE AVAILABLE AGE
-	arg := fmt.Sprintf("get deployment --no-headers %s", ns)
+	arg := fmt.Sprintf("get deployment %s --no-headers", ns)
 	resp := k.Execute(arg)
 	var deps []*Deployment
 	for line := range resp.Readline() {
