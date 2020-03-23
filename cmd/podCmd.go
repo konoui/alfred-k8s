@@ -33,7 +33,7 @@ func listPods(all bool) {
 		pods, err = k.GetPods()
 	}
 	if err != nil {
-		awf.Fatal("fatal error occurs", err.Error())
+		awf.Fatal(fatalMessage, err.Error())
 		return
 	}
 	for _, p := range pods {

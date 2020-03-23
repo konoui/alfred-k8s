@@ -20,7 +20,7 @@ func NewDeploymentCmd() *cobra.Command {
 		},
 		SilenceUsage: true,
 	}
-	cmd.PersistentFlags().BoolVarP(&all, "all", "a", false, "list pods in all namespaces")
+	cmd.PersistentFlags().BoolVarP(&all, "all", "a", false, "list deployments in all namespaces")
 	return cmd
 }
 
@@ -33,7 +33,7 @@ func listDeployments(all bool) {
 		deps, err = k.GetDeployments()
 	}
 	if err != nil {
-		awf.Fatal("fatal error occurs", err.Error())
+		awf.Fatal(fatalMessage, err.Error())
 		return
 	}
 	for _, d := range deps {

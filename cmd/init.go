@@ -11,6 +11,8 @@ import (
 var k *kubectl.Kubectl
 var awf *alfred.Workflow
 
+const fatalMessage = "fatal error occurs"
+
 // decide next action for workflow filter
 const (
 	nextActionKey = "nextAction"
@@ -43,7 +45,7 @@ func init() {
 
 func checkWithExit(err error) {
 	if err != nil {
-		awf.Fatal("fatal error occurs", err.Error())
+		awf.Fatal(fatalMessage, err.Error())
 		awf.Output()
 		os.Exit(255)
 	}

@@ -24,7 +24,7 @@ func NewNodeCmd() *cobra.Command {
 func listNodes() {
 	nodes, err := k.GetNodes()
 	if err != nil {
-		awf.Fatal("fatal error occurs", err.Error())
+		awf.Fatal(fatalMessage, err.Error())
 		return
 	}
 	for _, n := range nodes {

@@ -20,7 +20,7 @@ func NewServiceCmd() *cobra.Command {
 		},
 		SilenceUsage: true,
 	}
-	cmd.PersistentFlags().BoolVarP(&all, "all", "a", false, "list pods in all namespaces")
+	cmd.PersistentFlags().BoolVarP(&all, "all", "a", false, "list services in all namespaces")
 	return cmd
 }
 
@@ -33,7 +33,7 @@ func listServices(all bool) {
 		svcs, err = k.GetServices()
 	}
 	if err != nil {
-		awf.Fatal("fatal error occurs", err.Error())
+		awf.Fatal(fatalMessage, err.Error())
 		return
 	}
 	for _, s := range svcs {

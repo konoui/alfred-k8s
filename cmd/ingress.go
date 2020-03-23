@@ -20,7 +20,7 @@ func NewIngressCmd() *cobra.Command {
 		},
 		SilenceUsage: true,
 	}
-	cmd.PersistentFlags().BoolVarP(&all, "all", "a", false, "list pods in all namespaces")
+	cmd.PersistentFlags().BoolVarP(&all, "all", "a", false, "list ingresses in all namespaces")
 	return cmd
 }
 
@@ -33,7 +33,7 @@ func listIngresses(all bool) {
 		ingresses, err = k.GetIngresses()
 	}
 	if err != nil {
-		awf.Fatal("fatal error occurs", err.Error())
+		awf.Fatal(fatalMessage, err.Error())
 		return
 	}
 	for _, i := range ingresses {

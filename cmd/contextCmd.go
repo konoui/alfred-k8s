@@ -39,7 +39,7 @@ func useContext(context string) {
 func listContexts() {
 	contexts, err := k.GetContexts()
 	if err != nil {
-		awf.Fatal("fatal error occurs", err.Error())
+		awf.Fatal(fatalMessage, err.Error())
 		return
 	}
 	for _, c := range contexts {

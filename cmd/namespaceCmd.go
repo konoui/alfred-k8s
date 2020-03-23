@@ -12,7 +12,7 @@ func NewNamespaceCmd() *cobra.Command {
 	var ns string
 	cmd := &cobra.Command{
 		Use:   "ns",
-		Short: "list namespaces in current context",
+		Short: "list namespaces",
 		Args:  cobra.MinimumNArgs(0),
 		Run: func(cmd *cobra.Command, args []string) {
 			if ns == "" {
@@ -39,7 +39,7 @@ func useNamespace(ns string) {
 func listNamespaces() {
 	namespaces, err := k.GetNamespaces()
 	if err != nil {
-		awf.Fatal("fatal error occurs", err.Error())
+		awf.Fatal(fatalMessage, err.Error())
 		return
 	}
 	for _, ns := range namespaces {
