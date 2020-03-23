@@ -1,6 +1,7 @@
 package kubectl
 
 import (
+	"os"
 	"reflect"
 	"testing"
 
@@ -55,4 +56,27 @@ func TestNewKubectl(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestOptionPluginPath(t *testing.T) {
+	path := "/usr/local:/bin/usr"
+	key := "TEST_USER"
+	value := "test"
+	input := "$" + key + path
+	want := value + path
+	t.Run("expand env test", func(t *testing.T) {
+		if err := os.Setenv(key, value); err != nil {
+			t.Fatal(err)
+		}
+
+		k, err := New(OptionPluginPath(input))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		got := k.pluginPath
+		if got != want {
+			t.Errorf("unexpected want: %v\ngot: %v", want, got)
+		}
+	})
 }

@@ -1,6 +1,7 @@
 package kubectl
 
 import (
+	"os"
 	"os/exec"
 
 	"github.com/konoui/alfred-k8s/pkg/executor"
@@ -48,7 +49,8 @@ func OptionBinary(bin string) Option {
 // e.g.) authentication command path
 func OptionPluginPath(path string) Option {
 	return func(k *Kubectl) error {
-		k.pluginPath = path
+		// Replace ${HOME} with abs path
+		k.pluginPath = os.ExpandEnv(path)
 		return nil
 	}
 }

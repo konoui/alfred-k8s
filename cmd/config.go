@@ -6,13 +6,13 @@ import (
 
 // Config configuration
 type Config struct {
-	kubectl Kubectl `mapstructure:"kubectl"`
+	Kubectl Kubectl `mapstructure:"kubectl"`
 }
 
 // Kubectl configuration kubectl and plugin path
 type Kubectl struct {
-	bin        string `mapstructure:"kubectl_apsolute_path"`
-	pluginPath string `mapstructure:"plugin_path"`
+	Bin         string   `mapstructure:"kubectl_absolute_path"`
+	PluginPaths []string `mapstructure:"plugin_paths"`
 }
 
 // NewConfig return alfred k8s configuration

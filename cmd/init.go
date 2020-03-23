@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"os"
+	"strings"
 
 	"github.com/konoui/alfred-k8s/pkg/kubectl"
 	"github.com/konoui/go-alfred"
@@ -26,11 +27,12 @@ func init() {
 	checkWithExit(err)
 
 	binOpt, pluginPathOpt := kubectl.OptionNone(), kubectl.OptionNone()
-	if c.kubectl.bin != "" {
-		binOpt = kubectl.OptionBinary(c.kubectl.bin)
+	if c.Kubectl.Bin != "" {
+		binOpt = kubectl.OptionBinary(c.Kubectl.Bin)
 	}
-	if c.kubectl.pluginPath != "" {
-		pluginPathOpt = kubectl.OptionPluginPath(c.kubectl.pluginPath)
+	if paths := c.Kubectl.PluginPaths; len(paths) > 0 {
+		path := strings.Join(paths, ":")
+		pluginPathOpt = kubectl.OptionPluginPath(path)
 	}
 
 	k, err = kubectl.New(binOpt, pluginPathOpt)
