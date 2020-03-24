@@ -43,7 +43,7 @@ func listIngresses(all bool) {
 		}
 		awf.Append(&alfred.Item{
 			Title:        title,
-			Subtitle:     fmt.Sprintf("host [%s] address [%s] ports [%s] ", i.Host, i.Address, i.Ports),
+			Subtitle:     fmt.Sprintf("host [%s] address [%s] ports [%s] ", i.Hosts, i.Address, i.Ports),
 			Autocomplete: i.Name,
 			Arg:          i.Name,
 			Mods: map[alfred.ModKey]alfred.Mod{

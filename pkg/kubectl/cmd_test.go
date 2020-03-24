@@ -61,7 +61,7 @@ func TestExecute(t *testing.T) {
 	}
 }
 
-func TestReadLineContext(t *testing.T) {
+func TestReadlineContext(t *testing.T) {
 	tests := []struct {
 		name      string
 		cmdResp   *Response
@@ -104,7 +104,7 @@ func TestReadLineContext(t *testing.T) {
 	}
 }
 
-func TestReadLine(t *testing.T) {
+func TestReadline(t *testing.T) {
 	tests := []struct {
 		name      string
 		cmdResp   *Response

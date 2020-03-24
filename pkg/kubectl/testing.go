@@ -4,15 +4,17 @@ import (
 	"github.com/konoui/alfred-k8s/pkg/executor"
 )
 
-// FakeFunc is real implementation for mock test
-type FakeFunc func(args ...string) (*executor.Response, error)
-
 // FakeExecutor is mock for test
 type FakeExecutor struct {
 	Impl FakeFunc
 }
 
+// FakeFunc is real implementation for mock test
+// please contain stdout/stderr message in executor.Response.Stdout/Stderr
+type FakeFunc func(args ...string) (*executor.Response, error)
+
 // Exec is mock for test
+// Exec return executor.Response and error in FakeFunc
 func (e *FakeExecutor) Exec(args ...string) (*executor.Response, error) {
 	return e.Impl(args...)
 }

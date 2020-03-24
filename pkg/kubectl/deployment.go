@@ -64,6 +64,6 @@ func generateDeployment(rawData []string) *Deployment {
 		}
 	}
 
-	msg := fmt.Sprintf("we assume that deployment information have 5 or 6 elements. but got %d elements", len(rawData))
+	msg := fmt.Sprintf("we assume that deployment information have 5 or 6 elements. but got %d elements. values: %v", len(rawData), rawData)
 	panic(msg)
 }
