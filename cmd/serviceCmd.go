@@ -42,10 +42,9 @@ func listServices(all bool) {
 			title = fmt.Sprintf("[%s] %s", s.Namespace, s.Name)
 		}
 		awf.Append(&alfred.Item{
-			Title:        title,
-			Subtitle:     fmt.Sprintf("cluster-ip [%s] external-ip [%s] ports [%s]", s.ClusterIP, s.ExternalIP, s.Ports),
-			Autocomplete: s.Name,
-			Arg:          s.Name,
+			Title:    title,
+			Subtitle: fmt.Sprintf("cluster-ip [%s] external-ip [%s] ports [%s]", s.ClusterIP, s.ExternalIP, s.Ports),
+			Arg:      s.Name,
 		})
 	}
 

@@ -33,6 +33,7 @@ func NewCmd() *cobra.Command {
 	rootCmd.AddCommand(NewServiceCmd())
 	rootCmd.AddCommand(NewNodeCmd())
 	rootCmd.AddCommand(NewIngressCmd())
+	rootCmd.AddCommand(NewCRDCmd())
 	return rootCmd
 }
 

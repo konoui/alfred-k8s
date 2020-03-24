@@ -48,9 +48,8 @@ func listContexts() {
 			title = fmt.Sprintf("[*] %s", c.Name)
 		}
 		awf.Append(&alfred.Item{
-			Title:        title,
-			Autocomplete: c.Name,
-			Arg:          c.Name,
+			Title: title,
+			Arg:   c.Name,
 			Mods: map[alfred.ModKey]alfred.Mod{
 				alfred.ModCtrl: alfred.Mod{
 					Subtitle: "switch to specific context",

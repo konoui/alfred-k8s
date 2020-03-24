@@ -42,10 +42,9 @@ func listDeployments(all bool) {
 			title = fmt.Sprintf("[%s] %s", d.Namespace, d.Name)
 		}
 		awf.Append(&alfred.Item{
-			Title:        title,
-			Subtitle:     fmt.Sprintf("ready [%s] up-to-date [%s] available [%s]", d.Ready, d.UpToDate, d.Available),
-			Autocomplete: d.Name,
-			Arg:          d.Name,
+			Title:    title,
+			Subtitle: fmt.Sprintf("ready [%s] up-to-date [%s] available [%s]", d.Ready, d.UpToDate, d.Available),
+			Arg:      d.Name,
 		})
 	}
 

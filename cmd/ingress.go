@@ -42,10 +42,9 @@ func listIngresses(all bool) {
 			title = fmt.Sprintf("[%s] %s", i.Namespace, i.Name)
 		}
 		awf.Append(&alfred.Item{
-			Title:        title,
-			Subtitle:     fmt.Sprintf("host [%s] address [%s] ports [%s] ", i.Hosts, i.Address, i.Ports),
-			Autocomplete: i.Name,
-			Arg:          i.Name,
+			Title:    title,
+			Subtitle: fmt.Sprintf("host [%s] address [%s] ports [%s] ", i.Hosts, i.Address, i.Ports),
+			Arg:      i.Name,
 			Mods: map[alfred.ModKey]alfred.Mod{
 				alfred.ModCtrl: alfred.Mod{
 					Subtitle: "copy ingress Address",
