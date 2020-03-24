@@ -67,6 +67,6 @@ func generateService(rawData []string) *Service {
 		}
 	}
 
-	msg := fmt.Sprintf("we assume that service information have 6 or 7 elements. but got %d elements", len(rawData))
+	msg := fmt.Sprintf("we assume that service information have 6 or 7 elements. but got %d elements. values: %v", len(rawData), rawData)
 	panic(msg)
 }

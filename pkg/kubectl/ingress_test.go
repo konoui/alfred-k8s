@@ -19,7 +19,7 @@ var testAllIngresses = []*Ingress{
 	&Ingress{
 		Namespace: "test1-namespace",
 		Name:      "test1-ingress",
-		Host:      "*",
+		Hosts:     "*",
 		Address:   "ingress1.hoge.hoge",
 		Ports:     "80",
 		Age:       "24h",
@@ -27,7 +27,7 @@ var testAllIngresses = []*Ingress{
 	&Ingress{
 		Namespace: "test2-namespace",
 		Name:      "test2-ingress",
-		Host:      "*",
+		Hosts:     "*",
 		Address:   "ingress2.hoge.hoge",
 		Ports:     "80",
 		Age:       "24h",
@@ -36,14 +36,14 @@ var testAllIngresses = []*Ingress{
 var testIngresses = []*Ingress{
 	&Ingress{
 		Name:    "test1-ingress",
-		Host:    "*",
+		Hosts:   "*",
 		Address: "ingress1.hoge.hoge",
 		Ports:   "80",
 		Age:     "24h",
 	},
 	&Ingress{
 		Name:    "test2-ingress",
-		Host:    "*",
+		Hosts:   "*",
 		Address: "ingress2.hoge.hoge",
 		Ports:   "80",
 		Age:     "24h",

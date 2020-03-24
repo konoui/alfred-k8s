@@ -26,7 +26,7 @@ func init() {
 	awf.EmptyWarning("There are no resources", "No matching")
 
 	c, err := newConfig()
-	checkWithExit(err)
+	exitWith(err)
 
 	binOpt, pluginPathOpt := kubectl.OptionNone(), kubectl.OptionNone()
 	if c.Kubectl.Bin != "" {
@@ -39,11 +39,11 @@ func init() {
 
 	k, err = kubectl.New(binOpt, pluginPathOpt)
 	if err != nil {
-		checkWithExit(err)
+		exitWith(err)
 	}
 }
 
-func checkWithExit(err error) {
+func exitWith(err error) {
 	if err != nil {
 		awf.Fatal(fatalMessage, err.Error())
 		awf.Output()

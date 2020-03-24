@@ -9,6 +9,9 @@ import (
 )
 
 const (
+	contextTPL = `{{ range .contexts -}}
+*   {{.name}}   {{.context.cluster}}   {{.context.user}}    {{.context.namespace}}
+{{ end -}}`
 	// see https://golang.org/pkg/text/template/#Template.Option
 	noValue    = "<no value>"
 	dummyValue = "DUMMY"
@@ -25,7 +28,8 @@ type Context struct {
 func (k *Kubectl) GetContexts() ([]*Context, error) {
 	// Note: CURRENT NAME CLUSTER AUTHINFO NAMESPACE
 	// Note: CURRENT is dummy VALUE
-	resp := k.Execute("config view -o go-template-file=context.tpl")
+	arg := fmt.Sprintf("config view -o go-template --template='%s'", contextTPL)
+	resp := k.Execute(arg)
 	current, err := k.GetCurrentContext()
 	if err != nil {
 		return nil, err
