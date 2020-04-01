@@ -5,6 +5,6 @@ import (
 )
 
 func main() {
-	c := cmd.NewCmd()
+	c := cmd.NewDefaultCmd()
 	cmd.Execute(c)
 }

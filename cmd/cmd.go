@@ -23,8 +23,8 @@ func Execute(rootCmd *cobra.Command) {
 	}
 }
 
-// NewCmd create sub commands
-func NewCmd() *cobra.Command {
+// NewDefaultCmd create sub commands
+func NewDefaultCmd() *cobra.Command {
 	rootCmd := NewRootCmd()
 	rootCmd.AddCommand(NewPodCmd())
 	rootCmd.AddCommand(NewContextCmd())
