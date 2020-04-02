@@ -46,7 +46,6 @@ func init() {
 func exitWith(err error) {
 	if err != nil {
 		awf.Fatal(fatalMessage, err.Error())
-		awf.Output()
 		os.Exit(255)
 	}
 }

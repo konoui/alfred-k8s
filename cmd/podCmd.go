@@ -18,9 +18,12 @@ func NewPodCmd() *cobra.Command {
 		Run: func(cmd *cobra.Command, args []string) {
 			listPods(all)
 		},
-		SilenceUsage: true,
+		DisableSuggestions: true,
+		SilenceUsage:       true,
+		SilenceErrors:      true,
 	}
-	cmd.PersistentFlags().BoolVarP(&all, "all", "a", false, "list pods in all namespaces")
+	addAllNamespaceFlag(cmd, &all)
+
 	return cmd
 }
 

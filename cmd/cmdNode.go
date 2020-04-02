@@ -16,7 +16,9 @@ func NewNodeCmd() *cobra.Command {
 		Run: func(cmd *cobra.Command, args []string) {
 			listNodes()
 		},
-		SilenceUsage: true,
+		DisableSuggestions: true,
+		SilenceUsage:       true,
+		SilenceErrors:      true,
 	}
 	return cmd
 }

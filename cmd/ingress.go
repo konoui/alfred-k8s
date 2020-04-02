@@ -18,9 +18,12 @@ func NewIngressCmd() *cobra.Command {
 		Run: func(cmd *cobra.Command, args []string) {
 			listIngresses(all)
 		},
-		SilenceUsage: true,
+		DisableSuggestions: true,
+		SilenceUsage:       true,
+		SilenceErrors:      true,
 	}
-	cmd.PersistentFlags().BoolVarP(&all, "all", "a", false, "list ingresses in all namespaces")
+	addAllNamespaceFlag(cmd, &all)
+
 	return cmd
 }
 

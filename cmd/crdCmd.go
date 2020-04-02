@@ -22,9 +22,12 @@ func NewCRDCmd() *cobra.Command {
 			}
 			listSpecificResources(args[0], all)
 		},
-		SilenceUsage: true,
+		DisableSuggestions: true,
+		SilenceUsage:       true,
+		SilenceErrors:      true,
 	}
-	cmd.PersistentFlags().BoolVarP(&all, "all", "a", false, "list resources in all namespaces")
+	addAllNamespaceFlag(cmd, &all)
+
 	return cmd
 }
 

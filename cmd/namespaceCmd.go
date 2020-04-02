@@ -21,9 +21,11 @@ func NewNamespaceCmd() *cobra.Command {
 			}
 			useNamespace(ns)
 		},
-		SilenceUsage: true,
+		DisableSuggestions: true,
+		SilenceUsage:       true,
+		SilenceErrors:      true,
 	}
-	cmd.PersistentFlags().StringVarP(&ns, "name", "n", "", "namespace name to switch")
+	cmd.PersistentFlags().StringVarP(&ns, "use", "u", "", "namespace name to switch")
 
 	return cmd
 }
@@ -54,7 +56,7 @@ func listNamespaces() {
 			Mods: map[alfred.ModKey]alfred.Mod{
 				alfred.ModCtrl: alfred.Mod{
 					Subtitle: "switch to specific namespace",
-					Arg:      fmt.Sprintf("ns --name %s", ns.Name),
+					Arg:      fmt.Sprintf("ns --use %s", ns.Name),
 					Variables: map[string]string{
 						nextActionKey: nextActionCmd,
 					},

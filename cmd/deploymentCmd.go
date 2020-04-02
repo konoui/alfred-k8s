@@ -18,9 +18,12 @@ func NewDeploymentCmd() *cobra.Command {
 		Run: func(cmd *cobra.Command, args []string) {
 			listDeployments(all)
 		},
-		SilenceUsage: true,
+		DisableSuggestions: true,
+		SilenceUsage:       true,
+		SilenceErrors:      true,
 	}
-	cmd.PersistentFlags().BoolVarP(&all, "all", "a", false, "list deployments in all namespaces")
+	addAllNamespaceFlag(cmd, &all)
+
 	return cmd
 }
 

@@ -21,10 +21,12 @@ func NewContextCmd() *cobra.Command {
 			}
 			useContext(context)
 		},
-		SilenceUsage: true,
+		DisableSuggestions: true,
+		SilenceUsage:       true,
+		SilenceErrors:      true,
 	}
 
-	cmd.PersistentFlags().StringVarP(&context, "name", "n", "", "context name to switch")
+	cmd.PersistentFlags().StringVarP(&context, "use", "u", "", "context name to switch")
 	return cmd
 }
 
@@ -53,7 +55,7 @@ func listContexts() {
 			Mods: map[alfred.ModKey]alfred.Mod{
 				alfred.ModCtrl: alfred.Mod{
 					Subtitle: "switch to specific context",
-					Arg:      fmt.Sprintf("context --name %s", c.Name),
+					Arg:      fmt.Sprintf("context --use %s", c.Name),
 					Variables: map[string]string{
 						nextActionKey: nextActionCmd,
 					},

@@ -18,9 +18,12 @@ func NewServiceCmd() *cobra.Command {
 		Run: func(cmd *cobra.Command, args []string) {
 			listServices(all)
 		},
-		SilenceUsage: true,
+		DisableSuggestions: true,
+		SilenceUsage:       true,
+		SilenceErrors:      true,
 	}
-	cmd.PersistentFlags().BoolVarP(&all, "all", "a", false, "list services in all namespaces")
+	addAllNamespaceFlag(cmd, &all)
+
 	return cmd
 }
 
