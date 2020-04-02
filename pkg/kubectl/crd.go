@@ -44,13 +44,11 @@ func (k *Kubectl) GetCRDs() ([]*CRD, error) {
 }
 
 // GetSpecificResources return specific resources in current namespace
-func (k *Kubectl) GetSpecificResources(name string) ([]*BaseResource, error) {
+func (k *Kubectl) GetSpecificResources(name string, all bool) ([]*BaseResource, error) {
+	if all {
+		return k.getSpecificResources(name, allNamespaceFlag)
+	}
 	return k.getSpecificResources(name, "")
-}
-
-// GetAllSpecificResources return specific resources in all namespaces
-func (k *Kubectl) GetAllSpecificResources(name string) ([]*BaseResource, error) {
-	return k.getSpecificResources(name, allNamespaceFlag)
 }
 
 func (k *Kubectl) getSpecificResources(name, ns string) ([]*BaseResource, error) {

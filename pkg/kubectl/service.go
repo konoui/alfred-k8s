@@ -19,13 +19,11 @@ type Service struct {
 }
 
 // GetServices return services in current namespace
-func (k *Kubectl) GetServices() ([]*Service, error) {
+func (k *Kubectl) GetServices(all bool) ([]*Service, error) {
+	if all {
+		return k.getServices(allNamespaceFlag)
+	}
 	return k.getServices("")
-}
-
-// GetAllServices return services in current context
-func (k *Kubectl) GetAllServices() ([]*Service, error) {
-	return k.getServices(allNamespaceFlag)
 }
 
 func (k *Kubectl) getServices(ns string) ([]*Service, error) {

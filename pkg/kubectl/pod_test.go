@@ -76,6 +76,7 @@ func TestGetPods(t *testing.T) {
 	tests := []struct {
 		name         string
 		fakeExecutor executor.Executor
+		all          bool
 		want         []*Pod
 	}{
 		{
@@ -83,32 +84,10 @@ func TestGetPods(t *testing.T) {
 			fakeExecutor: NewFakeExecutor(FakePodFunc),
 			want:         testPods,
 		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			k := SetupKubectl(t, tt.fakeExecutor)
-			got, err := k.GetPods()
-			if err != nil {
-				t.Fatal(err)
-			}
-
-			if diff := cmp.Diff(got, tt.want); diff != "" {
-				t.Errorf("+want -got\n%+v", diff)
-			}
-		})
-	}
-}
-
-func TestGetAllPods(t *testing.T) {
-	tests := []struct {
-		name         string
-		fakeExecutor executor.Executor
-		want         []*Pod
-	}{
 		{
-			name:         "list pods",
+			name:         "list pods in all namespaces",
 			fakeExecutor: NewFakeExecutor(FakePodFunc),
+			all:          true,
 			want:         testAllPods,
 		},
 	}
@@ -116,7 +95,7 @@ func TestGetAllPods(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			k := SetupKubectl(t, tt.fakeExecutor)
-			got, err := k.GetAllPods()
+			got, err := k.GetPods(tt.all)
 			if err != nil {
 				t.Fatal(err)
 			}

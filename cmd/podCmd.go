@@ -3,7 +3,6 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/konoui/alfred-k8s/pkg/kubectl"
 	"github.com/konoui/go-alfred"
 	"github.com/spf13/cobra"
 )
@@ -28,17 +27,12 @@ func NewPodCmd() *cobra.Command {
 }
 
 func listPods(all bool) {
-	var err error
-	var pods []*kubectl.Pod
-	if all {
-		pods, err = k.GetAllPods()
-	} else {
-		pods, err = k.GetPods()
-	}
+	pods, err := k.GetPods(all)
 	if err != nil {
 		awf.Fatal(fatalMessage, err.Error())
 		return
 	}
+
 	for _, p := range pods {
 		title := p.Name
 		if p.Namespace != "" {

@@ -30,7 +30,6 @@ func listNodes() {
 		return
 	}
 	for _, n := range nodes {
-
 		awf.Append(&alfred.Item{
 			Title:    n.Name,
 			Subtitle: fmt.Sprintf("status [%s] version [%s]", n.Status, n.Version),

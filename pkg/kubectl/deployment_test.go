@@ -72,6 +72,7 @@ func TestGetDeployments(t *testing.T) {
 	tests := []struct {
 		name         string
 		fakeExecutor executor.Executor
+		all          bool
 		want         []*Deployment
 	}{
 		{
@@ -79,32 +80,10 @@ func TestGetDeployments(t *testing.T) {
 			fakeExecutor: NewFakeExecutor(FakeDeploymentFunc),
 			want:         testDeployments,
 		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			k := SetupKubectl(t, tt.fakeExecutor)
-			got, err := k.GetDeployments()
-			if err != nil {
-				t.Fatal(err)
-			}
-
-			if diff := cmp.Diff(got, tt.want); diff != "" {
-				t.Errorf("+want -got\n%+v", diff)
-			}
-		})
-	}
-}
-
-func TestGetAllDeployments(t *testing.T) {
-	tests := []struct {
-		name         string
-		fakeExecutor executor.Executor
-		want         []*Deployment
-	}{
 		{
 			name:         "list deployments in all namespaces",
 			fakeExecutor: NewFakeExecutor(FakeDeploymentFunc),
+			all:          true,
 			want:         testAllDeployments,
 		},
 	}
@@ -112,7 +91,7 @@ func TestGetAllDeployments(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			k := SetupKubectl(t, tt.fakeExecutor)
-			got, err := k.GetAllDeployments()
+			got, err := k.GetDeployments(tt.all)
 			if err != nil {
 				t.Fatal(err)
 			}

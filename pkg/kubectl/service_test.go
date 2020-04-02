@@ -77,6 +77,7 @@ func TestGetServices(t *testing.T) {
 	tests := []struct {
 		name         string
 		fakeExecutor executor.Executor
+		all          bool
 		want         []*Service
 	}{
 		{
@@ -84,32 +85,10 @@ func TestGetServices(t *testing.T) {
 			fakeExecutor: NewFakeExecutor(FakeServiceFunc),
 			want:         testServices,
 		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			k := SetupKubectl(t, tt.fakeExecutor)
-			got, err := k.GetServices()
-			if err != nil {
-				t.Fatal(err)
-			}
-
-			if diff := cmp.Diff(got, tt.want); diff != "" {
-				t.Errorf("+want -got\n%+v", diff)
-			}
-		})
-	}
-}
-
-func TestGetAllServices(t *testing.T) {
-	tests := []struct {
-		name         string
-		fakeExecutor executor.Executor
-		want         []*Service
-	}{
 		{
 			name:         "list services in all namespaces",
 			fakeExecutor: NewFakeExecutor(FakeServiceFunc),
+			all:          true,
 			want:         testAllServices,
 		},
 	}
@@ -117,7 +96,7 @@ func TestGetAllServices(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			k := SetupKubectl(t, tt.fakeExecutor)
-			got, err := k.GetAllServices()
+			got, err := k.GetServices(tt.all)
 			if err != nil {
 				t.Fatal(err)
 			}

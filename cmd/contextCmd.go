@@ -49,6 +49,7 @@ func listContexts() {
 		if c.Current {
 			title = fmt.Sprintf("[*] %s", c.Name)
 		}
+
 		awf.Append(&alfred.Item{
 			Title: title,
 			Arg:   c.Name,

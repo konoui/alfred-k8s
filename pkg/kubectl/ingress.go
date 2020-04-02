@@ -18,13 +18,11 @@ type Ingress struct {
 }
 
 // GetIngresses return ingresses in current namespace
-func (k *Kubectl) GetIngresses() ([]*Ingress, error) {
+func (k *Kubectl) GetIngresses(all bool) ([]*Ingress, error) {
+	if all {
+		return k.getIngress(allNamespaceFlag)
+	}
 	return k.getIngress("")
-}
-
-// GetAllIngresses return ingresses in all namespaces
-func (k *Kubectl) GetAllIngresses() ([]*Ingress, error) {
-	return k.getIngress(allNamespaceFlag)
 }
 
 func (k *Kubectl) getIngress(ns string) ([]*Ingress, error) {

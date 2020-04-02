@@ -3,7 +3,6 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/konoui/alfred-k8s/pkg/kubectl"
 	"github.com/konoui/go-alfred"
 	"github.com/spf13/cobra"
 )
@@ -28,17 +27,12 @@ func NewDeploymentCmd() *cobra.Command {
 }
 
 func listDeployments(all bool) {
-	var err error
-	var deps []*kubectl.Deployment
-	if all {
-		deps, err = k.GetAllDeployments()
-	} else {
-		deps, err = k.GetDeployments()
-	}
+	deps, err := k.GetDeployments(all)
 	if err != nil {
 		awf.Fatal(fatalMessage, err.Error())
 		return
 	}
+
 	for _, d := range deps {
 		title := d.Name
 		if d.Namespace != "" {

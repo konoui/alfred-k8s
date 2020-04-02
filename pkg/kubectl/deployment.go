@@ -18,13 +18,11 @@ type Deployment struct {
 }
 
 // GetDeployments return deployments in current namespace
-func (k *Kubectl) GetDeployments() ([]*Deployment, error) {
+func (k *Kubectl) GetDeployments(all bool) ([]*Deployment, error) {
+	if all {
+		return k.getDeployments(allNamespaceFlag)
+	}
 	return k.getDeployments("")
-}
-
-// GetAllDeployments return all deployments in current context
-func (k *Kubectl) GetAllDeployments() ([]*Deployment, error) {
-	return k.getDeployments(allNamespaceFlag)
 }
 
 func (k *Kubectl) getDeployments(ns string) ([]*Deployment, error) {

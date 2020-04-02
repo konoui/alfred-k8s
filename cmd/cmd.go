@@ -65,12 +65,14 @@ func showAvailableSubCmds(cmd *cobra.Command) {
 		if f := c.Flag("all"); f != nil {
 			subtitle = fmt.Sprintf("%s, opts [-%s: %s]", c.Short, f.Shorthand, f.Usage)
 		}
+
 		awf.Append(&alfred.Item{
 			Title:        c.Name(),
 			Subtitle:     subtitle,
 			Autocomplete: c.Name(),
 		})
 	}
+
 	awf.Output()
 }
 

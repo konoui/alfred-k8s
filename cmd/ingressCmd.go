@@ -3,7 +3,6 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/konoui/alfred-k8s/pkg/kubectl"
 	"github.com/konoui/go-alfred"
 	"github.com/spf13/cobra"
 )
@@ -28,17 +27,12 @@ func NewIngressCmd() *cobra.Command {
 }
 
 func listIngresses(all bool) {
-	var err error
-	var ingresses []*kubectl.Ingress
-	if all {
-		ingresses, err = k.GetAllIngresses()
-	} else {
-		ingresses, err = k.GetIngresses()
-	}
+	ingresses, err := k.GetIngresses(all)
 	if err != nil {
 		awf.Fatal(fatalMessage, err.Error())
 		return
 	}
+
 	for _, i := range ingresses {
 		title := i.Name
 		if i.Namespace != "" {

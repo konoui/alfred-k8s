@@ -18,13 +18,11 @@ type Pod struct {
 }
 
 // GetPods return pods in current namespace
-func (k *Kubectl) GetPods() ([]*Pod, error) {
+func (k *Kubectl) GetPods(all bool) ([]*Pod, error) {
+	if all {
+		return k.getPods(allNamespaceFlag)
+	}
 	return k.getPods("")
-}
-
-// GetAllPods return pods in all namespaces
-func (k *Kubectl) GetAllPods() ([]*Pod, error) {
-	return k.getPods(allNamespaceFlag)
 }
 
 func (k *Kubectl) getPods(ns string) ([]*Pod, error) {

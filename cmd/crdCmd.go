@@ -3,7 +3,6 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/konoui/alfred-k8s/pkg/kubectl"
 	"github.com/konoui/go-alfred"
 	"github.com/spf13/cobra"
 )
@@ -49,17 +48,12 @@ func listCustomResources() {
 }
 
 func listSpecificResources(query string, all bool) {
-	var err error
-	var rs []*kubectl.BaseResource
-	if all {
-		rs, err = k.GetAllSpecificResources(query)
-	} else {
-		rs, err = k.GetSpecificResources(query)
-	}
+	rs, err := k.GetSpecificResources(query, all)
 	if err != nil {
 		awf.Fatal(fatalMessage, err.Error())
 		return
 	}
+
 	for _, r := range rs {
 		title := r.Name
 		if r.Namespace != "" {

@@ -3,7 +3,6 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/konoui/alfred-k8s/pkg/kubectl"
 	"github.com/konoui/go-alfred"
 	"github.com/spf13/cobra"
 )
@@ -28,17 +27,12 @@ func NewServiceCmd() *cobra.Command {
 }
 
 func listServices(all bool) {
-	var err error
-	var svcs []*kubectl.Service
-	if all {
-		svcs, err = k.GetAllServices()
-	} else {
-		svcs, err = k.GetServices()
-	}
+	svcs, err := k.GetServices(all)
 	if err != nil {
 		awf.Fatal(fatalMessage, err.Error())
 		return
 	}
+
 	for _, s := range svcs {
 		title := fmt.Sprintf("type [%s]  %s", s.Type, s.Name)
 		if s.Namespace != "" {

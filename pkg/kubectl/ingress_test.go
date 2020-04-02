@@ -72,6 +72,7 @@ func TestGetIngresses(t *testing.T) {
 	tests := []struct {
 		name         string
 		fakeExecutor executor.Executor
+		all          bool
 		want         []*Ingress
 	}{
 		{
@@ -79,32 +80,10 @@ func TestGetIngresses(t *testing.T) {
 			fakeExecutor: NewFakeExecutor(FakeIngressFunc),
 			want:         testIngresses,
 		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			k := SetupKubectl(t, tt.fakeExecutor)
-			got, err := k.GetIngresses()
-			if err != nil {
-				t.Fatal(err)
-			}
-
-			if diff := cmp.Diff(got, tt.want); diff != "" {
-				t.Errorf("+want -got\n%+v", diff)
-			}
-		})
-	}
-}
-
-func TestGetAllIngresses(t *testing.T) {
-	tests := []struct {
-		name         string
-		fakeExecutor executor.Executor
-		want         []*Ingress
-	}{
 		{
 			name:         "list deployments in all namespaces",
 			fakeExecutor: NewFakeExecutor(FakeIngressFunc),
+			all:          true,
 			want:         testAllIngresses,
 		},
 	}
@@ -112,7 +91,7 @@ func TestGetAllIngresses(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			k := SetupKubectl(t, tt.fakeExecutor)
-			got, err := k.GetAllIngresses()
+			got, err := k.GetIngresses(tt.all)
 			if err != nil {
 				t.Fatal(err)
 			}

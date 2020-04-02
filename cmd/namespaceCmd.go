@@ -44,6 +44,7 @@ func listNamespaces() {
 		awf.Fatal(fatalMessage, err.Error())
 		return
 	}
+
 	for _, ns := range namespaces {
 		title := ns.Name
 		if ns.Current {
