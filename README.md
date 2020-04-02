@@ -19,12 +19,12 @@ Please type `kube <resource-name>`.
 e.g.) `kube pod`
 
 ### List resources in all namespaces
-Please add `a` suffix to resource name.  
-e.g.) `kube poda`
+Please add `-a` option.  
+e.g.) `kube pod -a`
 
-### List any resources in all namespaces
-`kube any <resource-name>` is for other resources not supported.  
-For example, you can list replicaset resources by `kube any rs` as the workflow does not support `kube rs`.
+### List specific resources
+`kube crd <resource-name>` is for other resources not supported.  
+For example, you can list replicaset resources by `kube crd rs` as the workflow does not support `kube rs`.
 
 ### Switch Context/Namespace
 Please type `kube context` or `kube ns`
