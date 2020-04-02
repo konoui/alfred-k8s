@@ -50,7 +50,7 @@ func listCustomResources() {
 
 func listSpecificResources(query string, all bool) {
 	var err error
-	var rs []*kubectl.AnyResource
+	var rs []*kubectl.BaseResource
 	if all {
 		rs, err = k.GetAllSpecificResources(query)
 	} else {

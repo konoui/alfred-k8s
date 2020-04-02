@@ -20,8 +20,8 @@ type CRD struct {
 	CreatedAT string
 }
 
-// AnyResource is for other resources not supported
-type AnyResource struct {
+// BaseResource is for other resources not supported
+type BaseResource struct {
 	Namespace string
 	Name      string
 	Age       string
@@ -44,22 +44,22 @@ func (k *Kubectl) GetCRDs() ([]*CRD, error) {
 }
 
 // GetSpecificResources return specific resources in current namespace
-func (k *Kubectl) GetSpecificResources(name string) ([]*AnyResource, error) {
-	return k.getAnyResources(name, "")
+func (k *Kubectl) GetSpecificResources(name string) ([]*BaseResource, error) {
+	return k.getSpecificResources(name, "")
 }
 
 // GetAllSpecificResources return specific resources in all namespaces
-func (k *Kubectl) GetAllSpecificResources(name string) ([]*AnyResource, error) {
-	return k.getAnyResources(name, allNamespaceFlag)
+func (k *Kubectl) GetAllSpecificResources(name string) ([]*BaseResource, error) {
+	return k.getSpecificResources(name, allNamespaceFlag)
 }
 
-func (k *Kubectl) getAnyResources(name, ns string) ([]*AnyResource, error) {
+func (k *Kubectl) getSpecificResources(name, ns string) ([]*BaseResource, error) {
 	arg := fmt.Sprintf("get %s %s", name, ns)
 	resp := k.Execute(arg)
 	header := <-resp.Readline()
 	headers := strings.Fields(header)
 
-	var rs []*AnyResource
+	var rs []*BaseResource
 	for line := range resp.Readline() {
 		rawData := strings.Fields(line)
 		a := generateAnyResource(rawData, headers)
@@ -72,8 +72,8 @@ func (k *Kubectl) getAnyResources(name, ns string) ([]*AnyResource, error) {
 	return rs, nil
 }
 
-func generateAnyResource(rawData, headers []string) *AnyResource {
-	var c AnyResource
+func generateAnyResource(rawData, headers []string) *BaseResource {
+	var c BaseResource
 	for i := range rawData {
 		if headers[i] == fieldName {
 			c.Name = rawData[i]
