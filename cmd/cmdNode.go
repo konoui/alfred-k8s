@@ -14,7 +14,7 @@ func NewNodeCmd() *cobra.Command {
 		Short: "list nodes",
 		Args:  cobra.MinimumNArgs(0),
 		Run: func(cmd *cobra.Command, args []string) {
-			listNodes()
+			listNodes(getQuery(args, 0))
 		},
 		DisableSuggestions: true,
 		SilenceUsage:       true,
@@ -23,7 +23,7 @@ func NewNodeCmd() *cobra.Command {
 	return cmd
 }
 
-func listNodes() {
+func listNodes(query string) {
 	nodes, err := k.GetNodes()
 	if err != nil {
 		awf.Fatal(fatalMessage, err.Error())
@@ -37,5 +37,5 @@ func listNodes() {
 		})
 	}
 
-	awf.Output()
+	awf.Filter(query).Output()
 }

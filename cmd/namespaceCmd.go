@@ -16,7 +16,7 @@ func NewNamespaceCmd() *cobra.Command {
 		Args:  cobra.MinimumNArgs(0),
 		Run: func(cmd *cobra.Command, args []string) {
 			if ns == "" {
-				listNamespaces()
+				listNamespaces(getQuery(args, 0))
 				return
 			}
 			useNamespace(ns)
@@ -38,7 +38,7 @@ func useNamespace(ns string) {
 	fmt.Fprintf(outStream, "Success!! switched %s namespace\n", ns)
 }
 
-func listNamespaces() {
+func listNamespaces(query string) {
 	namespaces, err := k.GetNamespaces()
 	if err != nil {
 		awf.Fatal(fatalMessage, err.Error())
@@ -66,5 +66,5 @@ func listNamespaces() {
 		})
 	}
 
-	awf.Output()
+	awf.Filter(query).Output()
 }

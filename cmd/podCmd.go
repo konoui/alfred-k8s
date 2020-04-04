@@ -15,7 +15,7 @@ func NewPodCmd() *cobra.Command {
 		Short: "list pods",
 		Args:  cobra.MinimumNArgs(0),
 		Run: func(cmd *cobra.Command, args []string) {
-			listPods(all)
+			listPods(all, getQuery(args, 0))
 		},
 		DisableSuggestions: true,
 		SilenceUsage:       true,
@@ -26,7 +26,7 @@ func NewPodCmd() *cobra.Command {
 	return cmd
 }
 
-func listPods(all bool) {
+func listPods(all bool, query string) {
 	pods, err := k.GetPods(all)
 	if err != nil {
 		awf.Fatal(fatalMessage, err.Error())
@@ -45,5 +45,5 @@ func listPods(all bool) {
 		})
 	}
 
-	awf.Output()
+	awf.Filter(query).Output()
 }

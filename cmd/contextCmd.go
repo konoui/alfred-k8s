@@ -16,7 +16,7 @@ func NewContextCmd() *cobra.Command {
 		Args:  cobra.MinimumNArgs(0),
 		Run: func(cmd *cobra.Command, args []string) {
 			if context == "" {
-				listContexts()
+				listContexts(getQuery(args, 0))
 				return
 			}
 			useContext(context)
@@ -38,7 +38,7 @@ func useContext(context string) {
 	fmt.Fprintln(outStream, "Success!! switched context")
 }
 
-func listContexts() {
+func listContexts(query string) {
 	contexts, err := k.GetContexts()
 	if err != nil {
 		awf.Fatal(fatalMessage, err.Error())
@@ -65,5 +65,5 @@ func listContexts() {
 		})
 	}
 
-	awf.Output()
+	awf.Filter(query).Output()
 }

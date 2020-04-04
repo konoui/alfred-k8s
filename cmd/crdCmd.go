@@ -16,10 +16,10 @@ func NewCRDCmd() *cobra.Command {
 		Args:  cobra.MinimumNArgs(0),
 		Run: func(cmd *cobra.Command, args []string) {
 			if len(args) == 0 {
-				listCustomResources()
+				listCustomResources(getQuery(args, 0))
 				return
 			}
-			listSpecificResources(args[0], all)
+			listSpecificResources(args[0], all, getQuery(args, 1))
 		},
 		DisableSuggestions: true,
 		SilenceUsage:       true,
@@ -30,7 +30,7 @@ func NewCRDCmd() *cobra.Command {
 	return cmd
 }
 
-func listCustomResources() {
+func listCustomResources(query string) {
 	crds, err := k.GetCRDs()
 	if err != nil {
 		awf.Fatal(fatalMessage, err.Error())
@@ -44,11 +44,11 @@ func listCustomResources() {
 		})
 	}
 
-	awf.Output()
+	awf.Filter(query).Output()
 }
 
-func listSpecificResources(query string, all bool) {
-	rs, err := k.GetSpecificResources(query, all)
+func listSpecificResources(name string, all bool, query string) {
+	rs, err := k.GetSpecificResources(name, all)
 	if err != nil {
 		awf.Fatal(fatalMessage, err.Error())
 		return
@@ -66,5 +66,5 @@ func listSpecificResources(query string, all bool) {
 		})
 	}
 
-	awf.Output()
+	awf.Filter(query).Output()
 }

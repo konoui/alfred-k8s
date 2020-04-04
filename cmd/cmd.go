@@ -19,7 +19,7 @@ func Execute(rootCmd *cobra.Command) {
 	rootCmd.SetErr(errStream)
 	rootCmd.SetOut(outStream)
 	if err := rootCmd.Execute(); err != nil {
-		exitWith(err)
+		showAvailableSubCmds(rootCmd, getQuery(os.Args, 1))
 	}
 }
 
@@ -42,7 +42,7 @@ func NewRootCmd() *cobra.Command {
 	rootCmd := &cobra.Command{
 		Short: "available commands",
 		Run: func(cmd *cobra.Command, args []string) {
-			showAvailableSubCmds(cmd)
+			showAvailableSubCmds(cmd, getQuery(args, 0))
 		},
 		DisableSuggestions: true,
 		SilenceUsage:       true,
@@ -55,7 +55,7 @@ func NewRootCmd() *cobra.Command {
 	return rootCmd
 }
 
-func showAvailableSubCmds(cmd *cobra.Command) {
+func showAvailableSubCmds(cmd *cobra.Command, query string) {
 	for _, c := range cmd.Commands() {
 		if !c.IsAvailableCommand() {
 			continue
@@ -73,9 +73,16 @@ func showAvailableSubCmds(cmd *cobra.Command) {
 		})
 	}
 
-	awf.Output()
+	awf.Filter(query).Output()
 }
 
 func addAllNamespaceFlag(cmd *cobra.Command, all *bool) {
 	cmd.PersistentFlags().BoolVarP(all, "all", "a", false, "in all namespaces")
+}
+
+func getQuery(args []string, idx int) string {
+	if len(args) > idx {
+		return args[idx]
+	}
+	return ""
 }

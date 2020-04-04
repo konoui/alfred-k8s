@@ -15,7 +15,7 @@ func NewServiceCmd() *cobra.Command {
 		Short: "list services",
 		Args:  cobra.MinimumNArgs(0),
 		Run: func(cmd *cobra.Command, args []string) {
-			listServices(all)
+			listServices(all, getQuery(args, 0))
 		},
 		DisableSuggestions: true,
 		SilenceUsage:       true,
@@ -26,7 +26,7 @@ func NewServiceCmd() *cobra.Command {
 	return cmd
 }
 
-func listServices(all bool) {
+func listServices(all bool, query string) {
 	svcs, err := k.GetServices(all)
 	if err != nil {
 		awf.Fatal(fatalMessage, err.Error())
@@ -45,5 +45,5 @@ func listServices(all bool) {
 		})
 	}
 
-	awf.Output()
+	awf.Filter(query).Output()
 }

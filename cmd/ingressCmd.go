@@ -15,7 +15,7 @@ func NewIngressCmd() *cobra.Command {
 		Short: "list ingresses",
 		Args:  cobra.MinimumNArgs(0),
 		Run: func(cmd *cobra.Command, args []string) {
-			listIngresses(all)
+			listIngresses(all, getQuery(args, 0))
 		},
 		DisableSuggestions: true,
 		SilenceUsage:       true,
@@ -26,7 +26,7 @@ func NewIngressCmd() *cobra.Command {
 	return cmd
 }
 
-func listIngresses(all bool) {
+func listIngresses(all bool, query string) {
 	ingresses, err := k.GetIngresses(all)
 	if err != nil {
 		awf.Fatal(fatalMessage, err.Error())
@@ -51,5 +51,5 @@ func listIngresses(all bool) {
 		})
 	}
 
-	awf.Output()
+	awf.Filter(query).Output()
 }
