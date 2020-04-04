@@ -23,8 +23,8 @@ Please add `-a` option.
 e.g.) `kube pod -a`
 
 ### List specific resources
-`kube crd <resource-name>` is for other resources not supported.  
-For example, you can list replicaset resources by `kube crd rs` as the workflow does not support `kube rs`.
+`kube obj <resource-name>` is for other resources not supported.  
+For example, you can list replicaset resources by `kube obj rs` as the workflow does not support `kube rs`.
 
 ### Switch Context/Namespace
 Please type `kube context` or `kube ns`

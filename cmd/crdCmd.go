@@ -15,11 +15,7 @@ func NewCRDCmd() *cobra.Command {
 		Short: "list crds",
 		Args:  cobra.MinimumNArgs(0),
 		Run: func(cmd *cobra.Command, args []string) {
-			if len(args) == 0 {
-				listCustomResources(getQuery(args, 0))
-				return
-			}
-			listSpecificResources(args[0], all, getQuery(args, 1))
+			listCustomResources(getQuery(args, 0))
 		},
 		DisableSuggestions: true,
 		SilenceUsage:       true,
@@ -41,28 +37,6 @@ func listCustomResources(query string) {
 			Title:    c.Name,
 			Subtitle: fmt.Sprintf("created-at [%s] ", c.CreatedAT),
 			Arg:      c.Name,
-		})
-	}
-
-	awf.Filter(query).Output()
-}
-
-func listSpecificResources(name string, all bool, query string) {
-	rs, err := k.GetSpecificResources(name, all)
-	if err != nil {
-		awf.Fatal(fatalMessage, err.Error())
-		return
-	}
-
-	for _, r := range rs {
-		title := r.Name
-		if r.Namespace != "" {
-			title = fmt.Sprintf("[%s] %s", r.Namespace, r.Name)
-		}
-		awf.Append(&alfred.Item{
-			Title:    title,
-			Subtitle: fmt.Sprintf("age [%s]", r.Age),
-			Arg:      r.Name,
 		})
 	}
 
