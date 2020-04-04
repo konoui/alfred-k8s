@@ -6,6 +6,7 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/konoui/alfred-k8s/pkg/executor"
+	"go.uber.org/goleak"
 )
 
 var (
@@ -90,6 +91,7 @@ func TestGetDeployments(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			defer goleak.VerifyNone(t)
 			k := SetupKubectl(t, tt.fakeExecutor)
 			got, err := k.GetDeployments(tt.all)
 			if err != nil {

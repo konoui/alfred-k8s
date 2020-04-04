@@ -6,6 +6,7 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/konoui/alfred-k8s/pkg/executor"
+	"go.uber.org/goleak"
 )
 
 var (
@@ -68,6 +69,7 @@ func TestGetCurrentNamespace(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			defer goleak.VerifyNone(t)
 			k := SetupKubectl(t, tt.fakeExecutor)
 			got, err := k.GetCurrentNamespace()
 			if err != nil {
@@ -96,6 +98,7 @@ func TestGetNamespaces(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			defer goleak.VerifyNone(t)
 			k := SetupKubectl(t, tt.fakeExecutor)
 			got, err := k.GetNamespaces()
 			if err != nil {

@@ -3,6 +3,8 @@ package kubectl
 import (
 	"fmt"
 	"strings"
+
+	"github.com/pkg/errors"
 )
 
 const crdTPL = `{{ range .items -}}
@@ -28,5 +30,5 @@ func (k *Kubectl) GetCRDs() ([]*CRD, error) {
 		}
 		crds = append(crds, c)
 	}
-	return crds, nil
+	return crds, errors.Wrapf(resp.err, string(resp.stderr))
 }

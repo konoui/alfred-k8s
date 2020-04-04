@@ -29,17 +29,14 @@ func (k *Kubectl) getPods(ns string) ([]*Pod, error) {
 	// Note: NAME READY STATUS RESTARTS AGE
 	// Note: NAMESPACE NAME READY STATUS RESTARTS AGE
 	resp := k.Execute(fmt.Sprintf("get pod %s", ns))
-	header := <-resp.Readline()
-	words := strings.Fields(header)
+	stdout := resp.Readline()
+	rawHeaders := <-stdout
+	headers := strings.Fields(rawHeaders)
 
 	var pods []*Pod
-	for line := range resp.Readline() {
+	for line := range stdout {
 		rawData := strings.Fields(line)
-		pod := generatePod(rawData, words)
-		// FIXME I don't understand why read repeated header from for-range.
-		if pod.Name == "NAME" {
-			continue
-		}
+		pod := generatePod(rawData, headers)
 		pods = append(pods, pod)
 	}
 

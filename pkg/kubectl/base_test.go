@@ -6,6 +6,7 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/konoui/alfred-k8s/pkg/executor"
+	"go.uber.org/goleak"
 )
 
 const testResourceName = "pod"
@@ -35,7 +36,7 @@ var (
 	}
 )
 
-var FakePodResourceFunc = func(args ...string) (*executor.Response, error) {
+var FakePodBaseResourceFunc = func(args ...string) (*executor.Response, error) {
 	if len(args) >= 1 {
 		if args[0] == "get" && args[1] == testResourceName {
 			if len(args) == 3 && args[2] == allNamespaceFlag {
@@ -52,7 +53,7 @@ var FakePodResourceFunc = func(args ...string) (*executor.Response, error) {
 	return &executor.Response{}, fmt.Errorf("match no command args")
 }
 
-func TestPodResource(t *testing.T) {
+func TestPodBaseResource(t *testing.T) {
 	tests := []struct {
 		name         string
 		fakeExecutor executor.Executor
@@ -61,12 +62,12 @@ func TestPodResource(t *testing.T) {
 	}{
 		{
 			name:         "list pods for base resource",
-			fakeExecutor: NewFakeExecutor(FakePodResourceFunc),
+			fakeExecutor: NewFakeExecutor(FakePodBaseResourceFunc),
 			want:         testBasePods,
 		},
 		{
 			name:         "list pods in all namespaces for base resource",
-			fakeExecutor: NewFakeExecutor(FakePodResourceFunc),
+			fakeExecutor: NewFakeExecutor(FakePodBaseResourceFunc),
 			all:          true,
 			want:         testBaseAllPods,
 		},
@@ -74,6 +75,7 @@ func TestPodResource(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			defer goleak.VerifyNone(t)
 			k := SetupKubectl(t, tt.fakeExecutor)
 			got, err := k.GetBaseResources(testResourceName, tt.all)
 			if err != nil {
