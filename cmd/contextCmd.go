@@ -58,7 +58,7 @@ func listContexts(query string) {
 					Subtitle: "switch to specific context",
 					Arg:      fmt.Sprintf("context --use %s", c.Name),
 					Variables: map[string]string{
-						nextActionKey: nextActionCmd,
+						nextActionKey: nextActionSwitch,
 					},
 				},
 			},

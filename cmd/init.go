@@ -15,8 +15,9 @@ const fatalMessage = "fatal error occurs"
 
 // decide next action for workflow filter
 const (
-	nextActionKey = "nextAction"
-	nextActionCmd = "cmd"
+	nextActionKey    = "nextAction"
+	nextActionSwitch = "switch"
+	nextActionCmd    = "cmd"
 )
 
 func init() {

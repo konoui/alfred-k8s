@@ -70,6 +70,10 @@ func showAvailableSubCmds(cmd *cobra.Command, query string) {
 			Title:        c.Name(),
 			Subtitle:     subtitle,
 			Autocomplete: c.Name(),
+			Variables: map[string]string{
+				nextActionKey: nextActionCmd,
+			},
+			Arg: c.Name(),
 		})
 	}
 

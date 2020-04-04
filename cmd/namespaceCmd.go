@@ -59,7 +59,7 @@ func listNamespaces(query string) {
 					Subtitle: "switch to specific namespace",
 					Arg:      fmt.Sprintf("ns --use %s", ns.Name),
 					Variables: map[string]string{
-						nextActionKey: nextActionCmd,
+						nextActionKey: nextActionSwitch,
 					},
 				},
 			},
