@@ -15,7 +15,7 @@ func NewDeploymentCmd() *cobra.Command {
 		Short: "list deployments",
 		Args:  cobra.MinimumNArgs(0),
 		Run: func(cmd *cobra.Command, args []string) {
-			listDeployments(all)
+			listDeployments(all, getQuery(args, 0))
 		},
 		DisableSuggestions: true,
 		SilenceUsage:       true,
@@ -26,7 +26,7 @@ func NewDeploymentCmd() *cobra.Command {
 	return cmd
 }
 
-func listDeployments(all bool) {
+func listDeployments(all bool, query string) {
 	deps, err := k.GetDeployments(all)
 	if err != nil {
 		awf.Fatal(fatalMessage, err.Error())
@@ -45,5 +45,5 @@ func listDeployments(all bool) {
 		})
 	}
 
-	awf.Output()
+	awf.Filter(query).Output()
 }
