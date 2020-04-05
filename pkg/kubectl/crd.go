@@ -3,8 +3,6 @@ package kubectl
 import (
 	"fmt"
 	"strings"
-
-	"github.com/pkg/errors"
 )
 
 const crdTPL = `{{ range .items -}}
@@ -20,7 +18,7 @@ type CRD struct {
 // GetCRDs return crd in current namespace
 func (k *Kubectl) GetCRDs() ([]*CRD, error) {
 	arg := fmt.Sprintf("get crd -o go-template --template='%s'", crdTPL)
-	resp := k.Execute(arg)
+	resp, err := k.Execute(arg)
 	var crds []*CRD
 	for line := range resp.Readline() {
 		rawData := strings.Fields(line)
@@ -30,5 +28,5 @@ func (k *Kubectl) GetCRDs() ([]*CRD, error) {
 		}
 		crds = append(crds, c)
 	}
-	return crds, errors.Wrapf(resp.err, string(resp.stderr))
+	return crds, err
 }

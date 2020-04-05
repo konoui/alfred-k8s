@@ -11,6 +11,7 @@ import (
 
 	"github.com/konoui/alfred-k8s/pkg/executor"
 	"github.com/mattn/go-shellwords"
+	"github.com/pkg/errors"
 )
 
 // Command is binary path and env to execute
@@ -21,7 +22,6 @@ type Command struct {
 // Response is output of kubectl command
 type Response struct {
 	exitCode int
-	err      error
 	stdout   []byte
 	stderr   []byte
 }
@@ -33,20 +33,19 @@ func newCommand(bin string) executor.Executor {
 }
 
 // Execute kubectl command
-func (k *Kubectl) Execute(arg string) *Response {
+func (k *Kubectl) Execute(arg string) (*Response, error) {
 	args, err := shellwords.Parse(arg)
 	if err != nil {
-		return &Response{}
+		return &Response{}, err
 	}
 
 	appendPathEnv(k.pluginPath)
 	resp, err := k.cmd.Exec(args...)
 	return &Response{
 		exitCode: resp.ExitCode,
-		err:      err,
 		stdout:   resp.Stdout,
 		stderr:   resp.Stderr,
-	}
+	}, errors.Wrapf(err, string(resp.Stderr))
 }
 
 func appendPathEnv(addPath string) {

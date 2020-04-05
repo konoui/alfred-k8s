@@ -86,6 +86,14 @@ func addAllNamespaceFlag(cmd *cobra.Command, all *bool) {
 	cmd.PersistentFlags().BoolVarP(all, "all", "a", false, "in all namespaces")
 }
 
+func addUseFlag(cmd *cobra.Command, use *bool) {
+	cmd.PersistentFlags().BoolVarP(use, "use", "u", false, "switch to it")
+}
+
+func addDeleteFlag(cmd *cobra.Command, del *bool) {
+	cmd.PersistentFlags().BoolVarP(del, "delete", "d", false, "delete the resource")
+}
+
 func getQuery(args []string, idx int) string {
 	if len(args) > idx {
 		return args[idx]

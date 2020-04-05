@@ -3,8 +3,6 @@ package kubectl
 import (
 	"fmt"
 	"strings"
-
-	"github.com/pkg/errors"
 )
 
 // BaseResource is for other resources not supported
@@ -30,7 +28,7 @@ func (k *Kubectl) GetBaseResources(name string, all bool) ([]*BaseResource, erro
 
 func (k *Kubectl) getBaseResources(name, ns string) ([]*BaseResource, error) {
 	arg := fmt.Sprintf("get %s %s", name, ns)
-	resp := k.Execute(arg)
+	resp, err := k.Execute(arg)
 	stdout := resp.Readline()
 	rawHeaders := <-stdout
 	headers := strings.Fields(rawHeaders)
@@ -41,7 +39,7 @@ func (k *Kubectl) getBaseResources(name, ns string) ([]*BaseResource, error) {
 		a := generateBaseResource(rawData, headers)
 		rs = append(rs, a)
 	}
-	return rs, errors.Wrapf(resp.err, string(resp.stderr))
+	return rs, err
 }
 
 func generateBaseResource(rawData, headers []string) *BaseResource {

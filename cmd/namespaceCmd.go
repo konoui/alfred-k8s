@@ -9,23 +9,23 @@ import (
 
 // NewNamespaceCmd create a new cmd for namespace resource
 func NewNamespaceCmd() *cobra.Command {
-	var ns string
+	var use bool
 	cmd := &cobra.Command{
 		Use:   "ns",
 		Short: "list namespaces",
 		Args:  cobra.MinimumNArgs(0),
 		Run: func(cmd *cobra.Command, args []string) {
-			if ns == "" {
-				listNamespaces(getQuery(args, 0))
+			if use {
+				useNamespace(getQuery(args, 0))
 				return
 			}
-			useNamespace(ns)
+			listNamespaces(getQuery(args, 0))
 		},
 		DisableSuggestions: true,
 		SilenceUsage:       true,
 		SilenceErrors:      true,
 	}
-	cmd.PersistentFlags().StringVarP(&ns, "use", "u", "", "namespace name to switch")
+	addUseFlag(cmd, &use)
 
 	return cmd
 }
@@ -56,10 +56,10 @@ func listNamespaces(query string) {
 			Arg:      ns.Name,
 			Mods: map[alfred.ModKey]alfred.Mod{
 				alfred.ModCtrl: alfred.Mod{
-					Subtitle: "switch to specific namespace",
-					Arg:      fmt.Sprintf("ns --use %s", ns.Name),
+					Subtitle: "switch to the namespace",
+					Arg:      fmt.Sprintf("ns %s --use", ns.Name),
 					Variables: map[string]string{
-						nextActionKey: nextActionSwitch,
+						nextActionKey: nextActionShell,
 					},
 				},
 			},

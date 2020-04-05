@@ -9,24 +9,24 @@ import (
 
 // NewContextCmd create a new cmd for context resource
 func NewContextCmd() *cobra.Command {
-	var context string
+	var use bool
 	cmd := &cobra.Command{
 		Use:   "context",
 		Short: "list contexts",
 		Args:  cobra.MinimumNArgs(0),
 		Run: func(cmd *cobra.Command, args []string) {
-			if context == "" {
-				listContexts(getQuery(args, 0))
+			if use {
+				useContext(getQuery(args, 0))
 				return
 			}
-			useContext(context)
+			listContexts(getQuery(args, 0))
 		},
 		DisableSuggestions: true,
 		SilenceUsage:       true,
 		SilenceErrors:      true,
 	}
+	addUseFlag(cmd, &use)
 
-	cmd.PersistentFlags().StringVarP(&context, "use", "u", "", "context name to switch")
 	return cmd
 }
 
@@ -55,10 +55,10 @@ func listContexts(query string) {
 			Arg:   c.Name,
 			Mods: map[alfred.ModKey]alfred.Mod{
 				alfred.ModCtrl: alfred.Mod{
-					Subtitle: "switch to specific context",
-					Arg:      fmt.Sprintf("context --use %s", c.Name),
+					Subtitle: "switch to the context",
+					Arg:      fmt.Sprintf("context %s --use", c.Name),
 					Variables: map[string]string{
-						nextActionKey: nextActionSwitch,
+						nextActionKey: nextActionShell,
 					},
 				},
 			},

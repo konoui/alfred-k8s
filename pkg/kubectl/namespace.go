@@ -3,8 +3,6 @@ package kubectl
 import (
 	"fmt"
 	"strings"
-
-	"github.com/pkg/errors"
 )
 
 // Namespace is kubectl get ns information
@@ -19,7 +17,10 @@ type Namespace struct {
 func (k *Kubectl) GetNamespaces() ([]*Namespace, error) {
 	// Note: NAME STATUS AGE
 	arg := fmt.Sprintf("get namespace --no-headers")
-	resp := k.Execute(arg)
+	resp, err := k.Execute(arg)
+	if err != nil {
+		return nil, err
+	}
 
 	current, err := k.GetCurrentNamespace()
 	if err != nil {
@@ -42,7 +43,7 @@ func (k *Kubectl) GetNamespaces() ([]*Namespace, error) {
 		namespaces = append(namespaces, &ns)
 	}
 
-	return namespaces, errors.Wrapf(resp.err, string(resp.stderr))
+	return namespaces, nil
 }
 
 // GetCurrentNamespace return current namespace name
@@ -70,6 +71,6 @@ func (k *Kubectl) UseNamespace(ns string) error {
 	}
 
 	arg := fmt.Sprintf("config set-context %s --namespace=%s", context, ns)
-	resp := k.Execute(arg)
-	return errors.Wrapf(resp.err, string(resp.stderr))
+	_, err = k.Execute(arg)
+	return err
 }

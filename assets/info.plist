@@ -305,7 +305,7 @@
 				<key>matchmode</key>
 				<integer>0</integer>
 				<key>matchstring</key>
-				<string>switch</string>
+				<string>shell</string>
 			</dict>
 			<key>type</key>
 			<string>alfred.workflow.utility.filter</string>

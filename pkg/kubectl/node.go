@@ -2,8 +2,6 @@ package kubectl
 
 import (
 	"strings"
-
-	"github.com/pkg/errors"
 )
 
 // Node is kubectl get node information
@@ -17,7 +15,7 @@ type Node struct {
 
 // GetNodes return nodes
 func (k *Kubectl) GetNodes() ([]*Node, error) {
-	resp := k.Execute("get node --no-headers")
+	resp, err := k.Execute("get node --no-headers")
 
 	var nodes []*Node
 	for line := range resp.Readline() {
@@ -32,5 +30,5 @@ func (k *Kubectl) GetNodes() ([]*Node, error) {
 		nodes = append(nodes, n)
 	}
 
-	return nodes, errors.Wrap(resp.err, string(resp.stderr))
+	return nodes, err
 }

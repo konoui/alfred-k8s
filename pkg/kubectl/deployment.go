@@ -3,8 +3,6 @@ package kubectl
 import (
 	"fmt"
 	"strings"
-
-	"github.com/pkg/errors"
 )
 
 // Deployment is kubectl get deployment information
@@ -29,7 +27,7 @@ func (k *Kubectl) getDeployments(ns string) ([]*Deployment, error) {
 	// Note: NAME READY UP-TO-DATE AVAILABLE AGE
 	// Note: NAMESPACE NAME READY UP-TO-DATE AVAILABLE AGE
 	arg := fmt.Sprintf("get deployment %s --no-headers", ns)
-	resp := k.Execute(arg)
+	resp, err := k.Execute(arg)
 	var deps []*Deployment
 	for line := range resp.Readline() {
 		rawData := strings.Fields(line)
@@ -37,7 +35,7 @@ func (k *Kubectl) getDeployments(ns string) ([]*Deployment, error) {
 		deps = append(deps, dep)
 	}
 
-	return deps, errors.Wrapf(resp.err, string(resp.stderr))
+	return deps, err
 }
 
 func generateDeployment(rawData []string) *Deployment {

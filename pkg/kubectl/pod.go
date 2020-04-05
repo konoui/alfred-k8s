@@ -3,8 +3,6 @@ package kubectl
 import (
 	"fmt"
 	"strings"
-
-	"github.com/pkg/errors"
 )
 
 // Pod is kubectl get pod information
@@ -28,7 +26,7 @@ func (k *Kubectl) GetPods(all bool) ([]*Pod, error) {
 func (k *Kubectl) getPods(ns string) ([]*Pod, error) {
 	// Note: NAME READY STATUS RESTARTS AGE
 	// Note: NAMESPACE NAME READY STATUS RESTARTS AGE
-	resp := k.Execute(fmt.Sprintf("get pod %s", ns))
+	resp, err := k.Execute(fmt.Sprintf("get pod %s", ns))
 	stdout := resp.Readline()
 	rawHeaders := <-stdout
 	headers := strings.Fields(rawHeaders)
@@ -40,7 +38,7 @@ func (k *Kubectl) getPods(ns string) ([]*Pod, error) {
 		pods = append(pods, pod)
 	}
 
-	return pods, errors.Wrapf(resp.err, string(resp.stderr))
+	return pods, err
 }
 
 func generatePod(rawData, headers []string) *Pod {

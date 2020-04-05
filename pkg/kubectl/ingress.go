@@ -3,8 +3,6 @@ package kubectl
 import (
 	"fmt"
 	"strings"
-
-	"github.com/pkg/errors"
 )
 
 // Ingress is kubectl get ingress information
@@ -29,14 +27,14 @@ func (k *Kubectl) getIngress(ns string) ([]*Ingress, error) {
 	// Note: NAME	HOSTS	ADDRESS	PORTS	AGE
 	// Note: NAMESPACE	NAME	HOSTS	ADDRESS	PORTS	AGE
 	arg := fmt.Sprintf("get ingress %s --no-headers", ns)
-	resp := k.Execute(arg)
+	resp, err := k.Execute(arg)
 	var ingresses []*Ingress
 	for line := range resp.Readline() {
 		rawData := strings.Fields(line)
 		i := generateIngress(rawData)
 		ingresses = append(ingresses, i)
 	}
-	return ingresses, errors.Wrapf(resp.err, string(resp.stderr))
+	return ingresses, err
 }
 
 func generateIngress(rawData []string) *Ingress {

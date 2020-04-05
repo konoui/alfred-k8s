@@ -38,8 +38,8 @@ func TestExecute(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			resp := k.Execute(tt.cmdArg)
-			if err = resp.err; err != nil {
+			resp, err := k.Execute(tt.cmdArg)
+			if err != nil {
 				t.Error(err)
 			}
 
@@ -68,7 +68,6 @@ func TestReadlineContext(t *testing.T) {
 			name: "multi lines",
 			cmdResp: &Response{
 				stdout:   []byte(fmt.Sprintln("stdout\nstdout\nstdout")),
-				err:      nil,
 				exitCode: 0,
 			},
 		},
@@ -76,7 +75,6 @@ func TestReadlineContext(t *testing.T) {
 			name: "one line",
 			cmdResp: &Response{
 				stdout:   []byte("stdout"),
-				err:      nil,
 				exitCode: 0,
 			},
 		},
@@ -111,7 +109,6 @@ func TestReadline(t *testing.T) {
 			name: "one line",
 			cmdResp: &Response{
 				stdout:   []byte("stdout\n"),
-				err:      nil,
 				exitCode: 0,
 			},
 		},

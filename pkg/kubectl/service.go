@@ -3,8 +3,6 @@ package kubectl
 import (
 	"fmt"
 	"strings"
-
-	"github.com/pkg/errors"
 )
 
 // Service is kubectl get service information
@@ -30,7 +28,7 @@ func (k *Kubectl) getServices(ns string) ([]*Service, error) {
 	// Note: NAME TYPE CLUSTER-IP EXTERNAL-IP PORT(S) AGE
 	// Note: NAMESPACE NAME TYPE CLUSTER-IP EXTERNAL-IP PORT(S) AGE
 	arg := fmt.Sprintf("get service %s --no-headers", ns)
-	resp := k.Execute(arg)
+	resp, err := k.Execute(arg)
 	var svcs []*Service
 	for line := range resp.Readline() {
 		rawData := strings.Fields(line)
@@ -38,7 +36,7 @@ func (k *Kubectl) getServices(ns string) ([]*Service, error) {
 		svcs = append(svcs, svc)
 	}
 
-	return svcs, errors.Wrapf(resp.err, string(resp.stderr))
+	return svcs, err
 }
 
 func generateService(rawData []string) *Service {

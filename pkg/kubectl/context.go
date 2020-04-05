@@ -4,8 +4,6 @@ import (
 	"context"
 	"fmt"
 	"strings"
-
-	"github.com/pkg/errors"
 )
 
 const (
@@ -29,7 +27,11 @@ func (k *Kubectl) GetContexts() ([]*Context, error) {
 	// Note: CURRENT NAME CLUSTER AUTHINFO NAMESPACE
 	// Note: CURRENT is dummy VALUE
 	arg := fmt.Sprintf("config view -o go-template --template='%s'", contextTPL)
-	resp := k.Execute(arg)
+	resp, err := k.Execute(arg)
+	if err != nil {
+		return nil, err
+	}
+
 	current, err := k.GetCurrentContext()
 	if err != nil {
 		return nil, err
@@ -42,7 +44,7 @@ func (k *Kubectl) GetContexts() ([]*Context, error) {
 		contexts = append(contexts, c)
 	}
 
-	return contexts, errors.Wrapf(resp.err, string(resp.stderr))
+	return contexts, nil
 }
 
 func generateContext(rawData []string, current string) *Context {
@@ -71,15 +73,15 @@ func generateContext(rawData []string, current string) *Context {
 
 // GetCurrentContext return current configuration
 func (k *Kubectl) GetCurrentContext() (string, error) {
-	resp := k.Execute("config current-context")
+	resp, err := k.Execute("config current-context")
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-	return <-resp.ReadlineContext(ctx), errors.Wrapf(resp.err, string(resp.stderr))
+	return <-resp.ReadlineContext(ctx), err
 }
 
 // UseContext configure context
 func (k *Kubectl) UseContext(c string) error {
 	arg := fmt.Sprintf("config use-context %s", c)
-	resp := k.Execute(arg)
-	return errors.Wrapf(resp.err, string(resp.stderr))
+	_, err := k.Execute(arg)
+	return err
 }
