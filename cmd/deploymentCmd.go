@@ -34,10 +34,7 @@ func listDeployments(all bool, query string) {
 	}
 
 	for _, d := range deps {
-		title := d.Name
-		if d.Namespace != "" {
-			title = fmt.Sprintf("[%s] %s", d.Namespace, d.Name)
-		}
+		title := getNamespaceResourceTitle(d)
 		awf.Append(&alfred.Item{
 			Title:    title,
 			Subtitle: fmt.Sprintf("ready [%s] up-to-date [%s] available [%s]", d.Ready, d.UpToDate, d.Available),

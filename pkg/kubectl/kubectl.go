@@ -37,10 +37,11 @@ func New(opts ...Option) (*Kubectl, error) {
 // OptionBinary is configuration of kubectl absolute path
 func OptionBinary(bin string) Option {
 	return func(k *Kubectl) error {
-		if _, err := exec.LookPath(bin); err != nil {
+		kctl := os.ExpandEnv(bin)
+		if _, err := exec.LookPath(kctl); err != nil {
 			return err
 		}
-		k.cmd = newCommand(bin)
+		k.cmd = newCommand(kctl)
 		return nil
 	}
 }
@@ -51,13 +52,6 @@ func OptionPluginPath(path string) Option {
 	return func(k *Kubectl) error {
 		// Replace ${HOME} with abs path
 		k.pluginPath = os.ExpandEnv(path)
-		return nil
-	}
-}
-
-// OptionNone noop
-func OptionNone() Option {
-	return func(k *Kubectl) error {
 		return nil
 	}
 }

@@ -29,7 +29,7 @@ func init() {
 	c, err := newConfig()
 	exitWith(err)
 
-	binOpt, pluginPathOpt := kubectl.OptionNone(), kubectl.OptionNone()
+	var binOpt, pluginPathOpt kubectl.Option
 	if c.Kubectl.Bin != "" {
 		binOpt = kubectl.OptionBinary(c.Kubectl.Bin)
 	}
@@ -39,9 +39,7 @@ func init() {
 	}
 
 	k, err = kubectl.New(binOpt, pluginPathOpt)
-	if err != nil {
-		exitWith(err)
-	}
+	exitWith(err)
 }
 
 func exitWith(err error) {

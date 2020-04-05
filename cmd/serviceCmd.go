@@ -34,10 +34,7 @@ func listServices(all bool, query string) {
 	}
 
 	for _, s := range svcs {
-		title := fmt.Sprintf("type [%s]  %s", s.Type, s.Name)
-		if s.Namespace != "" {
-			title = fmt.Sprintf("[%s] %s", s.Namespace, s.Name)
-		}
+		title := getNamespaceResourceTitle(s)
 		awf.Append(&alfred.Item{
 			Title:    title,
 			Subtitle: fmt.Sprintf("cluster-ip [%s] external-ip [%s] ports [%s]", s.ClusterIP, s.ExternalIP, s.Ports),

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"reflect"
 
 	"github.com/konoui/go-alfred"
 	"github.com/spf13/cobra"
@@ -90,4 +91,25 @@ func getQuery(args []string, idx int) string {
 		return args[idx]
 	}
 	return ""
+}
+
+func getNamespaceResourceTitle(i interface{}) string {
+	rv := reflect.Indirect(reflect.ValueOf(i))
+	rt := rv.Type()
+	if _, ok := rt.FieldByName("Name"); !ok {
+		// Note unexpected case
+		return "UnknownName"
+	}
+
+	name := rv.FieldByName("Name").String()
+	if _, ok := rt.FieldByName("Namespace"); !ok {
+		return name
+	}
+
+	ns := rv.FieldByName("Namespace").String()
+	if ns == "" {
+		return name
+	}
+
+	return fmt.Sprintf("[%s] %s", ns, name)
 }

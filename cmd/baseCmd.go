@@ -34,10 +34,7 @@ func listBaseResources(name string, all bool, query string) {
 	}
 
 	for _, r := range rs {
-		title := r.Name
-		if r.Namespace != "" {
-			title = fmt.Sprintf("[%s] %s", r.Namespace, r.Name)
-		}
+		title := getNamespaceResourceTitle(r)
 		awf.Append(&alfred.Item{
 			Title:    title,
 			Subtitle: fmt.Sprintf("age [%s]", r.Age),

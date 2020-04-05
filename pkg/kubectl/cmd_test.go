@@ -13,10 +13,6 @@ const (
 	knownBinPath = "/bin"
 )
 
-func TestExec(t *testing.T) {
-
-}
-
 func TestExecute(t *testing.T) {
 	tests := []struct {
 		name      string

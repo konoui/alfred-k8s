@@ -34,10 +34,7 @@ func listIngresses(all bool, query string) {
 	}
 
 	for _, i := range ingresses {
-		title := i.Name
-		if i.Namespace != "" {
-			title = fmt.Sprintf("[%s] %s", i.Namespace, i.Name)
-		}
+		title := getNamespaceResourceTitle(i)
 		awf.Append(&alfred.Item{
 			Title:    title,
 			Subtitle: fmt.Sprintf("host [%s] address [%s] ports [%s] ", i.Hosts, i.Address, i.Ports),

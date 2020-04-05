@@ -80,3 +80,26 @@ func TestOptionPluginPath(t *testing.T) {
 		}
 	})
 }
+
+func TestOptionBinary(t *testing.T) {
+	path := "/ls"
+	key := "TEST_BIN"
+	value := "/bin"
+	input := "$" + key + path
+	want := newCommand(value + path)
+	t.Run("expand env test", func(t *testing.T) {
+		if err := os.Setenv(key, value); err != nil {
+			t.Fatal(err)
+		}
+
+		k, err := New(OptionBinary(input))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		got := k.cmd
+		if !reflect.DeepEqual(want, got) {
+			t.Errorf("unexpected want: %v\ngot: %v", want, got)
+		}
+	})
+}

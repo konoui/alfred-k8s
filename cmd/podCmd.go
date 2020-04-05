@@ -34,10 +34,7 @@ func listPods(all bool, query string) {
 	}
 
 	for _, p := range pods {
-		title := p.Name
-		if p.Namespace != "" {
-			title = fmt.Sprintf("[%s] %s", p.Namespace, p.Name)
-		}
+		title := getNamespaceResourceTitle(p)
 		awf.Append(&alfred.Item{
 			Title:    title,
 			Subtitle: fmt.Sprintf("ready [%s] status [%s] restarts [%s] ", p.Ready, p.Status, p.Restarts),
