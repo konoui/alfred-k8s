@@ -1,0 +1,2 @@
+test1-namespace	deployment-test1     1/1     1            1           11d
+test2-namespace	deployment-test2	2/2	2	1	11d

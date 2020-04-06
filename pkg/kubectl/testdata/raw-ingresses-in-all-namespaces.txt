@@ -1,0 +1,2 @@
+test1-namespace	test1-ingress   *       ingress1.hoge.hoge   80      24h
+test2-namespace	test2-ingress   *       ingress2.hoge.hoge   80      24h
