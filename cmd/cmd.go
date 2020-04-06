@@ -20,7 +20,7 @@ func Execute(rootCmd *cobra.Command) {
 	rootCmd.SetErr(errStream)
 	rootCmd.SetOut(outStream)
 	if err := rootCmd.Execute(); err != nil {
-		showAvailableSubCmds(rootCmd, getQuery(os.Args, 1))
+		listAvailableSubCmds(rootCmd, getQuery(os.Args, 1))
 	}
 }
 
@@ -42,9 +42,9 @@ func NewDefaultCmd() *cobra.Command {
 // NewRootCmd create a new cmd for root
 func NewRootCmd() *cobra.Command {
 	rootCmd := &cobra.Command{
-		Short: "available commands",
+		Short: "list available commands",
 		Run: func(cmd *cobra.Command, args []string) {
-			showAvailableSubCmds(cmd, getQuery(args, 0))
+			listAvailableSubCmds(cmd, getQuery(args, 0))
 		},
 		DisableSuggestions: true,
 		SilenceUsage:       true,
@@ -57,7 +57,7 @@ func NewRootCmd() *cobra.Command {
 	return rootCmd
 }
 
-func showAvailableSubCmds(cmd *cobra.Command, query string) {
+func listAvailableSubCmds(cmd *cobra.Command, query string) {
 	for _, c := range cmd.Commands() {
 		if !c.IsAvailableCommand() {
 			continue
