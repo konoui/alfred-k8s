@@ -1,11 +1,9 @@
 package kubectl
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/konoui/alfred-k8s/pkg/executor"
 	"go.uber.org/goleak"
 )
 
@@ -47,26 +45,6 @@ var testServices = []*Service{
 		Ports:      "8080/TCP,9901/TCP",
 		Age:        "11d",
 	},
-}
-
-var FakeServiceFunc = func(t *testing.T, args ...string) (*executor.Response, error) {
-	rawDataAllServices := GetByteFromTestFile(t, "testdata/raw-services-in-all-namespaces.txt")
-	rawDataServices := GetByteFromTestFile(t, "testdata/raw-services.txt")
-	if len(args) >= 4 {
-		if args[1] == "service" && args[2] == allNamespaceFlag {
-			return &executor.Response{
-				Stdout: rawDataAllServices,
-			}, nil
-		}
-	}
-	if len(args) >= 2 {
-		if args[1] == "service" {
-			return &executor.Response{
-				Stdout: rawDataServices,
-			}, nil
-		}
-	}
-	return &executor.Response{}, fmt.Errorf("match no command args")
 }
 
 func TestGetServices(t *testing.T) {

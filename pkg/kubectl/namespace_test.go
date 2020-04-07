@@ -1,12 +1,9 @@
 package kubectl
 
 import (
-	"fmt"
-	"strings"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/konoui/alfred-k8s/pkg/executor"
 	"go.uber.org/goleak"
 )
 
@@ -34,25 +31,6 @@ var testNamespaces = []*Namespace{
 	},
 }
 
-func getCurrentNamespace(t *testing.T) string {
-	c := GetStringFromTestFile(t, "testdata/raw-current-namespace.txt")
-	return strings.Replace(c, "\n", "", -1)
-}
-
-var FakeNamespaceFunc = func(t *testing.T, args ...string) (*executor.Response, error) {
-	rawDataNamespaces := GetByteFromTestFile(t, "testdata/raw-namespaces.txt")
-	if len(args) >= 2 {
-		if args[1] == "namespace" {
-			return &executor.Response{
-				Stdout: rawDataNamespaces,
-			}, nil
-		}
-		// Note: get current namespace and namespaces call context function
-		return FakeContextFunc(t, args...)
-	}
-	return &executor.Response{}, fmt.Errorf("match no command args")
-}
-
 func TestGetCurrentNamespace(t *testing.T) {
 	tests := []struct {
 		name     string
@@ -62,7 +40,7 @@ func TestGetCurrentNamespace(t *testing.T) {
 		{
 			name:     "get current namespace",
 			fakeFunc: FakeNamespaceFunc,
-			want:     getCurrentNamespace(t),
+			want:     GetCurrentNamespace(t),
 		},
 	}
 

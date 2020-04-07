@@ -1,11 +1,9 @@
 package kubectl
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/konoui/alfred-k8s/pkg/executor"
 	"go.uber.org/goleak"
 )
 
@@ -42,26 +40,6 @@ var testDeployments = []*Deployment{
 		Available: "1",
 		Age:       "11d",
 	},
-}
-
-var FakeDeploymentFunc = func(t *testing.T, args ...string) (*executor.Response, error) {
-	rawDataAllDeployments := GetByteFromTestFile(t, "testdata/raw-deployments-in-all-namespaces.txt")
-	rawDataDeployments := GetByteFromTestFile(t, "testdata/raw-deployments.txt")
-	if len(args) >= 4 {
-		if args[1] == "deployment" && args[2] == allNamespaceFlag {
-			return &executor.Response{
-				Stdout: []byte(rawDataAllDeployments),
-			}, nil
-		}
-	}
-	if len(args) >= 2 {
-		if args[1] == "deployment" {
-			return &executor.Response{
-				Stdout: []byte(rawDataDeployments),
-			}, nil
-		}
-	}
-	return &executor.Response{}, fmt.Errorf("match no command args")
 }
 
 func TestGetDeployments(t *testing.T) {

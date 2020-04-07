@@ -1,12 +1,9 @@
 package kubectl
 
 import (
-	"fmt"
-	"strings"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/konoui/alfred-k8s/pkg/executor"
 	"go.uber.org/goleak"
 )
 
@@ -26,29 +23,6 @@ var testContexts = []*Context{
 	},
 }
 
-func getCurrentContext(t *testing.T) string {
-	c := GetStringFromTestFile(t, "testdata/raw-current-context.txt")
-	return strings.Replace(c, "\n", "", -1)
-}
-
-var FakeContextFunc = func(t *testing.T, args ...string) (*executor.Response, error) {
-	rawDataCurrentContext := GetByteFromTestFile(t, "testdata/raw-current-context.txt")
-	rawDataContexts := GetByteFromTestFile(t, "testdata/raw-contexts.txt")
-	if len(args) >= 2 {
-		if args[1] == "current-context" {
-			return &executor.Response{
-				Stdout: rawDataCurrentContext,
-			}, nil
-		}
-		if args[1] == "view" {
-			return &executor.Response{
-				Stdout: rawDataContexts,
-			}, nil
-		}
-	}
-	return &executor.Response{}, fmt.Errorf("match no command args")
-}
-
 func TestGetCurrentContext(t *testing.T) {
 	tests := []struct {
 		name     string
@@ -58,7 +32,7 @@ func TestGetCurrentContext(t *testing.T) {
 		{
 			name:     "get current context",
 			fakeFunc: FakeContextFunc,
-			want:     getCurrentContext(t),
+			want:     GetCurrentContext(t),
 		},
 	}
 
