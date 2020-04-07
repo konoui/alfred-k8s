@@ -6,6 +6,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/konoui/alfred-k8s/pkg/kubectl"
 	"github.com/konoui/go-alfred"
 	"github.com/spf13/cobra"
 )
@@ -13,6 +14,8 @@ import (
 func SetupCmd(t *testing.T, cmd *cobra.Command, args []string) (outBuf, errBuf *bytes.Buffer) {
 	t.Helper()
 
+	// set kubectl instance to global variable `k`
+	k = kubectl.SetupKubectl(t, nil)
 	outBuf, errBuf = new(bytes.Buffer), new(bytes.Buffer)
 	outStream, errStream = outBuf, errBuf
 	cmd.SetOut(outStream)
@@ -37,7 +40,7 @@ func TestExecute(t *testing.T) {
 		cmd  *cobra.Command
 	}{
 		{
-			name: "show available commands when no sub command",
+			name: "show available commands when no input",
 			want: want{
 				filepath: "testdata/list-available-commands.json",
 			},

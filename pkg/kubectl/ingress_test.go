@@ -44,28 +44,25 @@ var testIngresses = []*Ingress{
 
 func TestGetIngresses(t *testing.T) {
 	tests := []struct {
-		name     string
-		fakeFunc FakeFunc
-		all      bool
-		want     []*Ingress
+		name string
+		all  bool
+		want []*Ingress
 	}{
 		{
-			name:     "list ingresses",
-			fakeFunc: FakeIngressFunc,
-			want:     testIngresses,
+			name: "list ingresses",
+			want: testIngresses,
 		},
 		{
-			name:     "list deployments in all namespaces",
-			fakeFunc: FakeIngressFunc,
-			all:      true,
-			want:     testAllIngresses,
+			name: "list deployments in all namespaces",
+			all:  true,
+			want: testAllIngresses,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			defer goleak.VerifyNone(t)
-			k := SetupKubectl(t, tt.fakeFunc)
+			k := SetupKubectl(t, nil)
 			got, err := k.GetIngresses(tt.all)
 			if err != nil {
 				t.Fatal(err)

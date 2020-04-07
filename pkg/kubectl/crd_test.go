@@ -20,21 +20,19 @@ var testCRDs = []*CRD{
 
 func TestGetCRDs(t *testing.T) {
 	tests := []struct {
-		name     string
-		fakeFunc FakeFunc
-		want     []*CRD
+		name string
+		want []*CRD
 	}{
 		{
-			name:     "list CRDs",
-			fakeFunc: FakeCRDFunc,
-			want:     testCRDs,
+			name: "list CRDs",
+			want: testCRDs,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			defer goleak.VerifyNone(t)
-			k := SetupKubectl(t, tt.fakeFunc)
+			k := SetupKubectl(t, nil)
 			got, err := k.GetCRDs()
 			if err != nil {
 				t.Fatal(err)

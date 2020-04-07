@@ -3,6 +3,8 @@ package kubectl
 import (
 	"fmt"
 	"io/ioutil"
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 
@@ -35,9 +37,12 @@ func NewFakeExecutor(t *testing.T, impl FakeFunc) executor.Executor {
 
 // SetupKubectl is helper for mock test.
 // Please pass test and function of FakeFunc type
-func SetupKubectl(t *testing.T, fakeFunc FakeFunc) *Kubectl {
+func SetupKubectl(t *testing.T, f FakeFunc) *Kubectl {
 	t.Helper()
-	e := NewFakeExecutor(t, fakeFunc)
+	if f == nil {
+		f = FakeResourceFunc
+	}
+	e := NewFakeExecutor(t, f)
 	k, err := New(OptionExecutor(e))
 	if err != nil {
 		t.Fatal(err)
@@ -57,6 +62,12 @@ func OptionExecutor(e executor.Executor) Option {
 // GetByteFromTestFile get vlues as []byte from test file.
 func GetByteFromTestFile(t *testing.T, path string) []byte {
 	t.Helper()
+
+	if gopath := os.Getenv("GOPATH"); gopath != "" {
+		const repo = "src/github.com/konoui/alfred-k8s/pkg/kubectl"
+		path = filepath.Join(gopath, repo, path)
+	}
+
 	data, err := ioutil.ReadFile(path)
 	if err != nil {
 		t.Fatalf("failed to open file '%#v'", err)
@@ -70,36 +81,65 @@ func GetStringFromTestFile(t *testing.T, path string) string {
 	return string(GetByteFromTestFile(t, path))
 }
 
-// GetCurrentContext is helper to read test data
-func GetCurrentContext(t *testing.T) string {
+// GetCurrentContextFromtTestFile is helper to read test data
+func GetCurrentContextFromtTestFile(t *testing.T) string {
 	t.Helper()
 	c := GetStringFromTestFile(t, "testdata/raw-current-context.txt")
 	return strings.Replace(c, "\n", "", -1)
 }
 
-// GetCurrentNamespace is helper to read test data
-func GetCurrentNamespace(t *testing.T) string {
+// GetCurrentNamespaceFromtTestFile is helper to read test data
+func GetCurrentNamespaceFromtTestFile(t *testing.T) string {
 	t.Helper()
 	c := GetStringFromTestFile(t, "testdata/raw-current-namespace.txt")
 	return strings.Replace(c, "\n", "", -1)
 }
 
+func hasQuery(args []string, i int, expect string) bool {
+	if len(args) > i {
+		return args[i] == expect
+	}
+	return false
+}
+
+// FakeResourceFunc please call this for mock test
+func FakeResourceFunc(t *testing.T, args ...string) (*executor.Response, error) {
+	fs := []FakeFunc{
+		FakePodFunc,
+		FakeContextFunc,
+		FakeNamespaceFunc,
+		FakeDeploymentFunc,
+		FakeServiceFunc,
+		FakeNodeFunc,
+		FakeIngressFunc,
+		FakePodBaseResourceFunc,
+		FakeCRDFunc,
+	}
+	for _, f := range fs {
+		resp, err := f(t, args...)
+		if err == nil {
+			// found valid execution
+			return resp, nil
+		}
+	}
+	return &executor.Response{}, fmt.Errorf("match no execution function")
+}
+
 // FakePodBaseResourceFunc behave kubectl get pod
-var FakePodBaseResourceFunc = func(t *testing.T, args ...string) (*executor.Response, error) {
+func FakePodBaseResourceFunc(t *testing.T, args ...string) (*executor.Response, error) {
 	rawDataAllPods := GetByteFromTestFile(t, "testdata/raw-pods-in-all-namespaces.txt")
 	rawDataPods := GetByteFromTestFile(t, "testdata/raw-pods.txt")
-	if len(args) >= 1 {
-		if args[0] == "get" && args[1] == "pod" {
-			if len(args) == 3 && args[2] == allNamespaceFlag {
-				return &executor.Response{
-					Stdout: []byte(rawDataAllPods),
-				}, nil
-			}
 
+	if hasQuery(args, 0, "get") && hasQuery(args, 1, "pod") {
+		if hasQuery(args, 2, allNamespaceFlag) {
 			return &executor.Response{
-				Stdout: []byte(rawDataPods),
+				Stdout: []byte(rawDataAllPods),
 			}, nil
 		}
+
+		return &executor.Response{
+			Stdout: []byte(rawDataPods),
+		}, nil
 	}
 	return &executor.Response{}, fmt.Errorf("match no command args")
 }
@@ -108,17 +148,16 @@ var FakePodBaseResourceFunc = func(t *testing.T, args ...string) (*executor.Resp
 func FakeContextFunc(t *testing.T, args ...string) (*executor.Response, error) {
 	rawDataCurrentContext := GetByteFromTestFile(t, "testdata/raw-current-context.txt")
 	rawDataContexts := GetByteFromTestFile(t, "testdata/raw-contexts.txt")
-	if len(args) >= 2 {
-		if args[1] == "current-context" {
-			return &executor.Response{
-				Stdout: rawDataCurrentContext,
-			}, nil
-		}
-		if args[1] == "view" {
-			return &executor.Response{
-				Stdout: rawDataContexts,
-			}, nil
-		}
+
+	if hasQuery(args, 1, "current-context") {
+		return &executor.Response{
+			Stdout: rawDataCurrentContext,
+		}, nil
+	}
+	if hasQuery(args, 1, "view") {
+		return &executor.Response{
+			Stdout: rawDataContexts,
+		}, nil
 	}
 	return &executor.Response{}, fmt.Errorf("match no command args")
 }
@@ -126,12 +165,11 @@ func FakeContextFunc(t *testing.T, args ...string) (*executor.Response, error) {
 // FakeCRDFunc behave kubectl get crd
 func FakeCRDFunc(t *testing.T, args ...string) (*executor.Response, error) {
 	rawDataCRDs := GetByteFromTestFile(t, "testdata/raw-crds.txt")
-	if len(args) >= 1 {
-		if args[1] == "crd" {
-			return &executor.Response{
-				Stdout: rawDataCRDs,
-			}, nil
-		}
+
+	if hasQuery(args, 1, "crd") {
+		return &executor.Response{
+			Stdout: rawDataCRDs,
+		}, nil
 	}
 	return &executor.Response{}, fmt.Errorf("match no command args")
 }
@@ -140,19 +178,17 @@ func FakeCRDFunc(t *testing.T, args ...string) (*executor.Response, error) {
 func FakeDeploymentFunc(t *testing.T, args ...string) (*executor.Response, error) {
 	rawDataAllDeployments := GetByteFromTestFile(t, "testdata/raw-deployments-in-all-namespaces.txt")
 	rawDataDeployments := GetByteFromTestFile(t, "testdata/raw-deployments.txt")
-	if len(args) >= 4 {
-		if args[1] == "deployment" && args[2] == allNamespaceFlag {
+
+	if hasQuery(args, 0, "get") && hasQuery(args, 1, "deployment") {
+		if hasQuery(args, 2, allNamespaceFlag) {
 			return &executor.Response{
 				Stdout: []byte(rawDataAllDeployments),
 			}, nil
 		}
-	}
-	if len(args) >= 2 {
-		if args[1] == "deployment" {
-			return &executor.Response{
-				Stdout: []byte(rawDataDeployments),
-			}, nil
-		}
+
+		return &executor.Response{
+			Stdout: []byte(rawDataDeployments),
+		}, nil
 	}
 	return &executor.Response{}, fmt.Errorf("match no command args")
 }
@@ -161,19 +197,17 @@ func FakeDeploymentFunc(t *testing.T, args ...string) (*executor.Response, error
 func FakeIngressFunc(t *testing.T, args ...string) (*executor.Response, error) {
 	rawDataAllIngresses := GetByteFromTestFile(t, "testdata/raw-ingresses-in-all-namespaces.txt")
 	rawDataIngresses := GetByteFromTestFile(t, "testdata/raw-ingresses.txt")
-	if len(args) >= 4 {
-		if args[1] == "ingress" && args[2] == allNamespaceFlag {
+
+	if hasQuery(args, 0, "get") && hasQuery(args, 1, "ingress") {
+		if hasQuery(args, 2, allNamespaceFlag) {
 			return &executor.Response{
 				Stdout: rawDataAllIngresses,
 			}, nil
 		}
-	}
-	if len(args) >= 2 {
-		if args[1] == "ingress" {
-			return &executor.Response{
-				Stdout: rawDataIngresses,
-			}, nil
-		}
+
+		return &executor.Response{
+			Stdout: rawDataIngresses,
+		}, nil
 	}
 	return &executor.Response{}, fmt.Errorf("match no command args")
 }
@@ -181,27 +215,24 @@ func FakeIngressFunc(t *testing.T, args ...string) (*executor.Response, error) {
 // FakeNamespaceFunc behave kubectl get ns
 func FakeNamespaceFunc(t *testing.T, args ...string) (*executor.Response, error) {
 	rawDataNamespaces := GetByteFromTestFile(t, "testdata/raw-namespaces.txt")
-	if len(args) >= 2 {
-		if args[1] == "namespace" {
-			return &executor.Response{
-				Stdout: rawDataNamespaces,
-			}, nil
-		}
-		// Note: get current namespace and namespaces call context function
-		return FakeContextFunc(t, args...)
+
+	if hasQuery(args, 1, "namespace") {
+		return &executor.Response{
+			Stdout: rawDataNamespaces,
+		}, nil
 	}
-	return &executor.Response{}, fmt.Errorf("match no command args")
+	// Note: get current namespace and namespaces call context function
+	return FakeContextFunc(t, args...)
 }
 
 // FakeNodeFunc behave kubectl get node
 func FakeNodeFunc(t *testing.T, args ...string) (*executor.Response, error) {
 	rawDataNodes := GetByteFromTestFile(t, "testdata/raw-nodes.txt")
-	if len(args) >= 2 {
-		if args[1] == "node" {
-			return &executor.Response{
-				Stdout: rawDataNodes,
-			}, nil
-		}
+
+	if hasQuery(args, 1, "node") {
+		return &executor.Response{
+			Stdout: rawDataNodes,
+		}, nil
 	}
 	return &executor.Response{}, fmt.Errorf("match no command args")
 }
@@ -210,20 +241,17 @@ func FakeNodeFunc(t *testing.T, args ...string) (*executor.Response, error) {
 func FakePodFunc(t *testing.T, args ...string) (*executor.Response, error) {
 	rawDataAllPods := GetByteFromTestFile(t, "testdata/raw-pods-in-all-namespaces.txt")
 	rawDataPods := GetByteFromTestFile(t, "testdata/raw-pods.txt")
-	pod := "pod"
-	if len(args) >= 3 {
-		if args[1] == pod && args[2] == allNamespaceFlag {
+
+	if hasQuery(args, 0, "get") && hasQuery(args, 1, "pod") {
+		if hasQuery(args, 2, allNamespaceFlag) {
 			return &executor.Response{
 				Stdout: rawDataAllPods,
 			}, nil
 		}
-	}
-	if len(args) >= 2 {
-		if args[1] == pod {
-			return &executor.Response{
-				Stdout: rawDataPods,
-			}, nil
-		}
+
+		return &executor.Response{
+			Stdout: rawDataPods,
+		}, nil
 	}
 	return &executor.Response{}, fmt.Errorf("match no command args")
 }
@@ -232,19 +260,17 @@ func FakePodFunc(t *testing.T, args ...string) (*executor.Response, error) {
 func FakeServiceFunc(t *testing.T, args ...string) (*executor.Response, error) {
 	rawDataAllServices := GetByteFromTestFile(t, "testdata/raw-services-in-all-namespaces.txt")
 	rawDataServices := GetByteFromTestFile(t, "testdata/raw-services.txt")
-	if len(args) >= 4 {
-		if args[1] == "service" && args[2] == allNamespaceFlag {
+
+	if hasQuery(args, 0, "get") && hasQuery(args, 1, "service") {
+		if hasQuery(args, 2, allNamespaceFlag) {
 			return &executor.Response{
 				Stdout: rawDataAllServices,
 			}, nil
 		}
-	}
-	if len(args) >= 2 {
-		if args[1] == "service" {
-			return &executor.Response{
-				Stdout: rawDataServices,
-			}, nil
-		}
+
+		return &executor.Response{
+			Stdout: rawDataServices,
+		}, nil
 	}
 	return &executor.Response{}, fmt.Errorf("match no command args")
 }

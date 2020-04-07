@@ -44,28 +44,25 @@ var testDeployments = []*Deployment{
 
 func TestGetDeployments(t *testing.T) {
 	tests := []struct {
-		name     string
-		fakeFunc FakeFunc
-		all      bool
-		want     []*Deployment
+		name string
+		all  bool
+		want []*Deployment
 	}{
 		{
-			name:     "list deployments",
-			fakeFunc: FakeDeploymentFunc,
-			want:     testDeployments,
+			name: "list deployments",
+			want: testDeployments,
 		},
 		{
-			name:     "list deployments in all namespaces",
-			fakeFunc: FakeDeploymentFunc,
-			all:      true,
-			want:     testAllDeployments,
+			name: "list deployments in all namespaces",
+			all:  true,
+			want: testAllDeployments,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			defer goleak.VerifyNone(t)
-			k := SetupKubectl(t, tt.fakeFunc)
+			k := SetupKubectl(t, nil)
 			got, err := k.GetDeployments(tt.all)
 			if err != nil {
 				t.Fatal(err)

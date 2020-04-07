@@ -33,21 +33,19 @@ var testNamespaces = []*Namespace{
 
 func TestGetCurrentNamespace(t *testing.T) {
 	tests := []struct {
-		name     string
-		fakeFunc FakeFunc
-		want     string
+		name string
+		want string
 	}{
 		{
-			name:     "get current namespace",
-			fakeFunc: FakeNamespaceFunc,
-			want:     GetCurrentNamespace(t),
+			name: "get current namespace",
+			want: GetCurrentNamespaceFromtTestFile(t),
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			defer goleak.VerifyNone(t)
-			k := SetupKubectl(t, tt.fakeFunc)
+			k := SetupKubectl(t, nil)
 			got, err := k.GetCurrentNamespace()
 			if err != nil {
 				t.Fatal(err)
@@ -62,21 +60,19 @@ func TestGetCurrentNamespace(t *testing.T) {
 
 func TestGetNamespaces(t *testing.T) {
 	tests := []struct {
-		name     string
-		fakeFunc FakeFunc
-		want     []*Namespace
+		name string
+		want []*Namespace
 	}{
 		{
-			name:     "list namespaces",
-			fakeFunc: FakeNamespaceFunc,
-			want:     testNamespaces,
+			name: "list namespaces",
+			want: testNamespaces,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			defer goleak.VerifyNone(t)
-			k := SetupKubectl(t, tt.fakeFunc)
+			k := SetupKubectl(t, nil)
 			got, err := k.GetNamespaces()
 			if err != nil {
 				t.Fatal(err)

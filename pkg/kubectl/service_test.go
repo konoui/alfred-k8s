@@ -49,28 +49,25 @@ var testServices = []*Service{
 
 func TestGetServices(t *testing.T) {
 	tests := []struct {
-		name     string
-		fakeFunc FakeFunc
-		all      bool
-		want     []*Service
+		name string
+		all  bool
+		want []*Service
 	}{
 		{
-			name:     "list services",
-			fakeFunc: FakeServiceFunc,
-			want:     testServices,
+			name: "list services",
+			want: testServices,
 		},
 		{
-			name:     "list services in all namespaces",
-			fakeFunc: FakeServiceFunc,
-			all:      true,
-			want:     testAllServices,
+			name: "list services in all namespaces",
+			all:  true,
+			want: testAllServices,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			defer goleak.VerifyNone(t)
-			k := SetupKubectl(t, tt.fakeFunc)
+			k := SetupKubectl(t, nil)
 			got, err := k.GetServices(tt.all)
 			if err != nil {
 				t.Fatal(err)

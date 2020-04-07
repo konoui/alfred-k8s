@@ -46,28 +46,25 @@ var (
 
 func TestGetPods(t *testing.T) {
 	tests := []struct {
-		name     string
-		fakeFunc FakeFunc
-		all      bool
-		want     []*Pod
+		name string
+		all  bool
+		want []*Pod
 	}{
 		{
-			name:     "list pods",
-			fakeFunc: FakePodFunc,
-			want:     testPods,
+			name: "list pods",
+			want: testPods,
 		},
 		{
-			name:     "list pods in all namespaces",
-			fakeFunc: FakePodFunc,
-			all:      true,
-			want:     testAllPods,
+			name: "list pods in all namespaces",
+			all:  true,
+			want: testAllPods,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			defer goleak.VerifyNone(t)
-			k := SetupKubectl(t, tt.fakeFunc)
+			k := SetupKubectl(t, nil)
 			got, err := k.GetPods(tt.all)
 			if err != nil {
 				t.Fatal(err)

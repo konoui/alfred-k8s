@@ -30,16 +30,15 @@ func TestGetCurrentContext(t *testing.T) {
 		want     string
 	}{
 		{
-			name:     "get current context",
-			fakeFunc: FakeContextFunc,
-			want:     GetCurrentContext(t),
+			name: "get current context",
+			want: GetCurrentContextFromtTestFile(t),
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			defer goleak.VerifyNone(t)
-			k := SetupKubectl(t, tt.fakeFunc)
+			k := SetupKubectl(t, nil)
 			got, err := k.GetCurrentContext()
 			if err != nil {
 				t.Fatal(err)
@@ -54,21 +53,19 @@ func TestGetCurrentContext(t *testing.T) {
 
 func TestGetContexts(t *testing.T) {
 	tests := []struct {
-		name     string
-		fakeFunc FakeFunc
-		want     []*Context
+		name string
+		want []*Context
 	}{
 		{
-			name:     "view contexts",
-			fakeFunc: FakeContextFunc,
-			want:     testContexts,
+			name: "view contexts",
+			want: testContexts,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			defer goleak.VerifyNone(t)
-			k := SetupKubectl(t, tt.fakeFunc)
+			k := SetupKubectl(t, nil)
 			got, err := k.GetContexts()
 			if err != nil {
 				t.Fatal(err)
