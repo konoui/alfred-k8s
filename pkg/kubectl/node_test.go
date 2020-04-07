@@ -9,11 +9,6 @@ import (
 	"go.uber.org/goleak"
 )
 
-var (
-	testNodesRawData = `node-1   Ready    <none>   11d   v1.15.10-eks-bac369
-	node-2   Ready    <none>   11d   v1.15.10-eks-bac369`
-)
-
 var testNodes = []*Node{
 	&Node{
 		Name:    "node-1",
@@ -31,11 +26,12 @@ var testNodes = []*Node{
 	},
 }
 
-var FakeNodeFunc = func(args ...string) (*executor.Response, error) {
+var FakeNodeFunc = func(t *testing.T, args ...string) (*executor.Response, error) {
+	rawDataNodes := GetByteFromTestFile(t, "testdata/raw-nodes.txt")
 	if len(args) >= 2 {
 		if args[1] == "node" {
 			return &executor.Response{
-				Stdout: []byte(testNodesRawData),
+				Stdout: rawDataNodes,
 			}, nil
 		}
 	}
@@ -44,21 +40,21 @@ var FakeNodeFunc = func(args ...string) (*executor.Response, error) {
 
 func TestGetNodes(t *testing.T) {
 	tests := []struct {
-		name         string
-		fakeExecutor executor.Executor
-		want         []*Node
+		name     string
+		fakeFunc FakeFunc
+		want     []*Node
 	}{
 		{
-			name:         "list nodes",
-			fakeExecutor: NewFakeExecutor(FakeNodeFunc),
-			want:         testNodes,
+			name:     "list nodes",
+			fakeFunc: FakeNodeFunc,
+			want:     testNodes,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			defer goleak.VerifyNone(t)
-			k := SetupKubectl(t, tt.fakeExecutor)
+			k := SetupKubectl(t, tt.fakeFunc)
 			got, err := k.GetNodes()
 			if err != nil {
 				t.Fatal(err)

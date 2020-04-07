@@ -9,9 +9,6 @@ import (
 	"go.uber.org/goleak"
 )
 
-var testCRDsRawData = `eniconfigs.crd.k8s.amazonaws.com   2020-03-11T12:23:16Z
-meshes.appmesh.k8s.aws             2020-03-11T12:32:15Z`
-
 var testCRDs = []*CRD{
 	&CRD{
 		Name:      "eniconfigs.crd.k8s.amazonaws.com",
@@ -23,11 +20,12 @@ var testCRDs = []*CRD{
 	},
 }
 
-var FakeCRDFunc = func(args ...string) (*executor.Response, error) {
+var FakeCRDFunc = func(t *testing.T, args ...string) (*executor.Response, error) {
+	rawDataCRDs := GetByteFromTestFile(t, "testdata/raw-crds.txt")
 	if len(args) >= 1 {
 		if args[1] == "crd" {
 			return &executor.Response{
-				Stdout: []byte(testCRDsRawData),
+				Stdout: rawDataCRDs,
 			}, nil
 		}
 	}
@@ -36,21 +34,21 @@ var FakeCRDFunc = func(args ...string) (*executor.Response, error) {
 
 func TestGetCRDs(t *testing.T) {
 	tests := []struct {
-		name         string
-		fakeExecutor executor.Executor
-		want         []*CRD
+		name     string
+		fakeFunc FakeFunc
+		want     []*CRD
 	}{
 		{
-			name:         "list CRDs",
-			fakeExecutor: NewFakeExecutor(FakeCRDFunc),
-			want:         testCRDs,
+			name:     "list CRDs",
+			fakeFunc: FakeCRDFunc,
+			want:     testCRDs,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			defer goleak.VerifyNone(t)
-			k := SetupKubectl(t, tt.fakeExecutor)
+			k := SetupKubectl(t, tt.fakeFunc)
 			got, err := k.GetCRDs()
 			if err != nil {
 				t.Fatal(err)

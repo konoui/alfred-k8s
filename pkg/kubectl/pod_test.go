@@ -10,15 +10,6 @@ import (
 )
 
 var (
-	testAllPodsRawData = `NAMESPACE	NAME	READY	STATUS	RESTARTS	AGE
-	test1-namespace	test1-pod	1/1	Running	0	11d
-	test2-namespace	test2-pod	2/2	Running	1	11d`
-	testPodsRawData = `NAME	READY	STATUS	RESTARTS	AGE
-	test1-pod	1/1	Running	0	11d
-	test2-pod	2/2	Running	1	11d`
-)
-
-var (
 	testAllPods = []*Pod{
 		&Pod{
 			Namespace: "test1-namespace",
@@ -55,18 +46,20 @@ var (
 	}
 )
 
-var FakePodFunc = func(args ...string) (*executor.Response, error) {
+var FakePodFunc = func(t *testing.T, args ...string) (*executor.Response, error) {
+	rawDataAllPods := GetByteFromTestFile(t, "testdata/raw-pods-in-all-namespaces.txt")
+	rawDataPods := GetByteFromTestFile(t, "testdata/raw-pods.txt")
 	if len(args) >= 3 {
 		if args[1] == "pod" && args[2] == allNamespaceFlag {
 			return &executor.Response{
-				Stdout: []byte(testAllPodsRawData),
+				Stdout: rawDataAllPods,
 			}, nil
 		}
 	}
 	if len(args) >= 2 {
 		if args[1] == "pod" {
 			return &executor.Response{
-				Stdout: []byte(testPodsRawData),
+				Stdout: rawDataPods,
 			}, nil
 		}
 	}
@@ -75,28 +68,28 @@ var FakePodFunc = func(args ...string) (*executor.Response, error) {
 
 func TestGetPods(t *testing.T) {
 	tests := []struct {
-		name         string
-		fakeExecutor executor.Executor
-		all          bool
-		want         []*Pod
+		name     string
+		fakeFunc FakeFunc
+		all      bool
+		want     []*Pod
 	}{
 		{
-			name:         "list pods",
-			fakeExecutor: NewFakeExecutor(FakePodFunc),
-			want:         testPods,
+			name:     "list pods",
+			fakeFunc: FakePodFunc,
+			want:     testPods,
 		},
 		{
-			name:         "list pods in all namespaces",
-			fakeExecutor: NewFakeExecutor(FakePodFunc),
-			all:          true,
-			want:         testAllPods,
+			name:     "list pods in all namespaces",
+			fakeFunc: FakePodFunc,
+			all:      true,
+			want:     testAllPods,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			defer goleak.VerifyNone(t)
-			k := SetupKubectl(t, tt.fakeExecutor)
+			k := SetupKubectl(t, tt.fakeFunc)
 			got, err := k.GetPods(tt.all)
 			if err != nil {
 				t.Fatal(err)

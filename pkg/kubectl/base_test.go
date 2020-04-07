@@ -36,17 +36,19 @@ var (
 	}
 )
 
-var FakePodBaseResourceFunc = func(args ...string) (*executor.Response, error) {
+var FakePodBaseResourceFunc = func(t *testing.T, args ...string) (*executor.Response, error) {
+	rawDataAllPods := GetByteFromTestFile(t, "testdata/raw-pods-in-all-namespaces.txt")
+	rawDataPods := GetByteFromTestFile(t, "testdata/raw-pods.txt")
 	if len(args) >= 1 {
 		if args[0] == "get" && args[1] == testResourceName {
 			if len(args) == 3 && args[2] == allNamespaceFlag {
 				return &executor.Response{
-					Stdout: []byte(testAllPodsRawData),
+					Stdout: []byte(rawDataAllPods),
 				}, nil
 			}
 
 			return &executor.Response{
-				Stdout: []byte(testPodsRawData),
+				Stdout: []byte(rawDataPods),
 			}, nil
 		}
 	}
@@ -55,28 +57,28 @@ var FakePodBaseResourceFunc = func(args ...string) (*executor.Response, error) {
 
 func TestPodBaseResource(t *testing.T) {
 	tests := []struct {
-		name         string
-		fakeExecutor executor.Executor
-		all          bool
-		want         []*BaseResource
+		name     string
+		fakeFunc FakeFunc
+		all      bool
+		want     []*BaseResource
 	}{
 		{
-			name:         "list pods for base resource",
-			fakeExecutor: NewFakeExecutor(FakePodBaseResourceFunc),
-			want:         testBasePods,
+			name:     "list pods for base resource",
+			fakeFunc: FakePodBaseResourceFunc,
+			want:     testBasePods,
 		},
 		{
-			name:         "list pods in all namespaces for base resource",
-			fakeExecutor: NewFakeExecutor(FakePodBaseResourceFunc),
-			all:          true,
-			want:         testBaseAllPods,
+			name:     "list pods in all namespaces for base resource",
+			fakeFunc: FakePodBaseResourceFunc,
+			all:      true,
+			want:     testBaseAllPods,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			defer goleak.VerifyNone(t)
-			k := SetupKubectl(t, tt.fakeExecutor)
+			k := SetupKubectl(t, tt.fakeFunc)
 			got, err := k.GetBaseResources(testResourceName, tt.all)
 			if err != nil {
 				t.Fatal(err)

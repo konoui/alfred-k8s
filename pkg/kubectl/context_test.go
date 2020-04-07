@@ -2,18 +2,12 @@ package kubectl
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/konoui/alfred-k8s/pkg/executor"
 	"go.uber.org/goleak"
-)
-
-var (
-	testCurrentContext  = "test3-name"
-	testContextsRawData = `*	test1-name  test1-cluster   test1-authinfo	<no value>
-*	test2-name  test2-cluster   test2-authinfo	<no value>
-*	test3-name  test3-cluster   test3-authinfo  test3-namespace`
 )
 
 var testContexts = []*Context{
@@ -32,16 +26,23 @@ var testContexts = []*Context{
 	},
 }
 
-var FakeContextFunc = func(args ...string) (*executor.Response, error) {
+func getCurrentContext(t *testing.T) string {
+	c := GetStringFromTestFile(t, "testdata/raw-current-context.txt")
+	return strings.Replace(c, "\n", "", -1)
+}
+
+var FakeContextFunc = func(t *testing.T, args ...string) (*executor.Response, error) {
+	rawDataCurrentContext := GetByteFromTestFile(t, "testdata/raw-current-context.txt")
+	rawDataContexts := GetByteFromTestFile(t, "testdata/raw-contexts.txt")
 	if len(args) >= 2 {
 		if args[1] == "current-context" {
 			return &executor.Response{
-				Stdout: []byte(testCurrentContext),
+				Stdout: rawDataCurrentContext,
 			}, nil
 		}
 		if args[1] == "view" {
 			return &executor.Response{
-				Stdout: []byte(testContextsRawData),
+				Stdout: rawDataContexts,
 			}, nil
 		}
 	}
@@ -50,21 +51,21 @@ var FakeContextFunc = func(args ...string) (*executor.Response, error) {
 
 func TestGetCurrentContext(t *testing.T) {
 	tests := []struct {
-		name         string
-		fakeExecutor executor.Executor
-		want         string
+		name     string
+		fakeFunc FakeFunc
+		want     string
 	}{
 		{
-			name:         "get current context",
-			fakeExecutor: NewFakeExecutor(FakeContextFunc),
-			want:         testCurrentContext,
+			name:     "get current context",
+			fakeFunc: FakeContextFunc,
+			want:     getCurrentContext(t),
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			defer goleak.VerifyNone(t)
-			k := SetupKubectl(t, tt.fakeExecutor)
+			k := SetupKubectl(t, tt.fakeFunc)
 			got, err := k.GetCurrentContext()
 			if err != nil {
 				t.Fatal(err)
@@ -79,21 +80,21 @@ func TestGetCurrentContext(t *testing.T) {
 
 func TestGetContexts(t *testing.T) {
 	tests := []struct {
-		name         string
-		fakeExecutor executor.Executor
-		want         []*Context
+		name     string
+		fakeFunc FakeFunc
+		want     []*Context
 	}{
 		{
-			name:         "view contexts",
-			fakeExecutor: NewFakeExecutor(FakeContextFunc),
-			want:         testContexts,
+			name:     "view contexts",
+			fakeFunc: FakeContextFunc,
+			want:     testContexts,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			defer goleak.VerifyNone(t)
-			k := SetupKubectl(t, tt.fakeExecutor)
+			k := SetupKubectl(t, tt.fakeFunc)
 			got, err := k.GetContexts()
 			if err != nil {
 				t.Fatal(err)

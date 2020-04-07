@@ -9,13 +9,6 @@ import (
 	"go.uber.org/goleak"
 )
 
-var (
-	testAllIngressesRawData = `test1-namespace	test1-ingress   *       ingress1.hoge.hoge   80      24h
-	test2-namespace	test2-ingress   *       ingress2.hoge.hoge   80      24h`
-	testIngressesRawData = `test1-ingress   *       ingress1.hoge.hoge   80      24h
-	test2-ingress   *       ingress2.hoge.hoge   80      24h`
-)
-
 var testAllIngresses = []*Ingress{
 	&Ingress{
 		Namespace: "test1-namespace",
@@ -51,18 +44,20 @@ var testIngresses = []*Ingress{
 	},
 }
 
-var FakeIngressFunc = func(args ...string) (*executor.Response, error) {
+var FakeIngressFunc = func(t *testing.T, args ...string) (*executor.Response, error) {
+	rawDataAllIngresses := GetByteFromTestFile(t, "testdata/raw-ingresses-in-all-namespaces.txt")
+	rawDataIngresses := GetByteFromTestFile(t, "testdata/raw-ingresses.txt")
 	if len(args) >= 4 {
 		if args[1] == "ingress" && args[2] == allNamespaceFlag {
 			return &executor.Response{
-				Stdout: []byte(testAllIngressesRawData),
+				Stdout: rawDataAllIngresses,
 			}, nil
 		}
 	}
 	if len(args) >= 2 {
 		if args[1] == "ingress" {
 			return &executor.Response{
-				Stdout: []byte(testIngressesRawData),
+				Stdout: rawDataIngresses,
 			}, nil
 		}
 	}
@@ -71,28 +66,28 @@ var FakeIngressFunc = func(args ...string) (*executor.Response, error) {
 
 func TestGetIngresses(t *testing.T) {
 	tests := []struct {
-		name         string
-		fakeExecutor executor.Executor
-		all          bool
-		want         []*Ingress
+		name     string
+		fakeFunc FakeFunc
+		all      bool
+		want     []*Ingress
 	}{
 		{
-			name:         "list ingresses",
-			fakeExecutor: NewFakeExecutor(FakeIngressFunc),
-			want:         testIngresses,
+			name:     "list ingresses",
+			fakeFunc: FakeIngressFunc,
+			want:     testIngresses,
 		},
 		{
-			name:         "list deployments in all namespaces",
-			fakeExecutor: NewFakeExecutor(FakeIngressFunc),
-			all:          true,
-			want:         testAllIngresses,
+			name:     "list deployments in all namespaces",
+			fakeFunc: FakeIngressFunc,
+			all:      true,
+			want:     testAllIngresses,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			defer goleak.VerifyNone(t)
-			k := SetupKubectl(t, tt.fakeExecutor)
+			k := SetupKubectl(t, tt.fakeFunc)
 			got, err := k.GetIngresses(tt.all)
 			if err != nil {
 				t.Fatal(err)

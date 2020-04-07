@@ -9,13 +9,6 @@ import (
 	"go.uber.org/goleak"
 )
 
-var (
-	testAllDeploymentsRawData = `test1-namespace	deployment-test1     1/1     1            1           11d
-	test2-namespace	deployment-test2	2/2	2	1	11d`
-	testDeploymentsRawData = `deployment-test1	1/1	1	1	11d
-	deployment-test2   2/2	2	1	11d`
-)
-
 var testAllDeployments = []*Deployment{
 	&Deployment{
 		Namespace: "test1-namespace",
@@ -51,18 +44,20 @@ var testDeployments = []*Deployment{
 	},
 }
 
-var FakeDeploymentFunc = func(args ...string) (*executor.Response, error) {
+var FakeDeploymentFunc = func(t *testing.T, args ...string) (*executor.Response, error) {
+	rawDataAllDeployments := GetByteFromTestFile(t, "testdata/raw-deployments-in-all-namespaces.txt")
+	rawDataDeployments := GetByteFromTestFile(t, "testdata/raw-deployments.txt")
 	if len(args) >= 4 {
 		if args[1] == "deployment" && args[2] == allNamespaceFlag {
 			return &executor.Response{
-				Stdout: []byte(testAllDeploymentsRawData),
+				Stdout: []byte(rawDataAllDeployments),
 			}, nil
 		}
 	}
 	if len(args) >= 2 {
 		if args[1] == "deployment" {
 			return &executor.Response{
-				Stdout: []byte(testDeploymentsRawData),
+				Stdout: []byte(rawDataDeployments),
 			}, nil
 		}
 	}
@@ -71,28 +66,28 @@ var FakeDeploymentFunc = func(args ...string) (*executor.Response, error) {
 
 func TestGetDeployments(t *testing.T) {
 	tests := []struct {
-		name         string
-		fakeExecutor executor.Executor
-		all          bool
-		want         []*Deployment
+		name     string
+		fakeFunc FakeFunc
+		all      bool
+		want     []*Deployment
 	}{
 		{
-			name:         "list deployments",
-			fakeExecutor: NewFakeExecutor(FakeDeploymentFunc),
-			want:         testDeployments,
+			name:     "list deployments",
+			fakeFunc: FakeDeploymentFunc,
+			want:     testDeployments,
 		},
 		{
-			name:         "list deployments in all namespaces",
-			fakeExecutor: NewFakeExecutor(FakeDeploymentFunc),
-			all:          true,
-			want:         testAllDeployments,
+			name:     "list deployments in all namespaces",
+			fakeFunc: FakeDeploymentFunc,
+			all:      true,
+			want:     testAllDeployments,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			defer goleak.VerifyNone(t)
-			k := SetupKubectl(t, tt.fakeExecutor)
+			k := SetupKubectl(t, tt.fakeFunc)
 			got, err := k.GetDeployments(tt.all)
 			if err != nil {
 				t.Fatal(err)

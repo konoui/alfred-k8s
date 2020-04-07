@@ -9,13 +9,6 @@ import (
 	"go.uber.org/goleak"
 )
 
-var (
-	testAllServicesRawData = `test3-namespace   service-test1             ClusterIP   10.100.49.33     <none>        8080/TCP            11d
-	test3-namespace   service-test2           ClusterIP   10.100.75.11     <none>        8080/TCP,9901/TCP   11d`
-	testServicesRawData = `service-test1     ClusterIP   10.100.49.33     <none>        8080/TCP            11d
-	service-test2   ClusterIP   10.100.75.11     <none>        8080/TCP,9901/TCP   11d`
-)
-
 var testAllServices = []*Service{
 	&Service{
 		Namespace:  "test3-namespace",
@@ -56,18 +49,20 @@ var testServices = []*Service{
 	},
 }
 
-var FakeServiceFunc = func(args ...string) (*executor.Response, error) {
+var FakeServiceFunc = func(t *testing.T, args ...string) (*executor.Response, error) {
+	rawDataAllServices := GetByteFromTestFile(t, "testdata/raw-services-in-all-namespaces.txt")
+	rawDataServices := GetByteFromTestFile(t, "testdata/raw-services.txt")
 	if len(args) >= 4 {
 		if args[1] == "service" && args[2] == allNamespaceFlag {
 			return &executor.Response{
-				Stdout: []byte(testAllServicesRawData),
+				Stdout: rawDataAllServices,
 			}, nil
 		}
 	}
 	if len(args) >= 2 {
 		if args[1] == "service" {
 			return &executor.Response{
-				Stdout: []byte(testServicesRawData),
+				Stdout: rawDataServices,
 			}, nil
 		}
 	}
@@ -76,28 +71,28 @@ var FakeServiceFunc = func(args ...string) (*executor.Response, error) {
 
 func TestGetServices(t *testing.T) {
 	tests := []struct {
-		name         string
-		fakeExecutor executor.Executor
-		all          bool
-		want         []*Service
+		name     string
+		fakeFunc FakeFunc
+		all      bool
+		want     []*Service
 	}{
 		{
-			name:         "list services",
-			fakeExecutor: NewFakeExecutor(FakeServiceFunc),
-			want:         testServices,
+			name:     "list services",
+			fakeFunc: FakeServiceFunc,
+			want:     testServices,
 		},
 		{
-			name:         "list services in all namespaces",
-			fakeExecutor: NewFakeExecutor(FakeServiceFunc),
-			all:          true,
-			want:         testAllServices,
+			name:     "list services in all namespaces",
+			fakeFunc: FakeServiceFunc,
+			all:      true,
+			want:     testAllServices,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			defer goleak.VerifyNone(t)
-			k := SetupKubectl(t, tt.fakeExecutor)
+			k := SetupKubectl(t, tt.fakeFunc)
 			got, err := k.GetServices(tt.all)
 			if err != nil {
 				t.Fatal(err)

@@ -4,18 +4,7 @@ import (
 	"os"
 	"reflect"
 	"testing"
-
-	"github.com/konoui/alfred-k8s/pkg/executor"
 )
-
-func SetupKubectl(t *testing.T, fake executor.Executor) *Kubectl {
-	t.Helper()
-	k, err := New(OptionExecutor(fake))
-	if err != nil {
-		t.Fatal(err)
-	}
-	return k
-}
 
 func TestNewKubectl(t *testing.T) {
 	tests := []struct {
