@@ -3,13 +3,15 @@ package kubectl
 import (
 	"fmt"
 	"io/ioutil"
-	"os"
 	"path/filepath"
 	"strings"
 	"testing"
 
 	"github.com/konoui/alfred-k8s/pkg/executor"
 )
+
+// TestDataBaseDir is directory path to kubectl/testdata
+var TestDataBaseDir string
 
 // FakeExecutor is mock for test
 type FakeExecutor struct {
@@ -63,9 +65,8 @@ func OptionExecutor(e executor.Executor) Option {
 func GetByteFromTestFile(t *testing.T, path string) []byte {
 	t.Helper()
 
-	if gopath := os.Getenv("GOPATH"); gopath != "" {
-		const repo = "src/github.com/konoui/alfred-k8s/pkg/kubectl"
-		path = filepath.Join(gopath, repo, path)
+	if base := TestDataBaseDir; base != "" {
+		path = filepath.Join(base, path)
 	}
 
 	data, err := ioutil.ReadFile(path)
@@ -122,7 +123,7 @@ func FakeResourceFunc(t *testing.T, args ...string) (*executor.Response, error) 
 			return resp, nil
 		}
 	}
-	return &executor.Response{}, fmt.Errorf("match no execution function")
+	return &executor.Response{}, fmt.Errorf("match no execution function %s", args)
 }
 
 // FakePodBaseResourceFunc behave kubectl get pod

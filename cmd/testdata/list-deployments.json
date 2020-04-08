@@ -1,0 +1,14 @@
+{
+  "items": [
+    {
+      "title": "deployment-test1",
+      "subtitle": "ready [1/1] up-to-date [1] available [1]",
+      "arg": "deployment-test1"
+    },
+    {
+      "title": "deployment-test2",
+      "subtitle": "ready [2/2] up-to-date [2] available [1]",
+      "arg": "deployment-test2"
+    }
+  ]
+}

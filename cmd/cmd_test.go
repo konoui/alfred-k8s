@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"bytes"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"testing"
@@ -14,13 +15,16 @@ import (
 func SetupCmd(t *testing.T, cmd *cobra.Command, args []string) (outBuf, errBuf *bytes.Buffer) {
 	t.Helper()
 
-	// set kubectl instance to global variable `k`
+	// set global variables on behalf init()
+	kubectl.TestDataBaseDir = "../pkg/kubectl/"
 	k = kubectl.SetupKubectl(t, nil)
+	awf = alfred.NewWorkflow()
+	awf.EmptyWarning("There are no resources", "No matching")
+
 	outBuf, errBuf = new(bytes.Buffer), new(bytes.Buffer)
 	outStream, errStream = outBuf, errBuf
 	cmd.SetOut(outStream)
 	cmd.SetErr(errStream)
-	// need to set streams as init() is not called for the tests
 	awf.SetStreams(outStream, errStream)
 
 	cmd.SetArgs(args)
@@ -29,66 +33,105 @@ func SetupCmd(t *testing.T, cmd *cobra.Command, args []string) (outBuf, errBuf *
 }
 
 func TestExecute(t *testing.T) {
-	type want struct {
-		filepath string
-		errMsg   string
-	}
 	tests := []struct {
-		name string
-		args []string
-		want want
-		cmd  *cobra.Command
+		name   string
+		args   []string
+		update bool
 	}{
 		{
-			name: "show available commands when no input",
-			want: want{
-				filepath: "testdata/list-available-commands.json",
-			},
+			name: "list-available-commands",
 			args: []string{
 				"",
 			},
-			cmd: NewDefaultCmd(),
 		},
 		{
-			name: "match no sub command when invalid sub command",
-			want: want{
-				filepath: "testdata/empty-warning.json",
-			},
+			name: "empty-warning",
 			args: []string{
 				"xxxxxxxxxx",
 			},
-			cmd: NewDefaultCmd(),
 		},
 		{
-			name: "match some sub commands for fuzzy search",
-			want: want{
-				filepath: "testdata/list-available-commands-for-fuzzy.json",
-			},
+			name: "list-available-commands-for-fuzzy",
 			args: []string{
 				"no",
 			},
-			cmd: NewDefaultCmd(),
+		},
+		{
+			name: "list-nodes",
+			args: []string{
+				"node",
+			},
+		},
+		{
+			name: "list-pods",
+			args: []string{
+				"pod",
+			},
+		},
+		{
+			name: "list-services",
+			args: []string{
+				"svc",
+			},
+		},
+		{
+			name: "list-ingresses",
+			args: []string{
+				"ingress",
+			},
+		},
+		{
+			name: "list-deployments",
+			args: []string{
+				"deploy",
+			},
+		},
+		{
+			name: "list-contexts",
+			args: []string{
+				"context",
+			},
+		},
+		{
+			name: "list-namespaces",
+			args: []string{
+				"ns",
+			},
+		},
+		{
+			name: "list-crds",
+			args: []string{
+				"crd",
+			},
+		},
+		{
+			name: "list-base-pods",
+			args: []string{
+				"obj",
+				"pod",
+			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			outWantData, err := ioutil.ReadFile(tt.want.filepath)
+			f := fmt.Sprintf("testdata/%s.json", tt.name)
+			rootCmd := NewDefaultCmd()
+			outBuf, _ := SetupCmd(t, rootCmd, tt.args)
+			Execute(rootCmd)
+			outGotData := outBuf.Bytes()
+
+			if tt.update {
+				if err := ioutil.WriteFile(f, outGotData, 0644); err != nil {
+					t.Fatal(err)
+				}
+			}
+			outWantData, err := ioutil.ReadFile(f)
 			if err != nil {
 				t.Fatal(err)
 			}
 
-			outBuf, errBuf := SetupCmd(t, tt.cmd, tt.args)
-			Execute(tt.cmd)
-			outGotData := outBuf.Bytes()
-			errGotData := errBuf.Bytes()
-
 			if diff := alfred.DiffScriptFilter(outWantData, outGotData); diff != "" {
-				t.Errorf("+want -got\n%+v", diff)
-			}
-
-			errWant := tt.want.errMsg
-			if errWant != string(errGotData) {
-				t.Errorf("want: %+v\n, got: %+v\n", errWant, string(errGotData))
+				t.Errorf("-want +got\n%+v", diff)
 			}
 		})
 	}

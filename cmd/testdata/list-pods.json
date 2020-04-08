@@ -1,0 +1,28 @@
+{
+  "items": [
+    {
+      "title": "test1-pod",
+      "subtitle": "ready [1/1] status [Running] restarts [0] ",
+      "arg": "test1-pod",
+      "mods": {
+        "ctrl": {
+          "variables": { "nextAction": "shell" },
+          "arg": "pod test1-pod  --delete",
+          "subtitle": "rm the pod"
+        }
+      }
+    },
+    {
+      "title": "test2-pod",
+      "subtitle": "ready [2/2] status [Running] restarts [1] ",
+      "arg": "test2-pod",
+      "mods": {
+        "ctrl": {
+          "variables": { "nextAction": "shell" },
+          "arg": "pod test2-pod  --delete",
+          "subtitle": "rm the pod"
+        }
+      }
+    }
+  ]
+}

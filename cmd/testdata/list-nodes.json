@@ -1,0 +1,14 @@
+{
+  "items": [
+    {
+      "title": "node-1",
+      "subtitle": "status [Ready] version [v1.15.10-eks-bac369]",
+      "arg": "node-1"
+    },
+    {
+      "title": "node-2",
+      "subtitle": "status [Ready] version [v1.15.10-eks-bac369]",
+      "arg": "node-2"
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "items": [
+    {
+      "title": "test1-name",
+      "arg": "test1-name",
+      "mods": {
+        "ctrl": {
+          "variables": { "nextAction": "shell" },
+          "arg": "context test1-name --use",
+          "subtitle": "switch to the context"
+        }
+      }
+    },
+    {
+      "title": "test2-name",
+      "arg": "test2-name",
+      "mods": {
+        "ctrl": {
+          "variables": { "nextAction": "shell" },
+          "arg": "context test2-name --use",
+          "subtitle": "switch to the context"
+        }
+      }
+    },
+    {
+      "title": "[*] test3-name",
+      "arg": "test3-name",
+      "mods": {
+        "ctrl": {
+          "variables": { "nextAction": "shell" },
+          "arg": "context test3-name --use",
+          "subtitle": "switch to the context"
+        }
+      }
+    }
+  ]
+}
