@@ -10,6 +10,7 @@ import (
 // NewContextCmd create a new cmd for context resource
 func NewContextCmd() *cobra.Command {
 	var use bool
+	var del bool
 	cmd := &cobra.Command{
 		Use:   "context",
 		Short: "list contexts",
@@ -19,6 +20,10 @@ func NewContextCmd() *cobra.Command {
 				useContext(getQuery(args, 0))
 				return
 			}
+			if del {
+				deleteContext(getQuery(args, 0))
+				return
+			}
 			listContexts(getQuery(args, 0))
 		},
 		DisableSuggestions: true,
@@ -26,6 +31,7 @@ func NewContextCmd() *cobra.Command {
 		SilenceErrors:      true,
 	}
 	addUseFlag(cmd, &use)
+	addDeleteFlag(cmd, &del)
 
 	return cmd
 }
@@ -36,6 +42,14 @@ func useContext(context string) {
 		return
 	}
 	fmt.Fprintln(outStream, "Success!! switched context")
+}
+
+func deleteContext(context string) {
+	if _, err := k.Execute(fmt.Sprintf("config delete-context %s", context)); err != nil {
+		fmt.Fprintf(errStream, "Failed due to %s\n", err)
+		return
+	}
+	fmt.Fprintln(outStream, "Success!! deleted context")
 }
 
 func listContexts(query string) {
@@ -57,6 +71,13 @@ func listContexts(query string) {
 				alfred.ModCtrl: alfred.Mod{
 					Subtitle: "switch to the context",
 					Arg:      fmt.Sprintf("context %s --use", c.Name),
+					Variables: map[string]string{
+						nextActionKey: nextActionShell,
+					},
+				},
+				alfred.ModShift: alfred.Mod{
+					Subtitle: "delete the context",
+					Arg:      fmt.Sprintf("context %s --delete", c.Name),
 					Variables: map[string]string{
 						nextActionKey: nextActionShell,
 					},

@@ -8,6 +8,11 @@
           "variables": { "nextAction": "shell" },
           "arg": "context test1-name --use",
           "subtitle": "switch to the context"
+        },
+        "shift": {
+          "variables": { "nextAction": "shell" },
+          "arg": "context test1-name --delete",
+          "subtitle": "delete the context"
         }
       }
     },
@@ -19,6 +24,11 @@
           "variables": { "nextAction": "shell" },
           "arg": "context test2-name --use",
           "subtitle": "switch to the context"
+        },
+        "shift": {
+          "variables": { "nextAction": "shell" },
+          "arg": "context test2-name --delete",
+          "subtitle": "delete the context"
         }
       }
     },
@@ -30,6 +40,11 @@
           "variables": { "nextAction": "shell" },
           "arg": "context test3-name --use",
           "subtitle": "switch to the context"
+        },
+        "shift": {
+          "variables": { "nextAction": "shell" },
+          "arg": "context test3-name --delete",
+          "subtitle": "delete the context"
         }
       }
     }

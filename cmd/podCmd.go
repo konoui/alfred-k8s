@@ -16,7 +16,7 @@ func NewPodCmd() *cobra.Command {
 		Args:  cobra.MinimumNArgs(0),
 		Run: func(cmd *cobra.Command, args []string) {
 			if del {
-				deletePod(getQuery(args, 0), getQuery(args, 1))
+				deleteResource("pod", getQuery(args, 0), getQuery(args, 1))
 				return
 			}
 			listPods(all, getQuery(args, 0))
@@ -59,13 +59,14 @@ func listPods(all bool, query string) {
 	awf.Filter(query).Output()
 }
 
-func deletePod(name, ns string) {
-	arg := fmt.Sprintf("delete pod %s", name)
+func deleteResource(rs, name, ns string) {
+	arg := fmt.Sprintf("delete %s %s", rs, name)
 	if ns != "" {
 		arg = fmt.Sprintf("%s --namespace %s", arg, ns)
 	}
 	if _, err := k.Execute(arg); err != nil {
 		fmt.Fprintf(outStream, "failed due to %s", err)
+		return
 	}
-	fmt.Fprintln(outStream, "Success!! delete the pod")
+	fmt.Fprintf(outStream, "Success!! deleted the %s", rs)
 }
