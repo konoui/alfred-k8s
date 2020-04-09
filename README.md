@@ -14,6 +14,8 @@ Download the workflow form [latest release](https://github.com/konoui/alfred-k8s
 ## Usage
 Kyeword is `kube`.
 
+<img src="./usage.png" width="50%">
+
 ### List resources in current namespace
 Please type `kube <resource-name>`.  
 e.g.) `kube pod`
