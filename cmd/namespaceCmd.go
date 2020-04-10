@@ -39,12 +39,17 @@ func useNamespace(ns string) {
 }
 
 func listNamespaces(query string) {
-	namespaces, err := k.GetNamespaces()
-	if err != nil {
-		awf.Fatal(fatalMessage, err.Error())
+	key := "ns"
+	if err := awf.Cache(key).MaxAge(cacheTime).LoadItems().Err(); err == nil {
+		awf.Filter(query).Output()
 		return
 	}
+	defer func() {
+		awf.Cache(key).StoreItems().Workflow().Filter(query).Output()
+	}()
 
+	namespaces, err := k.GetNamespaces()
+	exitWith(err)
 	for _, ns := range namespaces {
 		title := ns.Name
 		if ns.Current {
@@ -55,7 +60,7 @@ func listNamespaces(query string) {
 			Subtitle: fmt.Sprintf("status [%s] age [%s]", ns.Status, ns.Age),
 			Arg:      ns.Name,
 			Mods: map[alfred.ModKey]alfred.Mod{
-				alfred.ModCtrl: alfred.Mod{
+				alfred.ModCtrl: {
 					Subtitle: "switch to the namespace",
 					Arg:      fmt.Sprintf("ns %s --use", ns.Name),
 					Variables: map[string]string{
@@ -65,6 +70,4 @@ func listNamespaces(query string) {
 			},
 		})
 	}
-
-	awf.Filter(query).Output()
 }

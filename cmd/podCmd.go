@@ -32,12 +32,17 @@ func NewPodCmd() *cobra.Command {
 }
 
 func listPods(all bool, query string) {
-	pods, err := k.GetPods(all)
-	if err != nil {
-		awf.Fatal(fatalMessage, err.Error())
+	key := fmt.Sprintf("pod-%t", all)
+	if err := awf.Cache(key).MaxAge(cacheTime).LoadItems().Err(); err == nil {
+		awf.Filter(query).Output()
 		return
 	}
+	defer func() {
+		awf.Cache(key).StoreItems().Workflow().Filter(query).Output()
+	}()
 
+	pods, err := k.GetPods(all)
+	exitWith(err)
 	for _, p := range pods {
 		title := getNamespaceResourceTitle(p)
 		awf.Append(&alfred.Item{
@@ -45,7 +50,7 @@ func listPods(all bool, query string) {
 			Subtitle: fmt.Sprintf("ready [%s] status [%s] restarts [%s] ", p.Ready, p.Status, p.Restarts),
 			Arg:      p.Name,
 			Mods: map[alfred.ModKey]alfred.Mod{
-				alfred.ModCtrl: alfred.Mod{
+				alfred.ModCtrl: {
 					Subtitle: "rm the pod",
 					Arg:      fmt.Sprintf("pod %s %s --delete", p.Name, p.Namespace),
 					Variables: map[string]string{
@@ -55,8 +60,6 @@ func listPods(all bool, query string) {
 			},
 		})
 	}
-
-	awf.Filter(query).Output()
 }
 
 func deleteResource(rs, name, ns string) {

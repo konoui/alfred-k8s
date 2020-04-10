@@ -3,3 +3,4 @@ kubectl:
     plugin_paths:
     - "/bin"
     - "/usr/bin"
+cache_time_second: 2

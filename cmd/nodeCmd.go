@@ -24,11 +24,17 @@ func NewNodeCmd() *cobra.Command {
 }
 
 func listNodes(query string) {
-	nodes, err := k.GetNodes()
-	if err != nil {
-		awf.Fatal(fatalMessage, err.Error())
+	key := "node"
+	if err := awf.Cache(key).MaxAge(cacheTime).LoadItems().Err(); err == nil {
+		awf.Filter(query).Output()
 		return
 	}
+	defer func() {
+		awf.Cache(key).StoreItems().Workflow().Filter(query).Output()
+	}()
+
+	nodes, err := k.GetNodes()
+	exitWith(err)
 	for _, n := range nodes {
 		awf.Append(&alfred.Item{
 			Title:    n.Name,
@@ -36,6 +42,4 @@ func listNodes(query string) {
 			Arg:      n.Name,
 		})
 	}
-
-	awf.Filter(query).Output()
 }

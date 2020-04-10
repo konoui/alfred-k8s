@@ -12,12 +12,13 @@ func TestNewConfig(t *testing.T) {
 		want *Config
 	}{
 		{
-			name: "override default value",
+			name: "override default value.",
 			want: &Config{
-				Kubectl{
+				Kubectl: Kubectl{
 					Bin:         "/bin/ls",
 					PluginPaths: []string{"/bin", "/usr/bin"},
 				},
+				CacheTimeSecond: 2,
 			},
 		},
 	}

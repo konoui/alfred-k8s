@@ -26,6 +26,9 @@ func New(opts ...Option) (*Kubectl, error) {
 	}
 
 	for _, opt := range opts {
+		if opt == nil {
+			continue
+		}
 		if err := opt(k); err != nil {
 			return nil, err
 		}

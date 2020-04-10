@@ -27,11 +27,17 @@ func NewCRDCmd() *cobra.Command {
 }
 
 func listCustomResources(query string) {
-	crds, err := k.GetCRDs()
-	if err != nil {
-		awf.Fatal(fatalMessage, err.Error())
+	key := "crd"
+	if err := awf.Cache(key).MaxAge(cacheTime).LoadItems().Err(); err == nil {
+		awf.Filter(query).Output()
 		return
 	}
+	defer func() {
+		awf.Cache(key).StoreItems().Workflow().Filter(query).Output()
+	}()
+
+	crds, err := k.GetCRDs()
+	exitWith(err)
 	for _, c := range crds {
 		awf.Append(&alfred.Item{
 			Title:    c.Name,
@@ -39,6 +45,4 @@ func listCustomResources(query string) {
 			Arg:      c.Name,
 		})
 	}
-
-	awf.Filter(query).Output()
 }

@@ -27,12 +27,17 @@ func NewServiceCmd() *cobra.Command {
 }
 
 func listServices(all bool, query string) {
-	svcs, err := k.GetServices(all)
-	if err != nil {
-		awf.Fatal(fatalMessage, err.Error())
+	key := fmt.Sprintf("svc-%t", all)
+	if err := awf.Cache(key).MaxAge(cacheTime).LoadItems().Err(); err == nil {
+		awf.Filter(query).Output()
 		return
 	}
+	defer func() {
+		awf.Cache(key).StoreItems().Workflow().Filter(query).Output()
+	}()
 
+	svcs, err := k.GetServices(all)
+	exitWith(err)
 	for _, s := range svcs {
 		title := getNamespaceResourceTitle(s)
 		awf.Append(&alfred.Item{
@@ -41,6 +46,4 @@ func listServices(all bool, query string) {
 			Arg:      s.Name,
 		})
 	}
-
-	awf.Filter(query).Output()
 }

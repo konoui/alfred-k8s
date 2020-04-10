@@ -27,12 +27,17 @@ func NewBaseCmd() *cobra.Command {
 }
 
 func listBaseResources(name string, all bool, query string) {
-	rs, err := k.GetBaseResources(name, all)
-	if err != nil {
-		awf.Fatal(fatalMessage, err.Error())
+	key := fmt.Sprintf("base-%t", all)
+	if err := awf.Cache(key).MaxAge(cacheTime).LoadItems().Err(); err == nil {
+		awf.Filter(query).Output()
 		return
 	}
+	defer func() {
+		awf.Cache(key).StoreItems().Workflow().Filter(query).Output()
+	}()
 
+	rs, err := k.GetBaseResources(name, all)
+	exitWith(err)
 	for _, r := range rs {
 		title := getNamespaceResourceTitle(r)
 		awf.Append(&alfred.Item{
@@ -41,6 +46,4 @@ func listBaseResources(name string, all bool, query string) {
 			Arg:      r.Name,
 		})
 	}
-
-	awf.Filter(query).Output()
 }

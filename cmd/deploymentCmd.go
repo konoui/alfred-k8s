@@ -27,12 +27,17 @@ func NewDeploymentCmd() *cobra.Command {
 }
 
 func listDeployments(all bool, query string) {
-	deps, err := k.GetDeployments(all)
-	if err != nil {
-		awf.Fatal(fatalMessage, err.Error())
+	key := fmt.Sprintf("deploy-%t", all)
+	if err := awf.Cache(key).MaxAge(cacheTime).LoadItems().Err(); err == nil {
+		awf.Filter(query).Output()
 		return
 	}
+	defer func() {
+		awf.Cache(key).StoreItems().Workflow().Filter(query).Output()
+	}()
 
+	deps, err := k.GetDeployments(all)
+	exitWith(err)
 	for _, d := range deps {
 		title := getNamespaceResourceTitle(d)
 		awf.Append(&alfred.Item{
@@ -41,6 +46,4 @@ func listDeployments(all bool, query string) {
 			Arg:      d.Name,
 		})
 	}
-
-	awf.Filter(query).Output()
 }

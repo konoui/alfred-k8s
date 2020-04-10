@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/konoui/alfred-k8s/pkg/kubectl"
 	"github.com/konoui/go-alfred"
@@ -17,6 +18,7 @@ func SetupCmd(t *testing.T, cmd *cobra.Command, args []string) (outBuf, errBuf *
 
 	// set global variables on behalf init()
 	kubectl.TestDataBaseDir = "../pkg/kubectl/"
+	cacheTime = 0 * time.Second
 	k = kubectl.SetupKubectl(t, nil)
 	awf = alfred.NewWorkflow()
 	awf.EmptyWarning("There are no resources", "No matching")
@@ -25,7 +27,7 @@ func SetupCmd(t *testing.T, cmd *cobra.Command, args []string) (outBuf, errBuf *
 	outStream, errStream = outBuf, errBuf
 	cmd.SetOut(outStream)
 	cmd.SetErr(errStream)
-	awf.SetStreams(outStream, errStream)
+	awf.SetOut(outStream)
 
 	cmd.SetArgs(args)
 	os.Args = append([]string{"dummy"}, args...)

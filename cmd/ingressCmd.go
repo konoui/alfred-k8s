@@ -27,12 +27,17 @@ func NewIngressCmd() *cobra.Command {
 }
 
 func listIngresses(all bool, query string) {
-	ingresses, err := k.GetIngresses(all)
-	if err != nil {
-		awf.Fatal(fatalMessage, err.Error())
+	key := fmt.Sprintf("ingress-%t", all)
+	if err := awf.Cache(key).MaxAge(cacheTime).LoadItems().Err(); err == nil {
+		awf.Filter(query).Output()
 		return
 	}
+	defer func() {
+		awf.Cache(key).StoreItems().Workflow().Filter(query).Output()
+	}()
 
+	ingresses, err := k.GetIngresses(all)
+	exitWith(err)
 	for _, i := range ingresses {
 		title := getNamespaceResourceTitle(i)
 		awf.Append(&alfred.Item{
@@ -40,13 +45,11 @@ func listIngresses(all bool, query string) {
 			Subtitle: fmt.Sprintf("host [%s] address [%s] ports [%s] ", i.Hosts, i.Address, i.Ports),
 			Arg:      i.Name,
 			Mods: map[alfred.ModKey]alfred.Mod{
-				alfred.ModCtrl: alfred.Mod{
+				alfred.ModCtrl: {
 					Subtitle: "copy ingress Address",
 					Arg:      i.Address,
 				},
 			},
 		})
 	}
-
-	awf.Filter(query).Output()
 }

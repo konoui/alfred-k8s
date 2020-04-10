@@ -9,8 +9,7 @@ import (
 
 // NewContextCmd create a new cmd for context resource
 func NewContextCmd() *cobra.Command {
-	var use bool
-	var del bool
+	var use, del bool
 	cmd := &cobra.Command{
 		Use:   "context",
 		Short: "list contexts",
@@ -53,11 +52,17 @@ func deleteContext(context string) {
 }
 
 func listContexts(query string) {
-	contexts, err := k.GetContexts()
-	if err != nil {
-		awf.Fatal(fatalMessage, err.Error())
+	key := "context"
+	if err := awf.Cache(key).MaxAge(cacheTime).LoadItems().Err(); err == nil {
+		awf.Filter(query).Output()
 		return
 	}
+	defer func() {
+		awf.Cache(key).StoreItems().Workflow().Filter(query).Output()
+	}()
+
+	contexts, err := k.GetContexts()
+	exitWith(err)
 	for _, c := range contexts {
 		title := c.Name
 		if c.Current {
@@ -68,14 +73,14 @@ func listContexts(query string) {
 			Title: title,
 			Arg:   c.Name,
 			Mods: map[alfred.ModKey]alfred.Mod{
-				alfred.ModCtrl: alfred.Mod{
+				alfred.ModCtrl: {
 					Subtitle: "switch to the context",
 					Arg:      fmt.Sprintf("context %s --use", c.Name),
 					Variables: map[string]string{
 						nextActionKey: nextActionShell,
 					},
 				},
-				alfred.ModShift: alfred.Mod{
+				alfred.ModShift: {
 					Subtitle: "delete the context",
 					Arg:      fmt.Sprintf("context %s --delete", c.Name),
 					Variables: map[string]string{
@@ -85,6 +90,4 @@ func listContexts(query string) {
 			},
 		})
 	}
-
-	awf.Filter(query).Output()
 }
