@@ -1,0 +1,26 @@
+{
+    "items": [
+        {
+            "title": "[test1-namespace] test1-ingress",
+            "subtitle": "host [*] address [ingress1.hoge.hoge] ports [80] ",
+            "arg": "test1-ingress",
+            "mods": {
+                "ctrl": {
+                    "arg": "ingress1.hoge.hoge",
+                    "subtitle": "copy ingress Address"
+                }
+            }
+        },
+        {
+            "title": "[test2-namespace] test2-ingress",
+            "subtitle": "host [*] address [ingress2.hoge.hoge] ports [80] ",
+            "arg": "test2-ingress",
+            "mods": {
+                "ctrl": {
+                    "arg": "ingress2.hoge.hoge",
+                    "subtitle": "copy ingress Address"
+                }
+            }
+        }
+    ]
+}

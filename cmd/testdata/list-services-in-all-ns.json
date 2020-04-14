@@ -1,0 +1,14 @@
+{
+    "items": [
+        {
+            "title": "[test3-namespace] service-test1",
+            "subtitle": "cluster-ip [10.100.49.33] external-ip [\u003cnone\u003e] ports [8080/TCP]",
+            "arg": "service-test1"
+        },
+        {
+            "title": "[test3-namespace] service-test2",
+            "subtitle": "cluster-ip [10.100.75.11] external-ip [\u003cnone\u003e] ports [8080/TCP,9901/TCP]",
+            "arg": "service-test2"
+        }
+    ]
+}

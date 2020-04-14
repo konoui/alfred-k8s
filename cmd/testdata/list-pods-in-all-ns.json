@@ -1,0 +1,32 @@
+{
+    "items": [
+        {
+            "title": "[test1-namespace] test1-pod",
+            "subtitle": "ready [1/1] status [Running] restarts [0] ",
+            "arg": "test1-pod",
+            "mods": {
+                "ctrl": {
+                    "variables": {
+                        "nextAction": "shell"
+                    },
+                    "arg": "pod test1-pod test1-namespace --delete",
+                    "subtitle": "rm the pod"
+                }
+            }
+        },
+        {
+            "title": "[test2-namespace] test2-pod",
+            "subtitle": "ready [2/2] status [Running] restarts [1] ",
+            "arg": "test2-pod",
+            "mods": {
+                "ctrl": {
+                    "variables": {
+                        "nextAction": "shell"
+                    },
+                    "arg": "pod test2-pod test2-namespace --delete",
+                    "subtitle": "rm the pod"
+                }
+            }
+        }
+    ]
+}

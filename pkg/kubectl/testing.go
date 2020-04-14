@@ -97,10 +97,14 @@ func GetCurrentNamespaceFromtTestFile(t *testing.T) string {
 }
 
 func hasQuery(args []string, i int, expect string) bool {
+	return getQuery(args, i) == expect
+}
+
+func getQuery(args []string, i int) string {
 	if len(args) > i {
-		return args[i] == expect
+		return args[i]
 	}
-	return false
+	return ""
 }
 
 // FakeResourceFunc please call this for mock test
@@ -142,6 +146,9 @@ func FakePodBaseResourceFunc(t *testing.T, args ...string) (*executor.Response, 
 			Stdout: []byte(rawDataPods),
 		}, nil
 	}
+	if hasQuery(args, 0, "delete") && hasQuery(args, 1, "pod") {
+		return &executor.Response{}, nil
+	}
 	return &executor.Response{}, fmt.Errorf("match no command args")
 }
 
@@ -150,15 +157,19 @@ func FakeContextFunc(t *testing.T, args ...string) (*executor.Response, error) {
 	rawDataCurrentContext := GetByteFromTestFile(t, "testdata/raw-current-context.txt")
 	rawDataContexts := GetByteFromTestFile(t, "testdata/raw-contexts.txt")
 
-	if hasQuery(args, 1, "current-context") {
-		return &executor.Response{
-			Stdout: rawDataCurrentContext,
-		}, nil
-	}
-	if hasQuery(args, 1, "view") {
-		return &executor.Response{
-			Stdout: rawDataContexts,
-		}, nil
+	if hasQuery(args, 0, "config") {
+		switch getQuery(args, 1) {
+		case "current-context":
+			return &executor.Response{
+				Stdout: rawDataCurrentContext,
+			}, nil
+		case "view":
+			return &executor.Response{
+				Stdout: rawDataContexts,
+			}, nil
+		case "use-context", "set-context", "delete-context":
+			return &executor.Response{}, nil
+		}
 	}
 	return &executor.Response{}, fmt.Errorf("match no command args")
 }
@@ -230,7 +241,7 @@ func FakeNamespaceFunc(t *testing.T, args ...string) (*executor.Response, error)
 func FakeNodeFunc(t *testing.T, args ...string) (*executor.Response, error) {
 	rawDataNodes := GetByteFromTestFile(t, "testdata/raw-nodes.txt")
 
-	if hasQuery(args, 1, "node") {
+	if hasQuery(args, 0, "get") && hasQuery(args, 1, "node") {
 		return &executor.Response{
 			Stdout: rawDataNodes,
 		}, nil

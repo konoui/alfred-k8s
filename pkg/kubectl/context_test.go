@@ -116,3 +116,26 @@ func TestGenerateContext(t *testing.T) {
 		})
 	}
 }
+
+func TestUseContext(t *testing.T) {
+	tests := []struct {
+		name    string
+		context string
+	}{
+		{
+			name:    "use context",
+			context: "dummy",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			defer goleak.VerifyNone(t)
+			k := SetupKubectl(t, nil)
+			err := k.UseContext(tt.context)
+			if err != nil {
+				t.Fatal(err)
+			}
+		})
+	}
+}

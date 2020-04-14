@@ -13,6 +13,13 @@ import (
 	"github.com/spf13/cobra"
 )
 
+func ExecuteDefaultCmd(t *testing.T, args []string) (outBuf, errBuf *bytes.Buffer) {
+	rootCmd := NewDefaultCmd()
+	outBuf, errBuf = SetupCmd(t, rootCmd, args)
+	Execute(rootCmd)
+	return outBuf, errBuf
+}
+
 func SetupCmd(t *testing.T, cmd *cobra.Command, args []string) (outBuf, errBuf *bytes.Buffer) {
 	t.Helper()
 
@@ -34,7 +41,7 @@ func SetupCmd(t *testing.T, cmd *cobra.Command, args []string) (outBuf, errBuf *
 	return outBuf, errBuf
 }
 
-func TestExecute(t *testing.T) {
+func TestListExecution(t *testing.T) {
 	tests := []struct {
 		name   string
 		args   []string
@@ -71,9 +78,23 @@ func TestExecute(t *testing.T) {
 			},
 		},
 		{
+			name: "list-pods-in-all-ns",
+			args: []string{
+				"pod",
+				"--all",
+			},
+		},
+		{
 			name: "list-services",
 			args: []string{
 				"svc",
+			},
+		},
+		{
+			name: "list-services-in-all-ns",
+			args: []string{
+				"svc",
+				"--all",
 			},
 		},
 		{
@@ -83,9 +104,23 @@ func TestExecute(t *testing.T) {
 			},
 		},
 		{
+			name: "list-ingresses-in-all-ns",
+			args: []string{
+				"ingress",
+				"--all",
+			},
+		},
+		{
 			name: "list-deployments",
 			args: []string{
 				"deploy",
+			},
+		},
+		{
+			name: "list-deployments-in-all-ns",
+			args: []string{
+				"deploy",
+				"--all",
 			},
 		},
 		{
@@ -113,15 +148,21 @@ func TestExecute(t *testing.T) {
 				"pod",
 			},
 		},
+		{
+			name: "list-base-pods-in-all-ns",
+			args: []string{
+				"obj",
+				"pod",
+				"--all",
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			f := fmt.Sprintf("testdata/%s.json", tt.name)
-			rootCmd := NewDefaultCmd()
-			outBuf, _ := SetupCmd(t, rootCmd, tt.args)
-			Execute(rootCmd)
+			outBuf, _ := ExecuteDefaultCmd(t, tt.args)
 			outGotData := outBuf.Bytes()
 
+			f := fmt.Sprintf("testdata/%s.json", tt.name)
 			if tt.update {
 				if err := ioutil.WriteFile(f, outGotData, 0644); err != nil {
 					t.Fatal(err)
@@ -134,6 +175,77 @@ func TestExecute(t *testing.T) {
 
 			if diff := alfred.DiffScriptFilter(outWantData, outGotData); diff != "" {
 				t.Errorf("-want +got\n%+v", diff)
+			}
+		})
+	}
+}
+
+func TestUseDeleteExecution(t *testing.T) {
+	tests := []struct {
+		name   string
+		args   []string
+		update bool
+	}{
+		{
+			name: "use-dummy-context",
+			args: []string{
+				"context",
+				"--use",
+				"dummy",
+			},
+		},
+		{
+			name: "delete-dummy-context",
+			args: []string{
+				"context",
+				"--delete",
+				"dummy",
+			},
+		},
+		{
+			name: "use-dummy-namespace",
+			args: []string{
+				"ns",
+				"--use",
+				"dummy",
+			},
+		},
+		{
+			name: "delete-dummy-pod",
+			args: []string{
+				"pod",
+				"--delete",
+				"dummy",
+			},
+		},
+		{
+			name: "delete-dummy-pod-in-all-ns",
+			args: []string{
+				"pod",
+				"--all",
+				"--delete",
+				"dummy",
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			outBuf, _ := ExecuteDefaultCmd(t, tt.args)
+			outGotData := outBuf.Bytes()
+
+			f := fmt.Sprintf("testdata/%s.txt", tt.name)
+			if tt.update {
+				if err := ioutil.WriteFile(f, outGotData, 0644); err != nil {
+					t.Fatal(err)
+				}
+			}
+			outWantData, err := ioutil.ReadFile(f)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if !bytes.Equal(outWantData, outGotData) {
+				t.Errorf("want: %v\ngot: %v", string(outWantData), string(outGotData))
 			}
 		})
 	}

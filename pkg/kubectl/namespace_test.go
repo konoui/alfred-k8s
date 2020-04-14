@@ -84,3 +84,26 @@ func TestGetNamespaces(t *testing.T) {
 		})
 	}
 }
+
+func TestUseNamespace(t *testing.T) {
+	tests := []struct {
+		name string
+		ns   string
+	}{
+		{
+			name: "use namespace",
+			ns:   "dummy",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			defer goleak.VerifyNone(t)
+			k := SetupKubectl(t, nil)
+			err := k.UseNamespace(tt.ns)
+			if err != nil {
+				t.Fatal(err)
+			}
+		})
+	}
+}
