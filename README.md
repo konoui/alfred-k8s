@@ -50,3 +50,6 @@ kubectl:
     - "/usr/local/bin/"
     - "${HOME}/.pyenv/shims/"
 ```
+
+## License
+MIT License.
