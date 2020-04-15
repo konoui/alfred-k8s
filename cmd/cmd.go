@@ -57,6 +57,10 @@ func NewRootCmd() *cobra.Command {
 }
 
 func listAvailableSubCmds(cmd *cobra.Command, query string) {
+	defer func() {
+		awf.Filter(query).Output()
+	}()
+
 	for _, c := range cmd.Commands() {
 		if !c.IsAvailableCommand() {
 			continue
@@ -77,6 +81,4 @@ func listAvailableSubCmds(cmd *cobra.Command, query string) {
 			Arg: c.Name(),
 		})
 	}
-
-	awf.Filter(query).Output()
 }

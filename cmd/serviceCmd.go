@@ -44,6 +44,10 @@ func listServices(all bool, query string) {
 			Title:    title,
 			Subtitle: fmt.Sprintf("cluster-ip [%s] external-ip [%s] ports [%s]", s.ClusterIP, s.ExternalIP, s.Ports),
 			Arg:      s.Name,
-		})
+			Mods: map[alfred.ModKey]alfred.Mod{
+				alfred.ModShift: getSternMod(s),
+			},
+		},
+		)
 	}
 }

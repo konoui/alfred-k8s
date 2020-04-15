@@ -44,6 +44,9 @@ func listDeployments(all bool, query string) {
 			Title:    title,
 			Subtitle: fmt.Sprintf("ready [%s] up-to-date [%s] available [%s]", d.Ready, d.UpToDate, d.Available),
 			Arg:      d.Name,
+			Mods: map[alfred.ModKey]alfred.Mod{
+				alfred.ModShift: getSternMod(d),
+			},
 		})
 	}
 }

@@ -11,6 +11,10 @@
                     },
                     "arg": "pod test1-pod test1-namespace --delete",
                     "subtitle": "rm the pod"
+                },
+                "shift": {
+                    "arg": "stern test1-pod --namespace test1-namespace",
+                    "subtitle": "copy simple stern command"
                 }
             }
         },
@@ -25,6 +29,10 @@
                     },
                     "arg": "pod test2-pod test2-namespace --delete",
                     "subtitle": "rm the pod"
+                },
+                "shift": {
+                    "arg": "stern test2-pod --namespace test2-namespace",
+                    "subtitle": "copy simple stern command"
                 }
             }
         }

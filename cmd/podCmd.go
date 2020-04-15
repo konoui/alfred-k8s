@@ -57,12 +57,14 @@ func listPods(all bool, query string) {
 						nextActionKey: nextActionShell,
 					},
 				},
+				alfred.ModShift: getSternMod(p),
 			},
 		})
 	}
 }
 
 func deleteResource(rs, name, ns string) {
+	// TODO Clear cache
 	arg := fmt.Sprintf("delete %s %s", rs, name)
 	if ns != "" {
 		arg = fmt.Sprintf("%s --namespace %s", arg, ns)

@@ -3,8 +3,9 @@ package cmd
 import (
 	"fmt"
 	"os"
-	"reflect"
 
+	"github.com/konoui/alfred-k8s/pkg/kubectl"
+	"github.com/konoui/go-alfred"
 	"github.com/spf13/cobra"
 )
 
@@ -20,20 +21,21 @@ func addDeleteFlag(cmd *cobra.Command, del *bool) {
 	cmd.PersistentFlags().BoolVarP(del, "delete", "d", false, "delete the resource")
 }
 
+func getSternMod(i interface{}) alfred.Mod {
+	name, ns := kubectl.GetNameNamespace(i)
+	arg := fmt.Sprintf("stern %s", name)
+	if ns != "" {
+		arg = fmt.Sprintf("%s --namespace %s", arg, ns)
+	}
+
+	return alfred.Mod{
+		Subtitle: "copy simple stern command",
+		Arg:      arg,
+	}
+}
+
 func getNamespaceResourceTitle(i interface{}) string {
-	rv := reflect.Indirect(reflect.ValueOf(i))
-	rt := rv.Type()
-	if _, ok := rt.FieldByName("Name"); !ok {
-		// Note unexpected case
-		return "UnknownName"
-	}
-
-	name := rv.FieldByName("Name").String()
-	if _, ok := rt.FieldByName("Namespace"); !ok {
-		return name
-	}
-
-	ns := rv.FieldByName("Namespace").String()
+	name, ns := kubectl.GetNameNamespace(i)
 	if ns == "" {
 		return name
 	}

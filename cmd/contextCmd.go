@@ -52,13 +52,8 @@ func deleteContext(context string) {
 }
 
 func listContexts(query string) {
-	key := "context"
-	if err := awf.Cache(key).MaxAge(cacheTime).LoadItems().Err(); err == nil {
-		awf.Filter(query).Output()
-		return
-	}
 	defer func() {
-		awf.Cache(key).StoreItems().Workflow().Filter(query).Output()
+		awf.Filter(query).Output()
 	}()
 
 	contexts, err := k.GetContexts()

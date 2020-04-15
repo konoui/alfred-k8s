@@ -16,8 +16,7 @@ type Namespace struct {
 // GetNamespaces return namespaces in current context
 func (k *Kubectl) GetNamespaces() ([]*Namespace, error) {
 	// Note: NAME STATUS AGE
-	arg := fmt.Sprintf("get namespace --no-headers")
-	resp, err := k.Execute(arg)
+	resp, err := k.Execute("get namespace --no-headers")
 	if err != nil {
 		return nil, err
 	}
