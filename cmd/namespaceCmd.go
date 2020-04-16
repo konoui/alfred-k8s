@@ -31,6 +31,7 @@ func NewNamespaceCmd() *cobra.Command {
 }
 
 func useNamespace(ns string) {
+	defer func() { awf.Cache(getCacheKey("ns", false)).Delete() }()
 	if err := k.UseNamespace(ns); err != nil {
 		fmt.Fprintf(errStream, "Failed due to %s\n", err)
 		return
@@ -60,13 +61,7 @@ func listNamespaces(query string) {
 			Subtitle: fmt.Sprintf("status [%s] age [%s]", ns.Status, ns.Age),
 			Arg:      ns.Name,
 			Mods: map[alfred.ModKey]alfred.Mod{
-				alfred.ModCtrl: {
-					Subtitle: "switch to the namespace",
-					Arg:      fmt.Sprintf("ns %s --use", ns.Name),
-					Variables: map[string]string{
-						nextActionKey: nextActionShell,
-					},
-				},
+				alfred.ModCtrl: getUseMod("ns", ns),
 			},
 		})
 	}

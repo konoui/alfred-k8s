@@ -27,7 +27,7 @@ func NewServiceCmd() *cobra.Command {
 }
 
 func listServices(all bool, query string) {
-	key := fmt.Sprintf("svc-%t", all)
+	key := getCacheKey("svc", all)
 	if err := awf.Cache(key).MaxAge(cacheTime).LoadItems().Err(); err == nil {
 		awf.Filter(query).Output()
 		return

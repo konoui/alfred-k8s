@@ -32,7 +32,7 @@ func NewPodCmd() *cobra.Command {
 }
 
 func listPods(all bool, query string) {
-	key := fmt.Sprintf("pod-%t", all)
+	key := getCacheKey("pod", all)
 	if err := awf.Cache(key).MaxAge(cacheTime).LoadItems().Err(); err == nil {
 		awf.Filter(query).Output()
 		return
@@ -50,13 +50,7 @@ func listPods(all bool, query string) {
 			Subtitle: fmt.Sprintf("ready [%s] status [%s] restarts [%s] ", p.Ready, p.Status, p.Restarts),
 			Arg:      p.Name,
 			Mods: map[alfred.ModKey]alfred.Mod{
-				alfred.ModCtrl: {
-					Subtitle: "rm the pod",
-					Arg:      fmt.Sprintf("pod %s %s --delete", p.Name, p.Namespace),
-					Variables: map[string]string{
-						nextActionKey: nextActionShell,
-					},
-				},
+				alfred.ModCtrl:  getDeleteMod("pod", p),
 				alfred.ModShift: getSternMod(p),
 			},
 		})
@@ -64,7 +58,7 @@ func listPods(all bool, query string) {
 }
 
 func deleteResource(rs, name, ns string) {
-	// TODO Clear cache
+	defer func() { awf.Cache(getCacheKey(rs, ns != "")).Delete() }()
 	arg := fmt.Sprintf("delete %s %s", rs, name)
 	if ns != "" {
 		arg = fmt.Sprintf("%s --namespace %s", arg, ns)

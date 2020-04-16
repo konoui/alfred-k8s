@@ -27,7 +27,7 @@ func NewIngressCmd() *cobra.Command {
 }
 
 func listIngresses(all bool, query string) {
-	key := fmt.Sprintf("ingress-%t", all)
+	key := getCacheKey("ingress", all)
 	if err := awf.Cache(key).MaxAge(cacheTime).LoadItems().Err(); err == nil {
 		awf.Filter(query).Output()
 		return

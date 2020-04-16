@@ -4,7 +4,7 @@ go 1.13
 
 require (
 	github.com/google/go-cmp v0.4.0
-	github.com/konoui/go-alfred v0.0.0-20200413015147-14128d136523
+	github.com/konoui/go-alfred v0.0.0-20200416103623-866d3daf9971
 	github.com/mattn/go-shellwords v1.0.10
 	github.com/pkg/errors v0.9.1
 	github.com/spf13/cobra v1.0.0

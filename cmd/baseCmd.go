@@ -27,7 +27,7 @@ func NewBaseCmd() *cobra.Command {
 }
 
 func listBaseResources(name string, all bool, query string) {
-	key := fmt.Sprintf("base-%t", all)
+	key := getCacheKey("base", all)
 	if err := awf.Cache(key).MaxAge(cacheTime).LoadItems().Err(); err == nil {
 		awf.Filter(query).Output()
 		return

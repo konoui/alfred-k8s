@@ -64,24 +64,15 @@ func listContexts(query string) {
 			title = fmt.Sprintf("[*] %s", c.Name)
 		}
 
+		// overwrite Arg for special case
+		deleteMod := getDeleteMod("context", c)
+		deleteMod.Arg = fmt.Sprintf("context %s %s", c.Name, deleteFlag)
 		awf.Append(&alfred.Item{
 			Title: title,
 			Arg:   c.Name,
 			Mods: map[alfred.ModKey]alfred.Mod{
-				alfred.ModCtrl: {
-					Subtitle: "switch to the context",
-					Arg:      fmt.Sprintf("context %s --use", c.Name),
-					Variables: map[string]string{
-						nextActionKey: nextActionShell,
-					},
-				},
-				alfred.ModShift: {
-					Subtitle: "delete the context",
-					Arg:      fmt.Sprintf("context %s --delete", c.Name),
-					Variables: map[string]string{
-						nextActionKey: nextActionShell,
-					},
-				},
+				alfred.ModCtrl:  getUseMod("context", c),
+				alfred.ModShift: deleteMod,
 			},
 		})
 	}

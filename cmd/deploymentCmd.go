@@ -27,7 +27,7 @@ func NewDeploymentCmd() *cobra.Command {
 }
 
 func listDeployments(all bool, query string) {
-	key := fmt.Sprintf("deploy-%t", all)
+	key := getCacheKey("deploy", all)
 	if err := awf.Cache(key).MaxAge(cacheTime).LoadItems().Err(); err == nil {
 		awf.Filter(query).Output()
 		return

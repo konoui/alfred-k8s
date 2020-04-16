@@ -10,7 +10,7 @@
                         "nextAction": "shell"
                     },
                     "arg": "pod test1-pod test1-namespace --delete",
-                    "subtitle": "rm the pod"
+                    "subtitle": "delete it"
                 },
                 "shift": {
                     "arg": "stern test1-pod --namespace test1-namespace",
@@ -28,7 +28,7 @@
                         "nextAction": "shell"
                     },
                     "arg": "pod test2-pod test2-namespace --delete",
-                    "subtitle": "rm the pod"
+                    "subtitle": "delete it"
                 },
                 "shift": {
                     "arg": "stern test2-pod --namespace test2-namespace",

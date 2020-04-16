@@ -10,7 +10,7 @@
                         "nextAction": "shell"
                     },
                     "arg": "pod test1-pod  --delete",
-                    "subtitle": "rm the pod"
+                    "subtitle": "delete it"
                 },
                 "shift": {
                     "arg": "stern test1-pod",
@@ -28,7 +28,7 @@
                         "nextAction": "shell"
                     },
                     "arg": "pod test2-pod  --delete",
-                    "subtitle": "rm the pod"
+                    "subtitle": "delete it"
                 },
                 "shift": {
                     "arg": "stern test2-pod",
