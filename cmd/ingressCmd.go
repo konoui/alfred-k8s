@@ -9,35 +9,28 @@ import (
 
 // NewIngressCmd create a new cmd for ingress resource
 func NewIngressCmd() *cobra.Command {
-	var all bool
 	cmd := &cobra.Command{
 		Use:   "ingress",
 		Short: "list ingresses",
 		Args:  cobra.MinimumNArgs(0),
-		Run: func(cmd *cobra.Command, args []string) {
-			listIngresses(all, getQuery(args, 0))
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return outputMiddleware(collectIngresses)(cmd, args)
 		},
 		DisableSuggestions: true,
 		SilenceUsage:       true,
 		SilenceErrors:      true,
 	}
-	addAllNamespaceFlag(cmd, &all)
+	addAllNamespacesFlag(cmd)
 
 	return cmd
 }
 
-func listIngresses(all bool, query string) {
-	key := getCacheKey("ingress", all)
-	if err := awf.Cache(key).MaxAge(cacheTime).LoadItems().Err(); err == nil {
-		awf.Filter(query).Output()
+func collectIngresses(cmd *cobra.Command, args []string) (err error) {
+	all := getBoolFlag(cmd, allNamespacesFlag)
+	ingresses, err := k.GetIngresses(all)
+	if err != nil {
 		return
 	}
-	defer func() {
-		awf.Cache(key).StoreItems().Workflow().Filter(query).Output()
-	}()
-
-	ingresses, err := k.GetIngresses(all)
-	exitWith(err)
 	for _, i := range ingresses {
 		title := getNamespaceResourceTitle(i)
 		awf.Append(&alfred.Item{
@@ -52,4 +45,5 @@ func listIngresses(all bool, query string) {
 			},
 		})
 	}
+	return
 }

@@ -14,7 +14,7 @@
         "nextAction": "cmd"
       },
       "title": "crd",
-      "subtitle": "list crds, opts [-a: in all namespaces]",
+      "subtitle": "list crds",
       "arg": "crd",
       "autocomplete": "crd"
     },

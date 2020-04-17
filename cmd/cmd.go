@@ -19,7 +19,7 @@ func Execute(rootCmd *cobra.Command) {
 	rootCmd.SetErr(errStream)
 	rootCmd.SetOut(outStream)
 	if err := rootCmd.Execute(); err != nil {
-		listAvailableSubCmds(rootCmd, getQuery(os.Args, 1))
+		_ = outputMiddleware(collectAvailableSubCmds)(rootCmd, []string{getQuery(os.Args, 1)})
 	}
 }
 
@@ -42,8 +42,8 @@ func NewDefaultCmd() *cobra.Command {
 func NewRootCmd() *cobra.Command {
 	rootCmd := &cobra.Command{
 		Short: "list available commands",
-		Run: func(cmd *cobra.Command, args []string) {
-			listAvailableSubCmds(cmd, getQuery(args, 0))
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return outputMiddleware(collectAvailableSubCmds)(cmd, args)
 		},
 		DisableSuggestions: true,
 		SilenceUsage:       true,
@@ -56,11 +56,7 @@ func NewRootCmd() *cobra.Command {
 	return rootCmd
 }
 
-func listAvailableSubCmds(cmd *cobra.Command, query string) {
-	defer func() {
-		awf.Filter(query).Output()
-	}()
-
+func collectAvailableSubCmds(cmd *cobra.Command, args []string) (err error) {
 	for _, c := range cmd.Commands() {
 		if !c.IsAvailableCommand() {
 			continue
@@ -81,4 +77,5 @@ func listAvailableSubCmds(cmd *cobra.Command, query string) {
 			Arg: c.Name(),
 		})
 	}
+	return
 }

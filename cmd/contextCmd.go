@@ -9,55 +9,52 @@ import (
 
 // NewContextCmd create a new cmd for context resource
 func NewContextCmd() *cobra.Command {
-	var use, del bool
 	cmd := &cobra.Command{
 		Use:   "context",
 		Short: "list contexts",
 		Args:  cobra.MinimumNArgs(0),
-		Run: func(cmd *cobra.Command, args []string) {
+		RunE: func(cmd *cobra.Command, args []string) error {
+			use, del := getBoolFlag(cmd, useFalg), getBoolFlag(cmd, deleteFlag)
 			if use {
-				useContext(getQuery(args, 0))
-				return
+				return shellOutputMiddleware(clearCacheMiddleware(useContext))(cmd, args)
 			}
 			if del {
-				deleteContext(getQuery(args, 0))
-				return
+				return shellOutputMiddleware(clearCacheMiddleware(deleteContext))(cmd, args)
 			}
-			listContexts(getQuery(args, 0))
+			return outputMiddleware(collectContexts)(cmd, args)
 		},
 		DisableSuggestions: true,
 		SilenceUsage:       true,
 		SilenceErrors:      true,
 	}
-	addUseFlag(cmd, &use)
-	addDeleteFlag(cmd, &del)
+	addUseFlag(cmd)
+	addDeleteFlag(cmd)
 
 	return cmd
 }
 
-func useContext(context string) {
-	if err := k.UseContext(context); err != nil {
-		fmt.Fprintf(errStream, "Failed due to %s\n", err)
+func useContext(cmd *cobra.Command, args []string) (err error) {
+	context := getQuery(args, 0)
+	if err = k.UseContext(context); err != nil {
 		return
 	}
-	fmt.Fprintln(outStream, "Success!! switched context")
+	return
 }
 
-func deleteContext(context string) {
-	if _, err := k.Execute(fmt.Sprintf("config delete-context %s", context)); err != nil {
-		fmt.Fprintf(errStream, "Failed due to %s\n", err)
+func deleteContext(cmd *cobra.Command, args []string) (err error) {
+	context := getQuery(args, 0)
+	if _, err = k.Execute(fmt.Sprintf("config delete-context %s", context)); err != nil {
 		return
 	}
-	fmt.Fprintln(outStream, "Success!! deleted context")
+	return
 }
 
-func listContexts(query string) {
-	defer func() {
-		awf.Filter(query).Output()
-	}()
-
+func collectContexts(cmd *cobra.Command, args []string) (err error) {
 	contexts, err := k.GetContexts()
-	exitWith(err)
+	if err != nil {
+		return
+	}
+
 	for _, c := range contexts {
 		title := c.Name
 		if c.Current {
@@ -65,15 +62,17 @@ func listContexts(query string) {
 		}
 
 		// overwrite Arg for special case
-		deleteMod := getDeleteMod("context", c)
-		deleteMod.Arg = fmt.Sprintf("context %s %s", c.Name, deleteFlag)
+		name := cmd.Name()
+		deleteMod := getDeleteMod(name, c)
+		deleteMod.Arg = fmt.Sprintf("%s %s --%s", name, c.Name, deleteFlag)
 		awf.Append(&alfred.Item{
 			Title: title,
 			Arg:   c.Name,
 			Mods: map[alfred.ModKey]alfred.Mod{
-				alfred.ModCtrl:  getUseMod("context", c),
+				alfred.ModCtrl:  getUseMod(name, c),
 				alfred.ModShift: deleteMod,
 			},
 		})
 	}
+	return
 }

@@ -9,35 +9,30 @@ import (
 
 // NewBaseCmd create a new cmd for resources not supported
 func NewBaseCmd() *cobra.Command {
-	var all bool
 	cmd := &cobra.Command{
 		Use:   "obj",
 		Short: "list specific resources",
 		Args:  cobra.MinimumNArgs(1),
-		Run: func(cmd *cobra.Command, args []string) {
-			listBaseResources(getQuery(args, 0), all, getQuery(args, 1))
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return outputMiddleware(collectBaseResources)(cmd, args)
 		},
 		DisableSuggestions: true,
 		SilenceUsage:       true,
 		SilenceErrors:      true,
 	}
-	addAllNamespaceFlag(cmd, &all)
+	addAllNamespacesFlag(cmd)
 
 	return cmd
 }
 
-func listBaseResources(name string, all bool, query string) {
-	key := getCacheKey("base", all)
-	if err := awf.Cache(key).MaxAge(cacheTime).LoadItems().Err(); err == nil {
-		awf.Filter(query).Output()
+func collectBaseResources(cmd *cobra.Command, args []string) (err error) {
+	all := getBoolFlag(cmd, allNamespacesFlag)
+	name := getQuery(args, 0)
+	rs, err := k.GetBaseResources(name, all)
+	if err != nil {
 		return
 	}
-	defer func() {
-		awf.Cache(key).StoreItems().Workflow().Filter(query).Output()
-	}()
 
-	rs, err := k.GetBaseResources(name, all)
-	exitWith(err)
 	for _, r := range rs {
 		title := getNamespaceResourceTitle(r)
 		awf.Append(&alfred.Item{
@@ -46,4 +41,5 @@ func listBaseResources(name string, all bool, query string) {
 			Arg:      r.Name,
 		})
 	}
+	return
 }

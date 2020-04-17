@@ -9,40 +9,33 @@ import (
 
 // NewPodCmd create a new cmd for pod resource
 func NewPodCmd() *cobra.Command {
-	var all, del bool
 	cmd := &cobra.Command{
 		Use:   "pod",
 		Short: "list pods",
 		Args:  cobra.MinimumNArgs(0),
-		Run: func(cmd *cobra.Command, args []string) {
+		RunE: func(cmd *cobra.Command, args []string) error {
+			del := getBoolFlag(cmd, deleteFlag)
 			if del {
-				deleteResource("pod", getQuery(args, 0), getQuery(args, 1))
-				return
+				return shellOutputMiddleware(clearCacheMiddleware(deleteResource))(cmd, args)
 			}
-			listPods(all, getQuery(args, 0))
+			return outputMiddleware(collectPods)(cmd, args)
 		},
 		DisableSuggestions: true,
 		SilenceUsage:       true,
 		SilenceErrors:      true,
 	}
-	addDeleteFlag(cmd, &del)
-	addAllNamespaceFlag(cmd, &all)
+	addDeleteFlag(cmd)
+	addAllNamespacesFlag(cmd)
 
 	return cmd
 }
 
-func listPods(all bool, query string) {
-	key := getCacheKey("pod", all)
-	if err := awf.Cache(key).MaxAge(cacheTime).LoadItems().Err(); err == nil {
-		awf.Filter(query).Output()
-		return
-	}
-	defer func() {
-		awf.Cache(key).StoreItems().Workflow().Filter(query).Output()
-	}()
-
+func collectPods(cmd *cobra.Command, args []string) error {
+	all := getBoolFlag(cmd, allNamespacesFlag)
 	pods, err := k.GetPods(all)
-	exitWith(err)
+	if err != nil {
+		return err
+	}
 	for _, p := range pods {
 		title := getNamespaceResourceTitle(p)
 		awf.Append(&alfred.Item{
@@ -50,22 +43,26 @@ func listPods(all bool, query string) {
 			Subtitle: fmt.Sprintf("ready [%s] status [%s] restarts [%s] ", p.Ready, p.Status, p.Restarts),
 			Arg:      p.Name,
 			Mods: map[alfred.ModKey]alfred.Mod{
-				alfred.ModCtrl:  getDeleteMod("pod", p),
+				alfred.ModCtrl:  getDeleteMod(cmd.Name(), p),
 				alfred.ModShift: getSternMod(p),
 			},
 		})
 	}
+	return nil
 }
 
-func deleteResource(rs, name, ns string) {
-	defer func() { awf.Cache(getCacheKey(rs, ns != "")).Delete() }()
+func deleteResource(cmd *cobra.Command, args []string) (err error) {
+	// resource name must be same as cobra.Command Use
+	rs := cmd.Name()
+	name := getQuery(args, 0)
+	ns := getQuery(args, 1)
+
 	arg := fmt.Sprintf("delete %s %s", rs, name)
 	if ns != "" {
 		arg = fmt.Sprintf("%s --namespace %s", arg, ns)
 	}
 	if _, err := k.Execute(arg); err != nil {
-		fmt.Fprintf(outStream, "failed due to %s", err)
-		return
+		return err
 	}
-	fmt.Fprintf(outStream, "Success!! deleted the %s", rs)
+	return nil
 }

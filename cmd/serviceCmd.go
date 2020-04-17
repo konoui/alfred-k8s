@@ -9,35 +9,28 @@ import (
 
 // NewServiceCmd create a new cmd for service resource
 func NewServiceCmd() *cobra.Command {
-	var all bool
 	cmd := &cobra.Command{
 		Use:   "svc",
 		Short: "list services",
 		Args:  cobra.MinimumNArgs(0),
-		Run: func(cmd *cobra.Command, args []string) {
-			listServices(all, getQuery(args, 0))
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return outputMiddleware(collectServices)(cmd, args)
 		},
 		DisableSuggestions: true,
 		SilenceUsage:       true,
 		SilenceErrors:      true,
 	}
-	addAllNamespaceFlag(cmd, &all)
+	addAllNamespacesFlag(cmd)
 
 	return cmd
 }
 
-func listServices(all bool, query string) {
-	key := getCacheKey("svc", all)
-	if err := awf.Cache(key).MaxAge(cacheTime).LoadItems().Err(); err == nil {
-		awf.Filter(query).Output()
+func collectServices(cmd *cobra.Command, args []string) (err error) {
+	all := getBoolFlag(cmd, allNamespacesFlag)
+	svcs, err := k.GetServices(all)
+	if err != nil {
 		return
 	}
-	defer func() {
-		awf.Cache(key).StoreItems().Workflow().Filter(query).Output()
-	}()
-
-	svcs, err := k.GetServices(all)
-	exitWith(err)
 	for _, s := range svcs {
 		title := getNamespaceResourceTitle(s)
 		awf.Append(&alfred.Item{
@@ -47,7 +40,7 @@ func listServices(all bool, query string) {
 			Mods: map[alfred.ModKey]alfred.Mod{
 				alfred.ModShift: getSternMod(s),
 			},
-		},
-		)
+		})
 	}
+	return
 }

@@ -9,35 +9,26 @@ import (
 
 // NewCRDCmd create a new cmd for crd resource
 func NewCRDCmd() *cobra.Command {
-	var all bool
 	cmd := &cobra.Command{
 		Use:   "crd",
 		Short: "list crds",
 		Args:  cobra.MinimumNArgs(0),
-		Run: func(cmd *cobra.Command, args []string) {
-			listCustomResources(getQuery(args, 0))
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return outputMiddleware(collectCRDs)(cmd, args)
 		},
 		DisableSuggestions: true,
 		SilenceUsage:       true,
 		SilenceErrors:      true,
 	}
-	addAllNamespaceFlag(cmd, &all)
 
 	return cmd
 }
 
-func listCustomResources(query string) {
-	key := "crd"
-	if err := awf.Cache(key).MaxAge(cacheTime).LoadItems().Err(); err == nil {
-		awf.Filter(query).Output()
+func collectCRDs(cmd *cobra.Command, args []string) (err error) {
+	crds, err := k.GetCRDs()
+	if err != nil {
 		return
 	}
-	defer func() {
-		awf.Cache(key).StoreItems().Workflow().Filter(query).Output()
-	}()
-
-	crds, err := k.GetCRDs()
-	exitWith(err)
 	for _, c := range crds {
 		awf.Append(&alfred.Item{
 			Title:    c.Name,
@@ -45,4 +36,5 @@ func listCustomResources(query string) {
 			Arg:      c.Name,
 		})
 	}
+	return
 }

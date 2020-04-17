@@ -13,8 +13,8 @@ func NewNodeCmd() *cobra.Command {
 		Use:   "node",
 		Short: "list nodes",
 		Args:  cobra.MinimumNArgs(0),
-		Run: func(cmd *cobra.Command, args []string) {
-			listNodes(getQuery(args, 0))
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return outputMiddleware(collectNodes)(cmd, args)
 		},
 		DisableSuggestions: true,
 		SilenceUsage:       true,
@@ -23,18 +23,11 @@ func NewNodeCmd() *cobra.Command {
 	return cmd
 }
 
-func listNodes(query string) {
-	key := "node"
-	if err := awf.Cache(key).MaxAge(cacheTime).LoadItems().Err(); err == nil {
-		awf.Filter(query).Output()
+func collectNodes(cmd *cobra.Command, args []string) (err error) {
+	nodes, err := k.GetNodes()
+	if err != nil {
 		return
 	}
-	defer func() {
-		awf.Cache(key).StoreItems().Workflow().Filter(query).Output()
-	}()
-
-	nodes, err := k.GetNodes()
-	exitWith(err)
 	for _, n := range nodes {
 		awf.Append(&alfred.Item{
 			Title:    n.Name,
@@ -42,4 +35,5 @@ func listNodes(query string) {
 			Arg:      n.Name,
 		})
 	}
+	return
 }

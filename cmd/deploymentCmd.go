@@ -9,35 +9,28 @@ import (
 
 // NewDeploymentCmd create a new cmd for deployment resource
 func NewDeploymentCmd() *cobra.Command {
-	var all bool
 	cmd := &cobra.Command{
 		Use:   "deploy",
 		Short: "list deployments",
 		Args:  cobra.MinimumNArgs(0),
-		Run: func(cmd *cobra.Command, args []string) {
-			listDeployments(all, getQuery(args, 0))
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return outputMiddleware(collectDeployments)(cmd, args)
 		},
 		DisableSuggestions: true,
 		SilenceUsage:       true,
 		SilenceErrors:      true,
 	}
-	addAllNamespaceFlag(cmd, &all)
+	addAllNamespacesFlag(cmd)
 
 	return cmd
 }
 
-func listDeployments(all bool, query string) {
-	key := getCacheKey("deploy", all)
-	if err := awf.Cache(key).MaxAge(cacheTime).LoadItems().Err(); err == nil {
-		awf.Filter(query).Output()
+func collectDeployments(cmd *cobra.Command, args []string) (err error) {
+	all := getBoolFlag(cmd, allNamespacesFlag)
+	deps, err := k.GetDeployments(all)
+	if err != nil {
 		return
 	}
-	defer func() {
-		awf.Cache(key).StoreItems().Workflow().Filter(query).Output()
-	}()
-
-	deps, err := k.GetDeployments(all)
-	exitWith(err)
 	for _, d := range deps {
 		title := getNamespaceResourceTitle(d)
 		awf.Append(&alfred.Item{
@@ -49,4 +42,5 @@ func listDeployments(all bool, query string) {
 			},
 		})
 	}
+	return
 }
