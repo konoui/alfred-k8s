@@ -12,6 +12,8 @@ import (
 var (
 	outStream io.Writer = os.Stdout
 	errStream io.Writer = os.Stderr
+	version             = "*"
+	revision            = "*"
 )
 
 // Execute root cmd
@@ -26,6 +28,7 @@ func Execute(rootCmd *cobra.Command) {
 // NewDefaultCmd create sub commands
 func NewDefaultCmd() *cobra.Command {
 	rootCmd := NewRootCmd()
+	rootCmd.AddCommand(NewVersionCmd())
 	rootCmd.AddCommand(NewPodCmd())
 	rootCmd.AddCommand(NewContextCmd())
 	rootCmd.AddCommand(NewNamespaceCmd())
@@ -78,4 +81,22 @@ func collectAvailableSubCmds(cmd *cobra.Command, args []string) (err error) {
 		})
 	}
 	return
+}
+
+// NewVersionCmd create a new cmd for version
+func NewVersionCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "version",
+		Short: "print alfred-k8s version",
+		Args:  cobra.MinimumNArgs(0),
+		Run: func(cmd *cobra.Command, args []string) {
+			fmt.Fprintf(outStream, "alfred-k8s %s (%s)\n", version, revision)
+		},
+		// hide version command for available command
+		Hidden:             true,
+		DisableSuggestions: true,
+		SilenceUsage:       true,
+		SilenceErrors:      true,
+	}
+	return cmd
 }
