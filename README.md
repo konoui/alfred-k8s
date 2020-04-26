@@ -1,9 +1,9 @@
-## alfred k8s (Kubernetes)
-Alfred Workflow to operate k8s resources.
+## Alfred Kubernetes
+Alfred workflow to operate Kubernetes resources.
 
 
 ## Features
-- Lists k8s resources and copies to clipboard (e.g. pod. deployment, ingress etc..).
+- List Kubernetes resources and copy them to clipboard (e.g. pod. deployment, ingress etc..).
 - Switch Context/Namespace
 
 
@@ -35,6 +35,7 @@ Please type `kube context` or `kube ns`
 | ---- | ---- |
 | `enter` | Copy to clipboard |
 |  `control` + `enter`  |  Switch context/namespace  |
+|  `shift` + `enter`  |  Delete context  |
 
 
 ## Configuration

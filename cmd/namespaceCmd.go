@@ -18,7 +18,7 @@ func NewNamespaceCmd() *cobra.Command {
 			if use {
 				return shellOutputMiddleware(clearCacheMiddleware(useNamespace))(cmd, args)
 			}
-			return outputMiddleware(collectNamespaces)(cmd, args)
+			return cacheOutputMiddleware(collectNamespaces)(cmd, args)
 		},
 		DisableSuggestions: true,
 		SilenceUsage:       true,

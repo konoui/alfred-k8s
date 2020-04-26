@@ -21,7 +21,7 @@ func NewContextCmd() *cobra.Command {
 			if del {
 				return shellOutputMiddleware(clearCacheMiddleware(deleteContext))(cmd, args)
 			}
-			return outputMiddleware(collectContexts)(cmd, args)
+			return cacheOutputMiddleware(collectContexts)(cmd, args)
 		},
 		DisableSuggestions: true,
 		SilenceUsage:       true,

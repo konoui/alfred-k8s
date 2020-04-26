@@ -14,7 +14,7 @@ func NewNodeCmd() *cobra.Command {
 		Short: "list nodes",
 		Args:  cobra.MinimumNArgs(0),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return outputMiddleware(collectNodes)(cmd, args)
+			return cacheOutputMiddleware(collectNodes)(cmd, args)
 		},
 		DisableSuggestions: true,
 		SilenceUsage:       true,

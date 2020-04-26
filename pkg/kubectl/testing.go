@@ -130,28 +130,6 @@ func FakeResourceFunc(t *testing.T, args ...string) (*executor.Response, error) 
 	return &executor.Response{}, fmt.Errorf("match no execution function %s", args)
 }
 
-// FakePodBaseResourceFunc behave kubectl get pod
-func FakePodBaseResourceFunc(t *testing.T, args ...string) (*executor.Response, error) {
-	rawDataAllPods := GetByteFromTestFile(t, "testdata/raw-pods-in-all-namespaces.txt")
-	rawDataPods := GetByteFromTestFile(t, "testdata/raw-pods.txt")
-
-	if hasQuery(args, 0, "get") && hasQuery(args, 1, "pod") {
-		if hasQuery(args, 2, allNamespaceFlag) {
-			return &executor.Response{
-				Stdout: []byte(rawDataAllPods),
-			}, nil
-		}
-
-		return &executor.Response{
-			Stdout: []byte(rawDataPods),
-		}, nil
-	}
-	if hasQuery(args, 0, "delete") && hasQuery(args, 1, "pod") {
-		return &executor.Response{}, nil
-	}
-	return &executor.Response{}, fmt.Errorf("match no command args")
-}
-
 // FakeContextFunc behave kubectl get context
 func FakeContextFunc(t *testing.T, args ...string) (*executor.Response, error) {
 	rawDataCurrentContext := GetByteFromTestFile(t, "testdata/raw-current-context.txt")
@@ -265,6 +243,9 @@ func FakePodFunc(t *testing.T, args ...string) (*executor.Response, error) {
 			Stdout: rawDataPods,
 		}, nil
 	}
+	if hasQuery(args, 0, "delete") && hasQuery(args, 1, "pod") {
+		return &executor.Response{}, nil
+	}
 	return &executor.Response{}, fmt.Errorf("match no command args")
 }
 
@@ -282,6 +263,25 @@ func FakeServiceFunc(t *testing.T, args ...string) (*executor.Response, error) {
 
 		return &executor.Response{
 			Stdout: rawDataServices,
+		}, nil
+	}
+	return &executor.Response{}, fmt.Errorf("match no command args")
+}
+
+// FakePodBaseResourceFunc behave kubectl get po
+func FakePodBaseResourceFunc(t *testing.T, args ...string) (*executor.Response, error) {
+	rawDataAllPods := GetByteFromTestFile(t, "testdata/raw-pods-in-all-namespaces.txt")
+	rawDataPods := GetByteFromTestFile(t, "testdata/raw-pods.txt")
+
+	if hasQuery(args, 0, "get") && hasQuery(args, 1, "po") {
+		if hasQuery(args, 2, allNamespaceFlag) {
+			return &executor.Response{
+				Stdout: []byte(rawDataAllPods),
+			}, nil
+		}
+
+		return &executor.Response{
+			Stdout: []byte(rawDataPods),
 		}, nil
 	}
 	return &executor.Response{}, fmt.Errorf("match no command args")

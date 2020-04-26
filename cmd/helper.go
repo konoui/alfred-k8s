@@ -21,6 +21,16 @@ const (
 type middlewareFunc func(*cobra.Command, []string) error
 
 func outputMiddleware(f middlewareFunc) middlewareFunc {
+	return func(cmd *cobra.Command, args []string) (ret error) {
+		// Note currently we assume for `obj` command
+		query := getQuery(args, 1)
+		_ = f(cmd, args)
+		awf.Filter(query).Output()
+		return
+	}
+}
+
+func cacheOutputMiddleware(f middlewareFunc) middlewareFunc {
 	// Note always return nil
 	return func(cmd *cobra.Command, args []string) (ret error) {
 		nonNs := getBoolFlag(cmd, allNamespacesFlag)

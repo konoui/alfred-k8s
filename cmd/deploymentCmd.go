@@ -14,7 +14,7 @@ func NewDeploymentCmd() *cobra.Command {
 		Short: "list deployments",
 		Args:  cobra.MinimumNArgs(0),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return outputMiddleware(collectDeployments)(cmd, args)
+			return cacheOutputMiddleware(collectDeployments)(cmd, args)
 		},
 		DisableSuggestions: true,
 		SilenceUsage:       true,

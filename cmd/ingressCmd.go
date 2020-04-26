@@ -14,7 +14,7 @@ func NewIngressCmd() *cobra.Command {
 		Short: "list ingresses",
 		Args:  cobra.MinimumNArgs(0),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return outputMiddleware(collectIngresses)(cmd, args)
+			return cacheOutputMiddleware(collectIngresses)(cmd, args)
 		},
 		DisableSuggestions: true,
 		SilenceUsage:       true,

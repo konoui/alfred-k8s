@@ -14,7 +14,7 @@ func NewCRDCmd() *cobra.Command {
 		Short: "list crds",
 		Args:  cobra.MinimumNArgs(0),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return outputMiddleware(collectCRDs)(cmd, args)
+			return cacheOutputMiddleware(collectCRDs)(cmd, args)
 		},
 		DisableSuggestions: true,
 		SilenceUsage:       true,

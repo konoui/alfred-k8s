@@ -18,7 +18,7 @@ func NewPodCmd() *cobra.Command {
 			if del {
 				return shellOutputMiddleware(clearCacheMiddleware(deleteResource))(cmd, args)
 			}
-			return outputMiddleware(collectPods)(cmd, args)
+			return cacheOutputMiddleware(collectPods)(cmd, args)
 		},
 		DisableSuggestions: true,
 		SilenceUsage:       true,

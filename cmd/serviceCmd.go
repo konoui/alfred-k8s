@@ -14,7 +14,7 @@ func NewServiceCmd() *cobra.Command {
 		Short: "list services",
 		Args:  cobra.MinimumNArgs(0),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return outputMiddleware(collectServices)(cmd, args)
+			return cacheOutputMiddleware(collectServices)(cmd, args)
 		},
 		DisableSuggestions: true,
 		SilenceUsage:       true,

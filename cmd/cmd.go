@@ -21,7 +21,7 @@ func Execute(rootCmd *cobra.Command) {
 	rootCmd.SetErr(errStream)
 	rootCmd.SetOut(outStream)
 	if err := rootCmd.Execute(); err != nil {
-		_ = outputMiddleware(collectAvailableSubCmds)(rootCmd, []string{getQuery(os.Args, 1)})
+		_ = cacheOutputMiddleware(collectAvailableSubCmds)(rootCmd, []string{getQuery(os.Args, 1)})
 	}
 }
 
@@ -46,7 +46,7 @@ func NewRootCmd() *cobra.Command {
 	rootCmd := &cobra.Command{
 		Short: "list available commands",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return outputMiddleware(collectAvailableSubCmds)(cmd, args)
+			return cacheOutputMiddleware(collectAvailableSubCmds)(cmd, args)
 		},
 		DisableSuggestions: true,
 		SilenceUsage:       true,
