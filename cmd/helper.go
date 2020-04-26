@@ -2,7 +2,10 @@ package cmd
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
+	"path/filepath"
+	"strings"
 
 	"github.com/konoui/alfred-k8s/pkg/kubectl"
 	"github.com/konoui/go-alfred"
@@ -20,9 +23,9 @@ type middlewareFunc func(*cobra.Command, []string) error
 func outputMiddleware(f middlewareFunc) middlewareFunc {
 	// Note always return nil
 	return func(cmd *cobra.Command, args []string) (ret error) {
-		all := getBoolFlag(cmd, allNamespacesFlag)
+		nonNs := getBoolFlag(cmd, allNamespacesFlag)
+		key := getCacheKey(cmd.Name(), !nonNs)
 		query := getQuery(args, 0)
-		key := getCacheKey(cmd.Name(), all)
 		if awf.Cache(key).MaxAge(cacheTime).LoadItems().Err() == nil {
 			awf.Filter(query).Output()
 			return
@@ -50,11 +53,35 @@ func shellOutputMiddleware(f middlewareFunc) middlewareFunc {
 
 func clearCacheMiddleware(f middlewareFunc) middlewareFunc {
 	return func(cmd *cobra.Command, args []string) error {
-		all := getBoolFlag(cmd, allNamespacesFlag)
-		key := getCacheKey(cmd.Name(), all)
-		defer func() { awf.Cache(key).Delete() }()
+		defer func() { _ = deleteAllCache() }()
 		return f(cmd, args)
 	}
+}
+
+// deleteCache delete all resources for current namespace/context resources.
+// 1. list pods in current ns
+// 2. switch ns
+// 3. list pods in switched current ns
+func deleteAllCache() error {
+	files, err := ioutil.ReadDir(cacheDir)
+	if err != nil {
+		return fmt.Errorf("invalid cache directory %s", cacheDir)
+	}
+
+	for _, f := range files {
+		if f.IsDir() {
+			continue
+		}
+		if !strings.HasSuffix(f.Name(), cacheSuffix) {
+			continue
+		}
+
+		path := filepath.Join(cacheDir, f.Name())
+		if err := os.Remove(path); err != nil {
+			return fmt.Errorf("failed to delete %s", path)
+		}
+	}
+	return nil
 }
 
 func getBoolFlag(cmd *cobra.Command, name string) bool {
@@ -119,12 +146,13 @@ func getNamespaceResourceTitle(i interface{}) string {
 	return fmt.Sprintf("[%s] %s", ns, name)
 }
 
-func getCacheKey(name string, ns bool) string {
-	key := name
-	if ns {
-		key = fmt.Sprintf("%s-in-all-ns", name)
+// getCacheKey return cache key.
+// 1st arg is resource name. 2nd arg means whether namespaced resource or not
+func getCacheKey(name string, namespaced bool) string {
+	if namespaced {
+		return fmt.Sprintf("%s-%s", cacheNamespacedPrefix, name)
 	}
-	return key
+	return fmt.Sprintf("%s-%s", cacheNonNamespacedPrefix, name)
 }
 
 func getQuery(args []string, idx int) string {

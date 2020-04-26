@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"os"
 	"strings"
 	"time"
 
@@ -14,6 +15,13 @@ var (
 	k         *kubectl.Kubectl
 	awf       *alfred.Workflow
 	cacheTime time.Duration
+	cacheDir  = os.TempDir()
+)
+
+const (
+	cacheSuffix              = "-alfred-k8s.cache"
+	cacheNamespacedPrefix    = "namespaced-"
+	cacheNonNamespacedPrefix = "non-namespaced-"
 )
 
 // decide next action for workflow filter
@@ -25,9 +33,11 @@ const (
 
 func init() {
 	awf = alfred.NewWorkflow()
-	// alfred script filter read from only stdout
 	awf.SetOut(outStream)
 	awf.EmptyWarning("There are no resources", "No matching")
+	awf.SetCacheSuffix(cacheSuffix)
+	err := awf.SetCacheDir(cacheDir)
+	exitWith(err)
 
 	c, err := newConfig()
 	exitWith(err)
