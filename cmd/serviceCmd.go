@@ -10,9 +10,10 @@ import (
 // NewServiceCmd create a new cmd for service resource
 func NewServiceCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "svc",
-		Short: "list services",
-		Args:  cobra.MinimumNArgs(0),
+		Use:     "svc",
+		Short:   "list services",
+		Aliases: []string{"service"},
+		Args:    cobra.MinimumNArgs(0),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return cacheOutputMiddleware(collectServices)(cmd, args)
 		},

@@ -10,9 +10,10 @@ import (
 // NewPodCmd create a new cmd for pod resource
 func NewPodCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "pod",
-		Short: "list pods",
-		Args:  cobra.MinimumNArgs(0),
+		Use:     "pod",
+		Short:   "list pods",
+		Aliases: []string{"po"},
+		Args:    cobra.MinimumNArgs(0),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			del := getBoolFlag(cmd, deleteFlag)
 			if del {

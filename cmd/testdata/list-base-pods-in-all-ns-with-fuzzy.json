@@ -2,7 +2,8 @@
     "items": [
         {
             "title": "There are no resources",
-            "subtitle": "No matching"
+            "subtitle": "No matching",
+            "valid": true
         }
     ]
 }

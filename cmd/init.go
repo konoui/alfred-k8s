@@ -22,6 +22,8 @@ const (
 	cacheSuffix              = "-alfred-k8s.cache"
 	cacheNamespacedPrefix    = "namespaced-"
 	cacheNonNamespacedPrefix = "non-namespaced-"
+	emptyTitle               = "There are no resources"
+	emptySubTitle            = "No matching"
 )
 
 // decide next action for workflow filter
@@ -34,7 +36,8 @@ const (
 func init() {
 	awf = alfred.NewWorkflow()
 	awf.SetOut(outStream)
-	awf.EmptyWarning("There are no resources", "No matching")
+	awf.SetErr(errStream)
+	awf.EmptyWarning(emptyTitle, emptySubTitle)
 	awf.SetCacheSuffix(cacheSuffix)
 	err := awf.SetCacheDir(cacheDir)
 	exitWith(err)

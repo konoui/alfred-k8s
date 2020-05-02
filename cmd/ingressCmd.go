@@ -10,9 +10,10 @@ import (
 // NewIngressCmd create a new cmd for ingress resource
 func NewIngressCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "ingress",
-		Short: "list ingresses",
-		Args:  cobra.MinimumNArgs(0),
+		Use:     "ingress",
+		Short:   "list ingresses",
+		Aliases: []string{"ing"},
+		Args:    cobra.MinimumNArgs(0),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return cacheOutputMiddleware(collectIngresses)(cmd, args)
 		},

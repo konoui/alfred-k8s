@@ -10,9 +10,10 @@ import (
 // NewNamespaceCmd create a new cmd for namespace resource
 func NewNamespaceCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "ns",
-		Short: "list namespaces",
-		Args:  cobra.MinimumNArgs(0),
+		Use:     "ns",
+		Short:   "list namespaces",
+		Aliases: []string{"namespace"},
+		Args:    cobra.MinimumNArgs(0),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			use := getBoolFlag(cmd, useFalg)
 			if use {
