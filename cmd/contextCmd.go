@@ -61,15 +61,17 @@ func collectContexts(cmd *cobra.Command, args []string) (err error) {
 			title = fmt.Sprintf("[*] %s", c.Name)
 		}
 
-		// overwrite Arg for special case
+		// overwrite Arg for special case as context is non namespaced resource but `c` has namespace field.
 		name := cmd.Name()
 		deleteMod := getDeleteMod(name, c)
 		deleteMod.Arg = fmt.Sprintf("%s %s --%s", name, c.Name, deleteFlag)
+		useMod := getUseMod(name, c)
+		useMod.Arg = fmt.Sprintf("%s %s --%s", name, c.Name, useFalg)
 		awf.Append(&alfred.Item{
 			Title: title,
 			Arg:   c.Name,
 			Mods: map[alfred.ModKey]alfred.Mod{
-				alfred.ModCtrl:  getUseMod(name, c),
+				alfred.ModCtrl:  useMod,
 				alfred.ModShift: deleteMod,
 			},
 		})

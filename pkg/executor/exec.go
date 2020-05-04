@@ -1,5 +1,9 @@
 package executor
 
+import (
+	"bytes"
+)
+
 // Executor is interface of command execution
 type Executor interface {
 	Exec(args ...string) (*Response, error)
@@ -8,6 +12,6 @@ type Executor interface {
 // Response is command execution response
 type Response struct {
 	ExitCode int
-	Stdout   []byte
-	Stderr   []byte
+	Stdout   *bytes.Buffer
+	Stderr   *bytes.Buffer
 }

@@ -85,6 +85,19 @@ func TestListExecution(t *testing.T) {
 			},
 		},
 		{
+			name: "list-deployments",
+			args: []string{
+				"deploy",
+			},
+		},
+		{
+			name: "list-deployments-in-all-ns",
+			args: []string{
+				"deploy",
+				"--all",
+			},
+		},
+		{
 			name: "list-services",
 			args: []string{
 				"svc",
@@ -107,19 +120,6 @@ func TestListExecution(t *testing.T) {
 			name: "list-ingresses-in-all-ns",
 			args: []string{
 				"ingress",
-				"--all",
-			},
-		},
-		{
-			name: "list-deployments",
-			args: []string{
-				"deploy",
-			},
-		},
-		{
-			name: "list-deployments-in-all-ns",
-			args: []string{
-				"deploy",
 				"--all",
 			},
 		},

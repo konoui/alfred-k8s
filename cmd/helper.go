@@ -16,6 +16,7 @@ const (
 	allNamespacesFlag = "all"
 	useFalg           = "use"
 	deleteFlag        = "delete"
+	namespaceFlag     = "namespace"
 )
 
 type middlewareFunc func(*cobra.Command, []string) error
@@ -63,7 +64,7 @@ func shellOutputMiddleware(f middlewareFunc) middlewareFunc {
 
 func clearCacheMiddleware(f middlewareFunc) middlewareFunc {
 	return func(cmd *cobra.Command, args []string) error {
-		defer func() { _ = deleteAllCache() }()
+		defer func() { _ = deleteAllCaches() }()
 		return f(cmd, args)
 	}
 }
@@ -72,7 +73,7 @@ func clearCacheMiddleware(f middlewareFunc) middlewareFunc {
 // 1. list pods in current ns
 // 2. switch ns
 // 3. list pods in switched current ns
-func deleteAllCache() error {
+func deleteAllCaches() error {
 	files, err := ioutil.ReadDir(cacheDir)
 	if err != nil {
 		return fmt.Errorf("invalid cache directory %s", cacheDir)
@@ -102,6 +103,14 @@ func getBoolFlag(cmd *cobra.Command, name string) bool {
 	return v
 }
 
+func getStringFlag(cmd *cobra.Command, name string) string {
+	v, err := cmd.PersistentFlags().GetString(name)
+	if err != nil {
+		return ""
+	}
+	return v
+}
+
 func addAllNamespacesFlag(cmd *cobra.Command) {
 	cmd.PersistentFlags().BoolP(allNamespacesFlag, "a", false, "in all namespaces")
 }
@@ -112,6 +121,10 @@ func addUseFlag(cmd *cobra.Command) {
 
 func addDeleteFlag(cmd *cobra.Command) {
 	cmd.PersistentFlags().Bool(deleteFlag, false, "delete the resource")
+}
+
+func addNamespaceFlag(cmd *cobra.Command) {
+	cmd.PersistentFlags().String(namespaceFlag, "", "namespace")
 }
 
 func getSternMod(i interface{}) alfred.Mod {
@@ -126,24 +139,75 @@ func getSternMod(i interface{}) alfred.Mod {
 	}
 }
 
-func getDeleteMod(rs string, i interface{}) alfred.Mod {
+func getDeleteMod(cmdName string, i interface{}) alfred.Mod {
 	name, ns := kubectl.GetNameNamespace(i)
+	arg := fmt.Sprintf("%s %s --%s", cmdName, name, deleteFlag)
+	if ns != "" {
+		arg = fmt.Sprintf("%s --%s %s", arg, namespaceFlag, ns)
+	}
 	return alfred.Mod{
 		Subtitle: "delete it",
-		Arg:      fmt.Sprintf("%s %s %s --%s", rs, name, ns, deleteFlag),
+		Arg:      arg,
 		Variables: map[string]string{
 			nextActionKey: nextActionShell,
 		},
 	}
 }
 
-func getUseMod(rs string, i interface{}) alfred.Mod {
-	name, _ := kubectl.GetNameNamespace(i)
+func getUseMod(cmdName string, i interface{}) alfred.Mod {
+	name, ns := kubectl.GetNameNamespace(i)
+	arg := fmt.Sprintf("%s %s --%s", cmdName, name, useFalg)
+	if ns != "" {
+		arg = fmt.Sprintf("%s --%s %s", arg, namespaceFlag, ns)
+	}
 	return alfred.Mod{
 		Subtitle: "switch to it",
-		Arg:      fmt.Sprintf("%s %s --%s", rs, name, useFalg),
+		Arg:      arg,
 		Variables: map[string]string{
 			nextActionKey: nextActionShell,
+		},
+	}
+}
+
+func getCopyPortForwardMod(resourceName string, i interface{}) alfred.Mod {
+	name, ns := kubectl.GetNameNamespace(i)
+	if ns == "" {
+		var err error
+		ns, err = k.GetCurrentNamespace()
+		if err != nil {
+			ns = "default"
+		}
+	}
+	ports := k.GetPorts(resourceName, name, ns)
+	if len(ports) == 0 {
+		return alfred.Mod{
+			Subtitle: "the resource has no ports",
+		}
+	}
+
+	arg := fmt.Sprintf("kubectl port-forward %s/%s %s", resourceName, name, strings.Join(ports, " "))
+	if ns != "" {
+		arg = fmt.Sprintf("%s --namespace %s", arg, ns)
+	}
+
+	return alfred.Mod{
+		Subtitle: "copy " + arg,
+		Arg:      arg,
+	}
+}
+
+func getExecPortForwardMod(resourceName string, i interface{}) alfred.Mod {
+	name, ns := kubectl.GetNameNamespace(i)
+	arg := fmt.Sprintf("port-forward %s/%s --%s", resourceName, name, useFalg)
+	if ns != "" {
+		arg = fmt.Sprintf("%s --%s %s", arg, namespaceFlag, ns)
+	}
+
+	return alfred.Mod{
+		Subtitle: "port-forward in background",
+		Arg:      arg,
+		Variables: map[string]string{
+			nextActionKey: nextActionJob,
 		},
 	}
 }

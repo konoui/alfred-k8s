@@ -26,6 +26,7 @@ func NewPodCmd() *cobra.Command {
 		SilenceErrors:      true,
 	}
 	addDeleteFlag(cmd)
+	addNamespaceFlag(cmd)
 	addAllNamespacesFlag(cmd)
 
 	return cmd
@@ -46,6 +47,7 @@ func collectPods(cmd *cobra.Command, args []string) error {
 			Mods: map[alfred.ModKey]alfred.Mod{
 				alfred.ModCtrl:  getDeleteMod(cmd.Name(), p),
 				alfred.ModShift: getSternMod(p),
+				alfred.ModAlt:   getPortForwardMod(cmd.Name(), p),
 			},
 		})
 	}
@@ -56,7 +58,7 @@ func deleteResource(cmd *cobra.Command, args []string) (err error) {
 	// resource name must be same as cobra.Command Use
 	rs := cmd.Name()
 	name := getQuery(args, 0)
-	ns := getQuery(args, 1)
+	ns := getStringFlag(cmd, namespaceFlag)
 
 	arg := fmt.Sprintf("delete %s %s", rs, name)
 	if ns != "" {

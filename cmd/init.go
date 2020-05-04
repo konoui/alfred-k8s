@@ -12,10 +12,12 @@ import (
 const defaulCacheValue = 70
 
 var (
-	k         *kubectl.Kubectl
-	awf       *alfred.Workflow
-	cacheTime time.Duration
-	cacheDir  = os.TempDir()
+	k                 *kubectl.Kubectl
+	awf               *alfred.Workflow
+	cacheTime         time.Duration
+	cacheDir          = os.TempDir()
+	experimental      = false
+	getPortForwardMod func(string, interface{}) alfred.Mod
 )
 
 const (
@@ -31,6 +33,7 @@ const (
 	nextActionKey   = "nextAction"
 	nextActionCmd   = "cmd"
 	nextActionShell = "shell"
+	nextActionJob   = "job"
 )
 
 func init() {
@@ -44,6 +47,8 @@ func init() {
 
 	c, err := newConfig()
 	exitWith(err)
+
+	initAlfredMod()
 
 	var binOpt, pluginPathOpt kubectl.Option
 	if c.Kubectl.Bin != "" {
@@ -66,4 +71,13 @@ func init() {
 
 	k, err = kubectl.New(binOpt, pluginPathOpt)
 	exitWith(err)
+}
+
+func initAlfredMod() {
+	// FIXME exec Portforward is experimental
+	if experimental {
+		getPortForwardMod = getExecPortForwardMod
+		return
+	}
+	getPortForwardMod = getCopyPortForwardMod
 }

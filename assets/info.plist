@@ -8,6 +8,19 @@
 	<string>Tools</string>
 	<key>connections</key>
 	<dict>
+		<key>0D9BCCA4-90D9-4637-843C-E9AE739E4B21</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>76D62B36-890C-4369-8390-74B2FD629D88</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
 		<key>18180AFE-8CC9-4842-92E9-6A4299BAD61D</key>
 		<array>
 			<dict>
@@ -26,6 +39,16 @@
 			<dict>
 				<key>destinationuid</key>
 				<string>45B26143-DA66-43B9-9F8C-F803CD49108E</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+			<dict>
+				<key>destinationuid</key>
+				<string>0D9BCCA4-90D9-4637-843C-E9AE739E4B21</string>
 				<key>modifiers</key>
 				<integer>0</integer>
 				<key>modifiersubtext</key>
@@ -52,6 +75,19 @@
 			<dict>
 				<key>destinationuid</key>
 				<string>CF5C2E44-AB46-4A1A-8C1B-762410020E23</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
+		<key>76D62B36-890C-4369-8390-74B2FD629D88</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>B839C13C-C28A-4562-848A-FC71AD55796C</string>
 				<key>modifiers</key>
 				<integer>0</integer>
 				<key>modifiersubtext</key>
@@ -332,11 +368,62 @@
 			<key>version</key>
 			<integer>1</integer>
 		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>concurrently</key>
+				<false/>
+				<key>escaping</key>
+				<integer>102</integer>
+				<key>script</key>
+				<string>echo "start job"
+## see https://www.alfredforum.com/topic/5662-starting-a-background-process/
+./alfred-k8s ${nextCmd} &amp;&gt; /dev/null &amp;</string>
+				<key>scriptargtype</key>
+				<integer>1</integer>
+				<key>scriptfile</key>
+				<string></string>
+				<key>type</key>
+				<integer>0</integer>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.action.script</string>
+			<key>uid</key>
+			<string>76D62B36-890C-4369-8390-74B2FD629D88</string>
+			<key>version</key>
+			<integer>2</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>inputstring</key>
+				<string>{var:nextAction}</string>
+				<key>matchcasesensitive</key>
+				<false/>
+				<key>matchmode</key>
+				<integer>0</integer>
+				<key>matchstring</key>
+				<string>job</string>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.utility.filter</string>
+			<key>uid</key>
+			<string>0D9BCCA4-90D9-4637-843C-E9AE739E4B21</string>
+			<key>version</key>
+			<integer>1</integer>
+		</dict>
 	</array>
 	<key>readme</key>
 	<string></string>
 	<key>uidata</key>
 	<dict>
+		<key>0D9BCCA4-90D9-4637-843C-E9AE739E4B21</key>
+		<dict>
+			<key>xpos</key>
+			<integer>270</integer>
+			<key>ypos</key>
+			<integer>500</integer>
+		</dict>
 		<key>18180AFE-8CC9-4842-92E9-6A4299BAD61D</key>
 		<dict>
 			<key>xpos</key>
@@ -364,6 +451,13 @@
 			<integer>250</integer>
 			<key>ypos</key>
 			<integer>185</integer>
+		</dict>
+		<key>76D62B36-890C-4369-8390-74B2FD629D88</key>
+		<dict>
+			<key>xpos</key>
+			<integer>375</integer>
+			<key>ypos</key>
+			<integer>470</integer>
 		</dict>
 		<key>B31FD45E-50C3-43A9-88A7-5C3FA4CD6390</key>
 		<dict>

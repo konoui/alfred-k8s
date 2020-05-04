@@ -39,6 +39,7 @@ func collectDeployments(cmd *cobra.Command, args []string) (err error) {
 			Arg:      d.Name,
 			Mods: map[alfred.ModKey]alfred.Mod{
 				alfred.ModShift: getSternMod(d),
+				alfred.ModAlt:   getPortForwardMod(cmd.Name(), d),
 			},
 		})
 	}

@@ -40,6 +40,7 @@ func collectServices(cmd *cobra.Command, args []string) (err error) {
 			Arg:      s.Name,
 			Mods: map[alfred.ModKey]alfred.Mod{
 				alfred.ModShift: getSternMod(s),
+				alfred.ModAlt:   getPortForwardMod(cmd.Name(), s),
 			},
 		})
 	}

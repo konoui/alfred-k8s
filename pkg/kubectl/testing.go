@@ -1,6 +1,7 @@
 package kubectl
 
 import (
+	"bytes"
 	"fmt"
 	"io/ioutil"
 	"path/filepath"
@@ -139,11 +140,11 @@ func FakeContextFunc(t *testing.T, args ...string) (*executor.Response, error) {
 		switch getQuery(args, 1) {
 		case "current-context":
 			return &executor.Response{
-				Stdout: rawDataCurrentContext,
+				Stdout: bytes.NewBuffer(rawDataCurrentContext),
 			}, nil
 		case "view":
 			return &executor.Response{
-				Stdout: rawDataContexts,
+				Stdout: bytes.NewBuffer(rawDataContexts),
 			}, nil
 		case "use-context", "set-context", "delete-context":
 			return &executor.Response{}, nil
@@ -158,7 +159,7 @@ func FakeCRDFunc(t *testing.T, args ...string) (*executor.Response, error) {
 
 	if hasQuery(args, 1, "crd") {
 		return &executor.Response{
-			Stdout: rawDataCRDs,
+			Stdout: bytes.NewBuffer(rawDataCRDs),
 		}, nil
 	}
 	return &executor.Response{}, fmt.Errorf("match no command args")
@@ -172,12 +173,12 @@ func FakeDeploymentFunc(t *testing.T, args ...string) (*executor.Response, error
 	if hasQuery(args, 0, "get") && hasQuery(args, 1, "deployment") {
 		if hasQuery(args, 2, allNamespaceFlag) {
 			return &executor.Response{
-				Stdout: []byte(rawDataAllDeployments),
+				Stdout: bytes.NewBuffer(rawDataAllDeployments),
 			}, nil
 		}
 
 		return &executor.Response{
-			Stdout: []byte(rawDataDeployments),
+			Stdout: bytes.NewBuffer(rawDataDeployments),
 		}, nil
 	}
 	return &executor.Response{}, fmt.Errorf("match no command args")
@@ -191,12 +192,12 @@ func FakeIngressFunc(t *testing.T, args ...string) (*executor.Response, error) {
 	if hasQuery(args, 0, "get") && hasQuery(args, 1, "ingress") {
 		if hasQuery(args, 2, allNamespaceFlag) {
 			return &executor.Response{
-				Stdout: rawDataAllIngresses,
+				Stdout: bytes.NewBuffer(rawDataAllIngresses),
 			}, nil
 		}
 
 		return &executor.Response{
-			Stdout: rawDataIngresses,
+			Stdout: bytes.NewBuffer(rawDataIngresses),
 		}, nil
 	}
 	return &executor.Response{}, fmt.Errorf("match no command args")
@@ -208,7 +209,7 @@ func FakeNamespaceFunc(t *testing.T, args ...string) (*executor.Response, error)
 
 	if hasQuery(args, 1, "namespace") {
 		return &executor.Response{
-			Stdout: rawDataNamespaces,
+			Stdout: bytes.NewBuffer(rawDataNamespaces),
 		}, nil
 	}
 	// Note: get current namespace and namespaces call context function
@@ -221,7 +222,7 @@ func FakeNodeFunc(t *testing.T, args ...string) (*executor.Response, error) {
 
 	if hasQuery(args, 0, "get") && hasQuery(args, 1, "node") {
 		return &executor.Response{
-			Stdout: rawDataNodes,
+			Stdout: bytes.NewBuffer(rawDataNodes),
 		}, nil
 	}
 	return &executor.Response{}, fmt.Errorf("match no command args")
@@ -235,12 +236,12 @@ func FakePodFunc(t *testing.T, args ...string) (*executor.Response, error) {
 	if hasQuery(args, 0, "get") && hasQuery(args, 1, "pod") {
 		if hasQuery(args, 2, allNamespaceFlag) {
 			return &executor.Response{
-				Stdout: rawDataAllPods,
+				Stdout: bytes.NewBuffer(rawDataAllPods),
 			}, nil
 		}
 
 		return &executor.Response{
-			Stdout: rawDataPods,
+			Stdout: bytes.NewBuffer(rawDataPods),
 		}, nil
 	}
 	if hasQuery(args, 0, "delete") && hasQuery(args, 1, "pod") {
@@ -257,12 +258,12 @@ func FakeServiceFunc(t *testing.T, args ...string) (*executor.Response, error) {
 	if hasQuery(args, 0, "get") && hasQuery(args, 1, "service") {
 		if hasQuery(args, 2, allNamespaceFlag) {
 			return &executor.Response{
-				Stdout: rawDataAllServices,
+				Stdout: bytes.NewBuffer(rawDataAllServices),
 			}, nil
 		}
 
 		return &executor.Response{
-			Stdout: rawDataServices,
+			Stdout: bytes.NewBuffer(rawDataServices),
 		}, nil
 	}
 	return &executor.Response{}, fmt.Errorf("match no command args")
@@ -276,12 +277,12 @@ func FakePodBaseResourceFunc(t *testing.T, args ...string) (*executor.Response, 
 	if hasQuery(args, 0, "get") && hasQuery(args, 1, "po") {
 		if hasQuery(args, 2, allNamespaceFlag) {
 			return &executor.Response{
-				Stdout: []byte(rawDataAllPods),
+				Stdout: bytes.NewBuffer(rawDataAllPods),
 			}, nil
 		}
 
 		return &executor.Response{
-			Stdout: []byte(rawDataPods),
+			Stdout: bytes.NewBuffer(rawDataPods),
 		}, nil
 	}
 	return &executor.Response{}, fmt.Errorf("match no command args")

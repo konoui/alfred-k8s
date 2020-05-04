@@ -5,11 +5,14 @@
             "subtitle": "ready [1/1] status [Running] restarts [0] ",
             "arg": "test1-pod",
             "mods": {
+                "alt": {
+                    "subtitle": "the resource has no ports"
+                },
                 "ctrl": {
                     "variables": {
                         "nextAction": "shell"
                     },
-                    "arg": "pod test1-pod  --delete",
+                    "arg": "pod test1-pod --delete",
                     "subtitle": "delete it"
                 },
                 "shift": {
@@ -23,11 +26,14 @@
             "subtitle": "ready [2/2] status [Running] restarts [1] ",
             "arg": "test2-pod",
             "mods": {
+                "alt": {
+                    "subtitle": "the resource has no ports"
+                },
                 "ctrl": {
                     "variables": {
                         "nextAction": "shell"
                     },
-                    "arg": "pod test2-pod  --delete",
+                    "arg": "pod test2-pod --delete",
                     "subtitle": "delete it"
                 },
                 "shift": {

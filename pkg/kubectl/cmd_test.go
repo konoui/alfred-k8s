@@ -1,8 +1,9 @@
 package kubectl
 
 import (
+	"bytes"
 	"context"
-	"fmt"
+	"io"
 	"testing"
 
 	"go.uber.org/goleak"
@@ -12,6 +13,12 @@ const (
 	knownBinary  = "/bin/ls"
 	knownBinPath = "/bin"
 )
+
+func streamToString(stream io.Reader) string {
+	buf := new(bytes.Buffer)
+	_, _ = buf.ReadFrom(stream)
+	return buf.String()
+}
 
 func TestExecute(t *testing.T) {
 	tests := []struct {
@@ -47,11 +54,11 @@ func TestExecute(t *testing.T) {
 				t.Error("exit status is not zero")
 			}
 
-			if stderr := string(resp.stderr); stderr != "" {
+			if stderr := streamToString(resp.stderr); stderr != "" {
 				t.Errorf("stderr is not empty %s", stderr)
 			}
 
-			if string(resp.stdout) == "" {
+			if streamToString(resp.stdout) == "" {
 				t.Error("stdout is empty")
 			}
 		})
@@ -67,14 +74,14 @@ func TestReadlineContext(t *testing.T) {
 		{
 			name: "multi lines",
 			cmdResp: &Response{
-				stdout:   []byte(fmt.Sprintln("stdout\nstdout\nstdout")),
+				stdout:   bytes.NewBufferString("stdout\nstdout\nstdout"),
 				exitCode: 0,
 			},
 		},
 		{
 			name: "one line",
 			cmdResp: &Response{
-				stdout:   []byte("stdout"),
+				stdout:   bytes.NewBufferString("stdout"),
 				exitCode: 0,
 			},
 		},
@@ -108,7 +115,7 @@ func TestReadline(t *testing.T) {
 		{
 			name: "one line",
 			cmdResp: &Response{
-				stdout:   []byte("stdout\n"),
+				stdout:   bytes.NewBufferString("stdout\n"),
 				exitCode: 0,
 			},
 		},

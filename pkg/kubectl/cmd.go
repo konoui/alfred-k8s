@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
 	"time"
@@ -16,19 +17,21 @@ import (
 
 // Command is binary path and env to execute
 type Command struct {
-	bin string
+	bin     string
+	timeout time.Duration
 }
 
 // Response is output of kubectl command
 type Response struct {
 	exitCode int
-	stdout   []byte
-	stderr   []byte
+	stdout   io.Reader
+	stderr   io.Reader
 }
 
 func newCommand(bin string) executor.Executor {
 	return &Command{
-		bin: bin,
+		bin:     bin,
+		timeout: 10 * time.Second,
 	}
 }
 
@@ -45,7 +48,7 @@ func (k *Kubectl) Execute(arg string) (*Response, error) {
 		exitCode: resp.ExitCode,
 		stdout:   resp.Stdout,
 		stderr:   resp.Stderr,
-	}, errors.Wrapf(err, string(resp.Stderr))
+	}, errors.Wrapf(err, resp.Stderr.String())
 }
 
 func appendPathEnv(addPath string) {
@@ -58,21 +61,23 @@ func appendPathEnv(addPath string) {
 }
 
 // Readline return stdout chan
-func (c *Response) Readline() <-chan string {
-	return c.ReadlineContext(context.Background())
+func (r *Response) Readline() <-chan string {
+	return r.ReadlineContext(context.Background())
 }
 
 // ReadlineContext return stdout chan
-func (c *Response) ReadlineContext(ctx context.Context) <-chan string {
-	s := bytes.NewReader(c.stdout)
-	scanner := bufio.NewScanner(s)
-	var outStream = make(chan string)
+func (r *Response) ReadlineContext(ctx context.Context) <-chan string {
+	if r.stdout == nil {
+		r.stdout = new(bytes.Buffer)
+	}
 
+	outchan := make(chan string)
+	scanner := bufio.NewScanner(r.stdout)
 	go func(ctx context.Context) {
-		defer close(outStream)
+		defer close(outchan)
 		for scanner.Scan() {
 			select {
-			case outStream <- scanner.Text():
+			case outchan <- scanner.Text():
 			case <-ctx.Done():
 				return
 			}
@@ -80,20 +85,21 @@ func (c *Response) ReadlineContext(ctx context.Context) <-chan string {
 
 		if err := scanner.Err(); err != nil {
 			select {
-			case outStream <- err.Error():
+			// FIXME
+			case outchan <- err.Error():
 			case <-ctx.Done():
 				return
 			}
 		}
 	}(ctx)
 
-	return outStream
+	return outchan
 }
 
 // Exec is implementation of command execution
 func (c *Command) Exec(args ...string) (*executor.Response, error) {
 	var stdout, stderr bytes.Buffer
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), c.timeout)
 	defer cancel()
 	cmd := exec.CommandContext(ctx, c.bin, args...)
 	cmd.Env = os.Environ()
@@ -108,14 +114,14 @@ func (c *Command) Exec(args ...string) (*executor.Response, error) {
 
 		return &executor.Response{
 			ExitCode: exitCode,
-			Stdout:   stdout.Bytes(),
-			Stderr:   stderr.Bytes(),
+			Stdout:   &stdout,
+			Stderr:   &stderr,
 		}, err
 	}
 
 	return &executor.Response{
 		ExitCode: 0,
-		Stdout:   stdout.Bytes(),
-		Stderr:   stderr.Bytes(),
+		Stdout:   &stdout,
+		Stderr:   &stderr,
 	}, nil
 }

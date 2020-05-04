@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"io"
+	"io/ioutil"
 	"os"
 
 	"github.com/konoui/go-alfred"
@@ -12,6 +13,7 @@ import (
 var (
 	outStream io.Writer = os.Stdout
 	errStream io.Writer = os.Stderr
+	jobStream io.Writer = ioutil.Discard
 	version             = "*"
 	revision            = "*"
 )
@@ -38,6 +40,7 @@ func NewDefaultCmd() *cobra.Command {
 	rootCmd.AddCommand(NewIngressCmd())
 	rootCmd.AddCommand(NewBaseCmd())
 	rootCmd.AddCommand(NewCRDCmd())
+	rootCmd.AddCommand(NewPortForwardCmd())
 	return rootCmd
 }
 

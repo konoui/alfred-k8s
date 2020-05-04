@@ -42,7 +42,7 @@ test:
 
 ## Install Binary and Assets to Workflow Directory
 install: build
-	@(cp $(ASSETS)  $(WORKFLOW_DIR)/)
+	@(cp -r $(ASSETS)  $(WORKFLOW_DIR)/)
 
 ## GitHub Release and uploads artifacts
 release: darwin
