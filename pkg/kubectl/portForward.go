@@ -1,6 +1,7 @@
 package kubectl
 
 import (
+	"context"
 	"fmt"
 	"strconv"
 	"strings"
@@ -22,15 +23,30 @@ const (
 {{ end -}}`
 )
 
+type PortResource struct {
+	Resource  string   `json:"Resource"`
+	Namespace string   `json:"Namespace"`
+	Name      string   `json:"Name"`
+	Ports     []string `json:"Ports"`
+	Job
+}
+
 // PortForward exec kubectl port-forward command
-func (k *Kubectl) PortForward(resourceName, ns string, ports []string) (resp *Status, errChan <-chan error) {
+func (k *Kubectl) PortForward(ctx context.Context, res, name, ns string, ports []string) (resp *PortResource, errChan <-chan error) {
 	args := append([]string{
 		"port-forward",
-		resourceName,
+		res + "/" + name,
 		"--namespace",
 		ns,
 	}, ports...)
-	resp, errChan = k.StartJob(args...)
+	job, errChan := k.StartJob(ctx, args...)
+	resp = &PortResource{
+		Resource:  res,
+		Namespace: ns,
+		Name:      name,
+		Ports:     ports,
+		Job:       *job,
+	}
 	return
 }
 

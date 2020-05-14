@@ -2,89 +2,87 @@ package kubectl
 
 import (
 	"bufio"
+	"context"
 	"io"
 	"os"
 	"os/exec"
-	"sync"
-	"syscall"
+
+	"github.com/pkg/errors"
 )
 
-// Status is represent async job status
-type Status struct {
-	pidChan chan int
-	outChan chan string
-	pid     int
+// Job is represent async job status
+type Job struct {
+	outCh chan string
+	Pid   int `json:"Pid"`
 }
 
 // StartJob is async command execution
-func (k *Kubectl) StartJob(args ...string) (resp *Status, errChan <-chan error) {
+func (k *Kubectl) StartJob(ctx context.Context, args ...string) (resp *Job, errCh <-chan error) {
 	kbin := k.cmd.(*Command)
 	appendPathEnv(k.pluginPath)
-	resp, errChan = startJob(kbin.bin, args...)
+	resp, errCh = startJob(ctx, kbin.bin, args...)
 	return
 }
 
 // StartJob is async command execution
-func startJob(name string, args ...string) (*Status, <-chan error) { //nolint:gocritic
+func startJob(ctx context.Context, name string, args ...string) (*Job, <-chan error) { //nolint:gocritic
 	cmd := exec.Command(name, args...) //nolint:gosec //nolint:gocritic
 	cmd.Env = os.Environ()
 	errChan := make(chan error)
-	status := &Status{
-		pid:     -1,
-		pidChan: make(chan int, 1),
-		outChan: make(chan string),
+	job := &Job{
+		Pid:   -1,
+		outCh: make(chan string),
 	}
 
+	ready := make(chan struct{})
 	go func() {
+		defer close(errChan)
+		defer close(ready)
 		stdout, _ := cmd.StdoutPipe()
 		stderr, _ := cmd.StderrPipe()
-		defer close(errChan)
 		if err := cmd.Start(); err != nil {
-			status.pidChan <- 0
 			errChan <- err
 			return
 		}
 
-		status.pidChan <- cmd.Process.Pid
-		close(status.pidChan)
-		scanner := bufio.NewScanner(io.MultiReader(stdout, stderr))
+		// notify ready to set pid
+		job.Pid = cmd.Process.Pid
+		ready <- struct{}{}
 
-		var wg sync.WaitGroup
-		wg.Add(1)
+		done := make(chan struct{})
+		scanner := bufio.NewScanner(io.MultiReader(stdout, stderr))
 		go func() {
-			defer wg.Done()
-			defer close(status.outChan)
+			defer close(done)
+			defer close(job.outCh)
 			for scanner.Scan() {
-				status.outChan <- scanner.Text()
+				job.outCh <- scanner.Text()
 			}
 		}()
 
-		wg.Wait()
-		errChan <- cmd.Wait()
+		select {
+		case <-ctx.Done():
+			_ = cmd.Process.Kill()
+			errChan <- errors.New("job is canceled")
+		case <-done:
+			errChan <- cmd.Wait()
+		}
 	}()
 
-	return status, errChan
+	// wait for set pid or close chan
+	<-ready
+	return job, errChan
 }
 
 // ReadLine return stdout and stderr chan
-func (s *Status) ReadLine() <-chan string {
-	return s.outChan
+func (j *Job) ReadLine() <-chan string {
+	return j.outCh
 }
 
-// TerminateJob kill the job
-func (s *Status) TerminateJob() error {
-	pid := s.Pid()
-	return syscall.Kill(-pid, syscall.SIGTERM)
-}
-
-// Pid return pid
-func (s *Status) Pid() int {
-	pid, ok := <-s.pidChan
-	// 1st call, set pid
-	if ok {
-		s.pid = pid
-		return pid
+// Terminate kill the job
+func (j *Job) Terminate() error {
+	p, err := os.FindProcess(j.Pid)
+	if err != nil {
+		return errors.Wrapf(err, "failed to find process %d", j.Pid)
 	}
-	// for 2nd call
-	return s.pid
+	return p.Kill()
 }

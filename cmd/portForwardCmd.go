@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -9,6 +10,7 @@ import (
 	"strings"
 	"syscall"
 
+	"github.com/konoui/alfred-k8s/pkg/kubectl"
 	"github.com/konoui/go-alfred"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
@@ -33,7 +35,7 @@ func NewPortForwardCmd() *cobra.Command {
 			if del {
 				if err := terminateJob(cmd, args); err != nil {
 					fmt.Fprintf(outStream, "Failed to terminate job due to %s. trying to scan jobs", err)
-					_ = listJobs()
+					_ = listPortResources()
 				}
 				fmt.Fprintln(outStream, "Success")
 				return
@@ -54,20 +56,12 @@ func NewPortForwardCmd() *cobra.Command {
 	return cmd
 }
 
-type job struct {
-	Pid       int
-	Resource  string
-	Namespace string
-	Name      string
-	Metadata  []string
-}
-
 func collectJobs(cmd *cobra.Command, args []string) error {
-	jobs := listJobs()
+	jobs := listPortResources()
 	for _, j := range jobs {
 		awf.Append(&alfred.Item{
 			Title:    fmt.Sprintf("[%s] %s/%s", j.Namespace, j.Resource, j.Name),
-			Subtitle: fmt.Sprintf("ports %s", strings.Join(j.Metadata, " ")),
+			Subtitle: fmt.Sprintf("ports %s", strings.Join(j.Ports, " ")),
 			Mods: map[alfred.ModKey]alfred.Mod{
 				alfred.ModAlt: {
 					Subtitle: "terminate port-forward process",
@@ -83,7 +77,7 @@ func collectJobs(cmd *cobra.Command, args []string) error {
 }
 
 // ListJobs return current jobs
-func listJobs() (jobs []*job) {
+func listPortResources() (jobs []*kubectl.PortResource) {
 	dir := getDataDir()
 	files, err := ioutil.ReadDir(dir)
 	if err != nil {
@@ -100,7 +94,7 @@ func listJobs() (jobs []*job) {
 		}
 		pidfile := filepath.Join(dir, f.Name())
 		// try to read pidfile
-		var j job
+		var j kubectl.PortResource
 		err = readPidfile(pidfile, &j)
 		if err != nil {
 			fmt.Fprintln(errStream, err)
@@ -115,32 +109,71 @@ func listJobs() (jobs []*job) {
 }
 
 // Note: terminateJob does not delete pid file.
-// listJobs() takes  responsibility for checking existing pid file, scaning process and deleting pidfile.
+// listJobs() takes responsibility for checking existing pid file, scaning process and deleting pidfile.
 func terminateJob(cmd *cobra.Command, args []string) error {
 	pidfile := getDataPath(cmd, args, ".pid")
 	f, err := os.Open(pidfile)
 	if err != nil {
 		return err
 	}
-	var j job
+	var j kubectl.PortResource
 	err = json.NewDecoder(f).Decode(&j)
 	if err != nil {
 		return err
 	}
 
-	err = terminate(j.Pid)
+	err = j.Terminate()
 	return errors.Wrapf(err, "pid %d", j.Pid)
 }
 
-func terminate(pid int) error {
-	p, err := os.FindProcess(pid)
-	if err != nil {
-		return errors.Wrapf(err, "failed to find process %d", pid)
+func background(cmd *cobra.Command, args []string) error {
+	res, name, ns := getResourceNameNamespace(cmd, args)
+	ports := k.GetPorts(res, name, ns)
+	if len(ports) == 0 {
+		return fmt.Errorf("%s/%s has no ports", res, name)
 	}
-	return p.Kill()
+
+	// kill if the same command is executed
+	pidfile := getDataPath(cmd, args, ".pid")
+	prev := new(kubectl.PortResource)
+	_ = readPidfile(pidfile, prev)
+	_ = prev.Terminate()
+
+	// create log file
+	logfile := getDataPath(cmd, args, ".log")
+	lf, err := os.Create(logfile)
+	if err != nil {
+		return errors.Wrapf(err, "failed to create log file %s", logfile)
+	}
+	defer lf.Close()
+	// set logger
+	jobStream = lf
+
+	// do port forward
+	job, errChan := k.PortForward(context.Background(), res, name, ns, ports)
+	go func() {
+		for line := range job.ReadLine() {
+			fmt.Fprintln(jobStream, line)
+		}
+	}()
+
+	f, err := os.Create(pidfile)
+	if err != nil {
+		return errors.Wrap(err, "failed to create pidfile")
+	}
+	defer f.Close()
+
+	// write job information
+	err = json.NewEncoder(f).Encode(job)
+	if err != nil {
+		return errors.Wrap(err, "failed to save data into pidfile")
+	}
+
+	// wait for port forward command
+	return <-errChan
 }
 
-func readPidfile(pidfile string, j *job) error {
+func readPidfile(pidfile string, j *kubectl.PortResource) error {
 	v, err := ioutil.ReadFile(pidfile)
 	logfile := strings.TrimRight(pidfile, "pid") + "log"
 	if err != nil {
@@ -166,67 +199,9 @@ func readPidfile(pidfile string, j *job) error {
 	return nil
 }
 
-func background(cmd *cobra.Command, args []string) error {
-	rs, name, ns := getResourceNameNamespace(cmd, args)
-	ports := k.GetPorts(rs, name, ns)
-	if len(ports) == 0 {
-		return fmt.Errorf("%s/%s has no ports", rs, name)
-	}
-
-	// kill if the same command is executed
-	pidfile := getDataPath(cmd, args, ".pid")
-	var j job
-	_ = readPidfile(pidfile, &j)
-	_ = terminate(j.Pid)
-
-	// create log file
-	logfile := getDataPath(cmd, args, ".log")
-	lf, err := os.Create(logfile)
-	if err != nil {
-		return errors.Wrapf(err, "failed to create log file %s", logfile)
-	}
-	defer lf.Close()
-	// set logger
-	jobStream = lf
-
-	// do port forward
-	pid, errChan := portForward(rs+"/"+name, ns, ports)
-
-	f, err := os.Create(pidfile)
-	if err != nil {
-		return errors.Wrap(err, "failed to create pidfile")
-	}
-	defer f.Close()
-
-	// write pid
-	err = json.NewEncoder(f).Encode(job{
-		Pid:       pid,
-		Resource:  rs,
-		Namespace: ns,
-		Name:      name,
-		Metadata:  ports,
-	})
-	if err != nil {
-		return errors.Wrap(err, "failed to save data into pidfile")
-	}
-
-	// wait for port forward command
-	return <-errChan
-}
-
-func portForward(query, ns string, ports []string) (pid int, errChan <-chan error) { //nolint:gocritic
-	status, errChan := k.PortForward(query, ns, ports)
-	go func() {
-		for line := range status.ReadLine() {
-			fmt.Fprintln(jobStream, line)
-		}
-	}()
-	return status.Pid(), errChan
-}
-
 func getDataPath(cmd *cobra.Command, args []string, extension string) string {
-	rs, name, ns := getResourceNameNamespace(cmd, args)
-	file := cmd.Name() + "-" + rs + "-" + ns + "-" + name + extension
+	res, name, ns := getResourceNameNamespace(cmd, args)
+	file := cmd.Name() + "-" + res + "-" + ns + "-" + name + extension
 	return filepath.Join(getDataDir(), file)
 }
 
@@ -234,17 +209,17 @@ func getDataDir() string {
 	return "./data"
 }
 
-func getResourceNameNamespace(cmd *cobra.Command, args []string) (rs, name, ns string) {
+func getResourceNameNamespace(cmd *cobra.Command, args []string) (res, name, ns string) {
 	query := getQuery(args, 0)
 	tmp := strings.Split(query, "/")
-	rs = getQuery(tmp, 0)
+	res = getQuery(tmp, 0)
 	name = getQuery(tmp, 1)
 	ns = getStringFlag(cmd, namespaceFlag)
 	if ns == "" {
 		var err error
 		ns, err = k.GetCurrentNamespace()
 		if err != nil {
-			return rs, name, "default"
+			return res, name, "default"
 		}
 	}
 	return
