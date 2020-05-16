@@ -1,3 +1,4 @@
-*	test1-name  test1-cluster   test1-authinfo	<no value>
-*	test2-name  test2-cluster   test2-authinfo	<no value>
-*	test3-name  test3-cluster   test3-authinfo  test3-namespace
+CURRENT    NAME        CLUSTER       AUTHINFO       NAMESPACE
+           test1-name  test1-cluster test1-authinfo
+           test2-name  test2-cluster test2-authinfo
+*          test3-name  test3-cluster test3-authinfo test3-namespace

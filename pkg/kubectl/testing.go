@@ -142,7 +142,7 @@ func FakeContextFunc(t *testing.T, args ...string) (*executor.Response, error) {
 			return &executor.Response{
 				Stdout: bytes.NewBuffer(rawDataCurrentContext),
 			}, nil
-		case "view":
+		case "get-contexts":
 			return &executor.Response{
 				Stdout: bytes.NewBuffer(rawDataContexts),
 			}, nil
