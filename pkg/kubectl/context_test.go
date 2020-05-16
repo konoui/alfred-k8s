@@ -8,15 +8,15 @@ import (
 )
 
 var testContexts = []*Context{
-	&Context{
+	{
 		Name:      "test1-name",
 		Namespace: "",
 	},
-	&Context{
+	{
 		Name:      "test2-name",
 		Namespace: "",
 	},
-	&Context{
+	{
 		Current:   true,
 		Name:      "test3-name",
 		Namespace: "test3-namespace",

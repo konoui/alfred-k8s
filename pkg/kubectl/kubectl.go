@@ -7,7 +7,15 @@ import (
 	"github.com/konoui/alfred-k8s/pkg/executor"
 )
 
-const allNamespaceFlag = "--all-namespaces"
+const (
+	knownNameField      = "NAME"
+	knownNamespaceField = "NAMESPACE"
+	knownAageField      = "AGE"
+	allNamespaceFlag    = "--all-namespaces"
+	// see https://golang.org/pkg/text/template/#Template.Option
+	noValue    = "<no value>"
+	dummyValue = "DUMMYVALUE"
+)
 
 // Kubectl is configuration of binary paths
 type Kubectl struct {

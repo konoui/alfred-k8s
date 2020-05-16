@@ -8,7 +8,7 @@ import (
 )
 
 var testAllServices = []*Service{
-	&Service{
+	{
 		Namespace:  "test3-namespace",
 		Name:       "service-test1",
 		Type:       "ClusterIP",
@@ -17,7 +17,7 @@ var testAllServices = []*Service{
 		Ports:      "8080/TCP",
 		Age:        "11d",
 	},
-	&Service{
+	{
 		Namespace:  "test3-namespace",
 		Name:       "service-test2",
 		Type:       "ClusterIP",
@@ -29,7 +29,7 @@ var testAllServices = []*Service{
 }
 
 var testServices = []*Service{
-	&Service{
+	{
 		Name:       "service-test1",
 		Type:       "ClusterIP",
 		ClusterIP:  "10.100.49.33",
@@ -37,7 +37,7 @@ var testServices = []*Service{
 		Ports:      "8080/TCP",
 		Age:        "11d",
 	},
-	&Service{
+	{
 		Name:       "service-test2",
 		Type:       "ClusterIP",
 		ClusterIP:  "10.100.75.11",

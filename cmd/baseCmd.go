@@ -28,12 +28,12 @@ func NewBaseCmd() *cobra.Command {
 func collectBaseResources(cmd *cobra.Command, args []string) (err error) {
 	all := getBoolFlag(cmd, allNamespacesFlag)
 	name := getQuery(args, 0)
-	rs, err := k.GetBaseResources(name, all)
+	reses, err := k.GetBaseResources(name, all)
 	if err != nil {
 		return
 	}
 
-	for _, r := range rs {
+	for _, r := range reses {
 		title := getNamespaceResourceTitle(r)
 		awf.Append(&alfred.Item{
 			Title:    title,

@@ -23,6 +23,7 @@ const (
 {{ end -}}`
 )
 
+// PortResource represents resource of ports
 type PortResource struct {
 	Resource  string   `json:"Resource"`
 	Namespace string   `json:"Namespace"`
@@ -51,8 +52,8 @@ func (k *Kubectl) PortForward(ctx context.Context, res, name, ns string, ports [
 }
 
 // GetPorts return pod/deployment/service ports
-func (k *Kubectl) GetPorts(rs, name, ns string) (ports []string) {
-	switch rs {
+func (k *Kubectl) GetPorts(res, name, ns string) (ports []string) {
+	switch res {
 	case "pod", "po":
 		ports = k.GetPodPorts(name, ns)
 	case "deploy", "deployment":

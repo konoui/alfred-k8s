@@ -8,11 +8,11 @@ import (
 )
 
 var testCRDs = []*CRD{
-	&CRD{
+	{
 		Name:      "eniconfigs.crd.k8s.amazonaws.com",
 		CreatedAT: "2020-03-11T12:23:16Z",
 	},
-	&CRD{
+	{
 		Name:      "meshes.appmesh.k8s.aws",
 		CreatedAT: "2020-03-11T12:32:15Z",
 	},

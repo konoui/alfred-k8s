@@ -8,7 +8,7 @@ import (
 )
 
 var testAllDeployments = []*Deployment{
-	&Deployment{
+	{
 		Namespace: "test1-namespace",
 		Name:      "deployment-test1",
 		Ready:     "1/1",
@@ -16,7 +16,7 @@ var testAllDeployments = []*Deployment{
 		Available: "1",
 		Age:       "11d",
 	},
-	&Deployment{
+	{
 		Namespace: "test2-namespace",
 		Name:      "deployment-test2",
 		Ready:     "2/2",
@@ -26,14 +26,14 @@ var testAllDeployments = []*Deployment{
 	},
 }
 var testDeployments = []*Deployment{
-	&Deployment{
+	{
 		Name:      "deployment-test1",
 		Ready:     "1/1",
 		UpToDate:  "1",
 		Available: "1",
 		Age:       "11d",
 	},
-	&Deployment{
+	{
 		Name:      "deployment-test2",
 		Ready:     "2/2",
 		UpToDate:  "2",

@@ -10,9 +10,6 @@ const (
 	contextTPL = `{{ range .contexts -}}
 *   {{.name}}   {{.context.cluster}}   {{.context.user}}    {{.context.namespace}}
 {{ end -}}`
-	// see https://golang.org/pkg/text/template/#Template.Option
-	noValue    = "<no value>"
-	dummyValue = "DUMMY"
 )
 
 // Context is kubectl get-contexts information

@@ -8,23 +8,23 @@ import (
 )
 
 var testNamespaces = []*Namespace{
-	&Namespace{
+	{
 		Name:   "test1-namepsace",
 		Status: "Active",
 		Age:    "11d",
 	},
-	&Namespace{
+	{
 		Name:   "test2-namepsace",
 		Status: "Active",
 		Age:    "11d",
 	},
-	&Namespace{
+	{
 		Current: true,
 		Name:    "test3-namespace",
 		Status:  "Active",
 		Age:     "11d",
 	},
-	&Namespace{
+	{
 		Name:   "default",
 		Status: "Active",
 		Age:    "11d",

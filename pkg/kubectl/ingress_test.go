@@ -8,7 +8,7 @@ import (
 )
 
 var testAllIngresses = []*Ingress{
-	&Ingress{
+	{
 		Namespace: "test1-namespace",
 		Name:      "test1-ingress",
 		Hosts:     "*",
@@ -16,7 +16,7 @@ var testAllIngresses = []*Ingress{
 		Ports:     "80",
 		Age:       "24h",
 	},
-	&Ingress{
+	{
 		Namespace: "test2-namespace",
 		Name:      "test2-ingress",
 		Hosts:     "*",
@@ -26,14 +26,14 @@ var testAllIngresses = []*Ingress{
 	},
 }
 var testIngresses = []*Ingress{
-	&Ingress{
+	{
 		Name:    "test1-ingress",
 		Hosts:   "*",
 		Address: "ingress1.hoge.hoge",
 		Ports:   "80",
 		Age:     "24h",
 	},
-	&Ingress{
+	{
 		Name:    "test2-ingress",
 		Hosts:   "*",
 		Address: "ingress2.hoge.hoge",

@@ -169,7 +169,7 @@ func getUseMod(cmdName string, i interface{}) alfred.Mod {
 	}
 }
 
-func getCopyPortForwardMod(resourceName string, i interface{}) alfred.Mod {
+func getCopyPortForwardMod(res string, i interface{}) alfred.Mod {
 	name, ns := kubectl.GetNameNamespace(i)
 	if ns == "" {
 		var err error
@@ -178,14 +178,14 @@ func getCopyPortForwardMod(resourceName string, i interface{}) alfred.Mod {
 			ns = "default"
 		}
 	}
-	ports := k.GetPorts(resourceName, name, ns)
+	ports := k.GetPorts(res, name, ns)
 	if len(ports) == 0 {
 		return alfred.Mod{
 			Subtitle: "the resource has no ports",
 		}
 	}
 
-	arg := fmt.Sprintf("kubectl port-forward %s/%s %s", resourceName, name, strings.Join(ports, " "))
+	arg := fmt.Sprintf("kubectl port-forward %s/%s %s", res, name, strings.Join(ports, " "))
 	if ns != "" {
 		arg = fmt.Sprintf("%s --namespace %s", arg, ns)
 	}
@@ -196,9 +196,9 @@ func getCopyPortForwardMod(resourceName string, i interface{}) alfred.Mod {
 	}
 }
 
-func getExecPortForwardMod(resourceName string, i interface{}) alfred.Mod {
+func getExecPortForwardMod(res string, i interface{}) alfred.Mod {
 	name, ns := kubectl.GetNameNamespace(i)
-	arg := fmt.Sprintf("port-forward %s/%s --%s", resourceName, name, useFalg)
+	arg := fmt.Sprintf("port-forward %s/%s --%s", res, name, useFalg)
 	if ns != "" {
 		arg = fmt.Sprintf("%s --%s %s", arg, namespaceFlag, ns)
 	}

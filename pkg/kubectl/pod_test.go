@@ -9,7 +9,7 @@ import (
 
 var (
 	testAllPods = []*Pod{
-		&Pod{
+		{
 			Namespace: "test1-namespace",
 			Name:      "test1-pod",
 			Ready:     "1/1",
@@ -17,7 +17,7 @@ var (
 			Restarts:  "0",
 			Age:       "11d",
 		},
-		&Pod{
+		{
 			Namespace: "test2-namespace",
 			Name:      "test2-pod",
 			Ready:     "2/2",
@@ -27,14 +27,14 @@ var (
 		},
 	}
 	testPods = []*Pod{
-		&Pod{
+		{
 			Name:     "test1-pod",
 			Ready:    "1/1",
 			Status:   "Running",
 			Restarts: "0",
 			Age:      "11d",
 		},
-		&Pod{
+		{
 			Name:     "test2-pod",
 			Ready:    "2/2",
 			Status:   "Running",

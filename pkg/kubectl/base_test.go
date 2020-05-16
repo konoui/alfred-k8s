@@ -7,30 +7,29 @@ import (
 	"go.uber.org/goleak"
 )
 
-var (
-	testBaseAllPods = []*BaseResource{
-		&BaseResource{
-			Namespace: "test1-namespace",
-			Name:      "test1-pod",
-			Age:       "11d",
-		},
-		&BaseResource{
-			Namespace: "test2-namespace",
-			Name:      "test2-pod",
-			Age:       "11d",
-		},
-	}
-	testBasePods = []*BaseResource{
-		&BaseResource{
-			Name: "test1-pod",
-			Age:  "11d",
-		},
-		&BaseResource{
-			Name: "test2-pod",
-			Age:  "11d",
-		},
-	}
-)
+var testBaseAllPods = []*BaseResource{
+	{
+		Namespace: "test1-namespace",
+		Name:      "test1-pod",
+		Age:       "11d",
+	},
+	{
+		Namespace: "test2-namespace",
+		Name:      "test2-pod",
+		Age:       "11d",
+	},
+}
+
+var testBasePods = []*BaseResource{
+	{
+		Name: "test1-pod",
+		Age:  "11d",
+	},
+	{
+		Name: "test2-pod",
+		Age:  "11d",
+	},
+}
 
 func TestPodBaseResource(t *testing.T) {
 	tests := []struct {

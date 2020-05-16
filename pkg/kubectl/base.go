@@ -12,12 +12,6 @@ type BaseResource struct {
 	Age       string
 }
 
-const (
-	fieldName      = "NAME"
-	fieldNamespace = "NAMESPACE"
-	fieldAage      = "AGE"
-)
-
 // GetBaseResources return specific resources in current namespace
 func (k *Kubectl) GetBaseResources(name string, all bool) ([]*BaseResource, error) {
 	if all {
@@ -33,25 +27,25 @@ func (k *Kubectl) getBaseResources(name, ns string) ([]*BaseResource, error) {
 	rawHeaders := <-stdout
 	headers := strings.Fields(rawHeaders)
 
-	var rs []*BaseResource
+	var r []*BaseResource
 	for line := range stdout {
 		rawData := strings.Fields(line)
 		a := generateBaseResource(rawData, headers)
-		rs = append(rs, a)
+		r = append(r, a)
 	}
-	return rs, err
+	return r, err
 }
 
 func generateBaseResource(rawData, headers []string) *BaseResource {
 	var c BaseResource
 	for i := range rawData {
-		if headers[i] == fieldName {
+		if headers[i] == knownNameField {
 			c.Name = rawData[i]
 		}
-		if headers[i] == fieldNamespace {
+		if headers[i] == knownNamespaceField {
 			c.Namespace = rawData[i]
 		}
-		if headers[i] == fieldAage {
+		if headers[i] == knownAageField {
 			c.Age = rawData[i]
 		}
 	}

@@ -8,14 +8,14 @@ import (
 )
 
 var testNodes = []*Node{
-	&Node{
+	{
 		Name:    "node-1",
 		Status:  "Ready",
 		Roles:   "<none>",
 		Age:     "11d",
 		Version: "v1.15.10-eks-bac369",
 	},
-	&Node{
+	{
 		Name:    "node-2",
 		Status:  "Ready",
 		Roles:   "<none>",

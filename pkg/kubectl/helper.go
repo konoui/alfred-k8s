@@ -8,17 +8,19 @@ func GetNameNamespace(i interface{}) (name, ns string) {
 	const unknown = "UnknownName"
 	rv := reflect.Indirect(reflect.ValueOf(i))
 	rt := rv.Type()
-	if _, ok := rt.FieldByName("Name"); !ok {
+	nameField, ok := rt.FieldByName("Name")
+	if !ok {
 		return unknown, ""
 	}
-	name = rv.FieldByName("Name").String()
+	name = rv.FieldByName(nameField.Name).String()
 	if name == "" {
 		return unknown, ""
 	}
 
-	if _, ok := rt.FieldByName("Namespace"); !ok {
+	nsField, ok := rt.FieldByName("Namespace")
+	if !ok {
 		return name, ""
 	}
-	ns = rv.FieldByName("Namespace").String()
+	ns = rv.FieldByName(nsField.Name).String()
 	return name, ns
 }

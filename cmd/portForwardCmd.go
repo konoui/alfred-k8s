@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -94,8 +95,8 @@ func listPortResources() (jobs []*kubectl.PortResource) {
 		}
 		pidfile := filepath.Join(dir, f.Name())
 		// try to read pidfile
-		var j kubectl.PortResource
-		err = readPidfile(pidfile, &j)
+		j := new(kubectl.PortResource)
+		err = readPidfile(pidfile, j)
 		if err != nil {
 			fmt.Fprintln(errStream, err)
 			continue
@@ -103,7 +104,7 @@ func listPortResources() (jobs []*kubectl.PortResource) {
 
 		// valid process
 		fmt.Fprintf(errStream, "Found the job %v\n", j)
-		jobs = append(jobs, &j)
+		jobs = append(jobs, j)
 	}
 	return jobs
 }
@@ -116,8 +117,9 @@ func terminateJob(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	var j kubectl.PortResource
-	err = json.NewDecoder(f).Decode(&j)
+
+	j := new(kubectl.PortResource)
+	err = json.NewDecoder(f).Decode(j)
 	if err != nil {
 		return err
 	}
@@ -146,8 +148,8 @@ func background(cmd *cobra.Command, args []string) error {
 		return errors.Wrapf(err, "failed to create log file %s", logfile)
 	}
 	defer lf.Close()
-	// set logger
-	jobStream = lf
+	// set logger. we add file stream
+	jobStream = io.MultiWriter(lf, jobStream)
 
 	// do port forward
 	job, errChan := k.PortForward(context.Background(), res, name, ns, ports)
@@ -174,8 +176,8 @@ func background(cmd *cobra.Command, args []string) error {
 }
 
 func readPidfile(pidfile string, j *kubectl.PortResource) error {
-	v, err := ioutil.ReadFile(pidfile)
 	logfile := strings.TrimRight(pidfile, "pid") + "log"
+	v, err := ioutil.ReadFile(pidfile)
 	if err != nil {
 		_ = os.Remove(pidfile)
 		_ = os.Remove(logfile)

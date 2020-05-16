@@ -44,11 +44,14 @@ func (k *Kubectl) getPods(ns string) ([]*Pod, error) {
 func generatePod(rawData, headers []string) *Pod {
 	var pod Pod
 	for i := range rawData {
-		if strings.EqualFold(headers[i], "NAMESPACE") {
+		if strings.EqualFold(headers[i], knownNamespaceField) {
 			pod.Namespace = rawData[i]
 		}
-		if strings.EqualFold(headers[i], "NAME") {
+		if strings.EqualFold(headers[i], knownNameField) {
 			pod.Name = rawData[i]
+		}
+		if strings.EqualFold(headers[i], knownAageField) {
+			pod.Age = rawData[i]
 		}
 		if strings.EqualFold(headers[i], "READY") {
 			pod.Ready = rawData[i]
@@ -58,9 +61,6 @@ func generatePod(rawData, headers []string) *Pod {
 		}
 		if strings.EqualFold(headers[i], "RESTARTS") {
 			pod.Restarts = rawData[i]
-		}
-		if strings.EqualFold(headers[i], "AGE") {
-			pod.Age = rawData[i]
 		}
 	}
 
