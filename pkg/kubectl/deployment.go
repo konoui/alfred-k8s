@@ -2,7 +2,6 @@ package kubectl
 
 import (
 	"fmt"
-	"strings"
 )
 
 // Deployment is kubectl get deployment information
@@ -26,40 +25,23 @@ func (k *Kubectl) GetDeployments(all bool) ([]*Deployment, error) {
 func (k *Kubectl) getDeployments(ns string) ([]*Deployment, error) {
 	// Note: NAME READY UP-TO-DATE AVAILABLE AGE
 	// Note: NAMESPACE NAME READY UP-TO-DATE AVAILABLE AGE
-	arg := fmt.Sprintf("get deployment %s --no-headers", ns)
+	arg := fmt.Sprintf("get deployment %s", ns)
 	resp, err := k.Execute(arg)
+	if err != nil {
+		return nil, err
+	}
+
+	outCh := resp.Readline()
+	rawHeaders := <-outCh
+
 	var deps []*Deployment
-	for line := range resp.Readline() {
-		rawData := strings.Fields(line)
-		dep := generateDeployment(rawData)
+	for line := range outCh {
+		dep := new(Deployment)
+		if err := MakeResourceStruct(line, rawHeaders, dep); err != nil {
+			return deps, err
+		}
 		deps = append(deps, dep)
 	}
 
-	return deps, err
-}
-
-func generateDeployment(rawData []string) *Deployment {
-	if len(rawData) == 5 {
-		return &Deployment{
-			Name:      rawData[0],
-			Ready:     rawData[1],
-			UpToDate:  rawData[2],
-			Available: rawData[3],
-			Age:       rawData[4],
-		}
-	}
-
-	if len(rawData) == 6 {
-		return &Deployment{
-			Namespace: rawData[0],
-			Name:      rawData[1],
-			Ready:     rawData[2],
-			UpToDate:  rawData[3],
-			Available: rawData[4],
-			Age:       rawData[5],
-		}
-	}
-
-	msg := fmt.Sprintf("we assume that deployment information have 5 or 6 elements. but got %d elements. values: %v", len(rawData), rawData)
-	panic(msg)
+	return deps, nil
 }

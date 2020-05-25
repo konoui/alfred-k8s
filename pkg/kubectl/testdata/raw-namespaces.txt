@@ -1,4 +1,5 @@
-test1-namepsace	Active	11d
-test2-namepsace	Active	11d
-test3-namespace	Active	11d
-default	Active	11d
+NAME            STATUS      AGE
+test1-namepsace Active      11d
+test2-namepsace Active      11d
+test3-namespace Active      11d
+default         Active      11d

@@ -3,7 +3,6 @@ package kubectl
 import (
 	"context"
 	"fmt"
-	"strings"
 )
 
 // Context is kubectl get-contexts information
@@ -23,11 +22,20 @@ func (k *Kubectl) GetContexts() ([]*Context, error) {
 
 	outCh := resp.Readline()
 	rawHeaders := <-outCh
-	indexMap := makeIndexMap(rawHeaders)
-
 	var contexts []*Context
 	for line := range outCh {
-		c := makeContext(line, indexMap)
+		l := new(struct{ Current string })
+		c := new(Context)
+		if err := MakeResourceStruct(line, rawHeaders, l); err != nil {
+			return contexts, err
+		}
+		if err := MakeResourceStruct(line, rawHeaders, c); err != nil {
+			return contexts, err
+		}
+
+		if l.Current == "*" {
+			c.Current = true
+		}
 		contexts = append(contexts, c)
 	}
 
@@ -47,36 +55,4 @@ func (k *Kubectl) UseContext(c string) error {
 	arg := fmt.Sprintf("config use-context %s", c)
 	_, err := k.Execute(arg)
 	return err
-}
-
-func makeIndexMap(rawHeaders string) (indexMap map[string]int) {
-	indexMap = make(map[string]int)
-	headers := strings.Fields(rawHeaders)
-	for _, h := range headers {
-		indexMap[h] = strings.Index(rawHeaders, h)
-	}
-	return
-}
-
-func makeContext(line string, indexMap map[string]int) *Context {
-	var c Context
-	for key, start := range indexMap {
-		value := ""
-		if len(line) > start {
-			value = strings.Fields(line[start:])[0]
-		}
-
-		if strings.EqualFold(key, knownNamespaceField) {
-			c.Namespace = value
-		}
-		if strings.EqualFold(key, knownNameField) {
-			c.Name = value
-		}
-		if strings.EqualFold(key, "CURRENT") {
-			if value == "*" {
-				c.Current = true
-			}
-		}
-	}
-	return &c
 }

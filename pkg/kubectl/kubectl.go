@@ -8,10 +8,7 @@ import (
 )
 
 const (
-	knownNameField      = "NAME"
-	knownNamespaceField = "NAMESPACE"
-	knownAageField      = "AGE"
-	allNamespaceFlag    = "--all-namespaces"
+	allNamespaceFlag = "--all-namespaces"
 )
 
 // Kubectl is configuration of binary paths

@@ -2,7 +2,6 @@ package kubectl
 
 import (
 	"fmt"
-	"strings"
 )
 
 // BaseResource is for other resources not supported
@@ -23,31 +22,21 @@ func (k *Kubectl) GetBaseResources(name string, all bool) ([]*BaseResource, erro
 func (k *Kubectl) getBaseResources(name, ns string) ([]*BaseResource, error) {
 	arg := fmt.Sprintf("get %s %s", name, ns)
 	resp, err := k.Execute(arg)
-	stdout := resp.Readline()
-	rawHeaders := <-stdout
-	headers := strings.Fields(rawHeaders)
+	if err != nil {
+		return nil, err
+	}
+
+	outCh := resp.Readline()
+	rawHeaders := <-outCh
 
 	var r []*BaseResource
-	for line := range stdout {
-		rawData := strings.Fields(line)
-		a := generateBaseResource(rawData, headers)
+	for line := range outCh {
+		a := new(BaseResource)
+		if err := MakeResourceStruct(line, rawHeaders, a); err != nil {
+			return r, err
+		}
 		r = append(r, a)
 	}
-	return r, err
-}
 
-func generateBaseResource(rawData, headers []string) *BaseResource {
-	var c BaseResource
-	for i := range rawData {
-		if headers[i] == knownNameField {
-			c.Name = rawData[i]
-		}
-		if headers[i] == knownNamespaceField {
-			c.Namespace = rawData[i]
-		}
-		if headers[i] == knownAageField {
-			c.Age = rawData[i]
-		}
-	}
-	return &c
+	return r, nil
 }

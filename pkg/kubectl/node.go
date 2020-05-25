@@ -1,9 +1,5 @@
 package kubectl
 
-import (
-	"strings"
-)
-
 // Node is kubectl get node information
 type Node struct {
 	Name    string
@@ -15,20 +11,23 @@ type Node struct {
 
 // GetNodes return nodes
 func (k *Kubectl) GetNodes() ([]*Node, error) {
-	resp, err := k.Execute("get node --no-headers")
+	// Note: NAME STATUS ROLES AGE VERSION
+	resp, err := k.Execute("get node")
+	if err != nil {
+		return nil, err
+	}
+
+	outCh := resp.Readline()
+	rawHeaders := <-outCh
 
 	var nodes []*Node
-	for line := range resp.Readline() {
-		rawData := strings.Fields(line)
-		n := &Node{
-			Name:    rawData[0],
-			Status:  rawData[1],
-			Roles:   rawData[2],
-			Age:     rawData[3],
-			Version: rawData[4],
+	for line := range outCh {
+		n := new(Node)
+		if err := MakeResourceStruct(line, rawHeaders, n); err != nil {
+			return nodes, err
 		}
 		nodes = append(nodes, n)
 	}
 
-	return nodes, err
+	return nodes, nil
 }

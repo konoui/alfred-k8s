@@ -1,2 +1,3 @@
-test3-namespace   service-test1             ClusterIP   10.100.49.33     <none>        8080/TCP            11d
-test3-namespace   service-test2           ClusterIP   10.100.75.11     <none>        8080/TCP,9901/TCP   11d
+NAMESPACE         NAME            TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)             AGE
+test3-namespace   service-test1   ClusterIP   10.100.49.33     <none>        8080/TCP            11d
+test3-namespace   service-test2   ClusterIP   10.100.75.11     <none>        8080/TCP,9901/TCP   11d

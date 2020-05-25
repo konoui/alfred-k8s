@@ -16,7 +16,7 @@ type Namespace struct {
 // GetNamespaces return namespaces in current context
 func (k *Kubectl) GetNamespaces() ([]*Namespace, error) {
 	// Note: NAME STATUS AGE
-	resp, err := k.Execute("get namespace --no-headers")
+	resp, err := k.Execute("get namespace")
 	if err != nil {
 		return nil, err
 	}
@@ -26,20 +26,19 @@ func (k *Kubectl) GetNamespaces() ([]*Namespace, error) {
 		return nil, err
 	}
 
+	outCh := resp.Readline()
+	rawHeaders := <-outCh
 	var namespaces []*Namespace
-	for line := range resp.Readline() {
-		rawData := strings.Fields(line)
-		ns := Namespace{
-			Name:   rawData[0],
-			Status: rawData[1],
-			Age:    rawData[2],
+	for line := range outCh {
+		ns := new(Namespace)
+		if err := MakeResourceStruct(line, rawHeaders, ns); err != nil {
+			return namespaces, err
 		}
 
-		if rawData[0] == current {
+		if strings.EqualFold(ns.Name, current) {
 			ns.Current = true
 		}
-
-		namespaces = append(namespaces, &ns)
+		namespaces = append(namespaces, ns)
 	}
 
 	return namespaces, nil
