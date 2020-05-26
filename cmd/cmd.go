@@ -38,7 +38,6 @@ func NewDefaultCmd() *cobra.Command {
 	rootCmd.AddCommand(NewNodeCmd())
 	rootCmd.AddCommand(NewIngressCmd())
 	rootCmd.AddCommand(NewBaseCmd())
-	rootCmd.AddCommand(NewCRDCmd())
 	rootCmd.AddCommand(NewPortForwardCmd())
 	return rootCmd
 }

@@ -13,15 +13,6 @@
             "variables": {
                 "nextAction": "cmd"
             },
-            "title": "crd",
-            "subtitle": "list crds",
-            "arg": "crd",
-            "autocomplete": "crd"
-        },
-        {
-            "variables": {
-                "nextAction": "cmd"
-            },
             "title": "deploy",
             "subtitle": "list deployments, opts [-a: in all namespaces]",
             "arg": "deploy",

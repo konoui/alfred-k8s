@@ -136,12 +136,6 @@ func TestListExecution(t *testing.T) {
 			},
 		},
 		{
-			name: "list-crds",
-			args: []string{
-				"crd",
-			},
-		},
-		{
 			name: "list-base-pods",
 			args: []string{
 				"obj",

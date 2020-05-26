@@ -119,7 +119,6 @@ func FakeResourceFunc(t *testing.T, args ...string) (*executor.Response, error) 
 		FakeNodeFunc,
 		FakeIngressFunc,
 		FakePodBaseResourceFunc,
-		FakeCRDFunc,
 	}
 	for _, f := range fs {
 		resp, err := f(t, args...)
@@ -149,18 +148,6 @@ func FakeContextFunc(t *testing.T, args ...string) (*executor.Response, error) {
 		case "use-context", "set-context", "delete-context":
 			return &executor.Response{}, nil
 		}
-	}
-	return &executor.Response{}, fmt.Errorf("match no command args")
-}
-
-// FakeCRDFunc behave kubectl get crd
-func FakeCRDFunc(t *testing.T, args ...string) (*executor.Response, error) {
-	rawDataCRDs := GetByteFromTestFile(t, "testdata/raw-crds.txt")
-
-	if hasQuery(args, 1, "crd") {
-		return &executor.Response{
-			Stdout: bytes.NewBuffer(rawDataCRDs),
-		}, nil
 	}
 	return &executor.Response{}, fmt.Errorf("match no command args")
 }
