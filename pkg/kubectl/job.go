@@ -28,7 +28,7 @@ func (k *Kubectl) StartJob(ctx context.Context, args ...string) (resp *Job, errC
 func startJob(ctx context.Context, name string, args ...string) (*Job, <-chan error) { //nolint:gocritic
 	cmd := exec.Command(name, args...) //nolint:gosec //nolint:gocritic
 	cmd.Env = os.Environ()
-	errChan := make(chan error)
+	errCh := make(chan error)
 	job := &Job{
 		Pid:   -1,
 		outCh: make(chan string),
@@ -36,12 +36,12 @@ func startJob(ctx context.Context, name string, args ...string) (*Job, <-chan er
 
 	ready := make(chan struct{})
 	go func() {
-		defer close(errChan)
+		defer close(errCh)
 		defer close(ready)
 		stdout, _ := cmd.StdoutPipe()
 		stderr, _ := cmd.StderrPipe()
 		if err := cmd.Start(); err != nil {
-			errChan <- err
+			errCh <- err
 			return
 		}
 
@@ -62,15 +62,15 @@ func startJob(ctx context.Context, name string, args ...string) (*Job, <-chan er
 		select {
 		case <-ctx.Done():
 			_ = cmd.Process.Kill()
-			errChan <- errors.New("job is canceled")
+			errCh <- errors.New("job is canceled")
 		case <-done:
-			errChan <- cmd.Wait()
+			errCh <- cmd.Wait()
 		}
 	}()
 
 	// wait for set pid or close chan
 	<-ready
-	return job, errChan
+	return job, errCh
 }
 
 // ReadLine return stdout and stderr chan

@@ -33,14 +33,14 @@ type PortResource struct {
 }
 
 // PortForward exec kubectl port-forward command
-func (k *Kubectl) PortForward(ctx context.Context, res, name, ns string, ports []string) (resp *PortResource, errChan <-chan error) {
+func (k *Kubectl) PortForward(ctx context.Context, res, name, ns string, ports []string) (resp *PortResource, errCh <-chan error) {
 	args := append([]string{
 		"port-forward",
 		res + "/" + name,
 		"--namespace",
 		ns,
 	}, ports...)
-	job, errChan := k.StartJob(ctx, args...)
+	job, errCh := k.StartJob(ctx, args...)
 	resp = &PortResource{
 		Resource:  res,
 		Namespace: ns,

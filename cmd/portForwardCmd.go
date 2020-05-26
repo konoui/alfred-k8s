@@ -152,7 +152,7 @@ func background(cmd *cobra.Command, args []string) error {
 	jobStream = io.MultiWriter(lf, jobStream)
 
 	// do port forward
-	job, errChan := k.PortForward(context.Background(), res, name, ns, ports)
+	job, errCh := k.PortForward(context.Background(), res, name, ns, ports)
 	go func() {
 		for line := range job.ReadLine() {
 			fmt.Fprintln(jobStream, line)
@@ -172,7 +172,7 @@ func background(cmd *cobra.Command, args []string) error {
 	}
 
 	// wait for port forward command
-	return <-errChan
+	return <-errCh
 }
 
 func readPidfile(pidfile string, j *kubectl.PortResource) error {

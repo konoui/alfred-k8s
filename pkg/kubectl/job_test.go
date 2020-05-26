@@ -63,7 +63,7 @@ func Test_startJob(t *testing.T) {
 			defer goleak.VerifyNone(t)
 			ctx, cancel := context.WithTimeout(context.Background(), tt.timeout)
 			defer cancel()
-			status, errChan := startJob(ctx, tt.args.name, tt.args.args...)
+			status, errCh := startJob(ctx, tt.args.name, tt.args.args...)
 
 			var got []string
 			for line := range status.ReadLine() {
@@ -75,7 +75,7 @@ func Test_startJob(t *testing.T) {
 			}
 
 			// wait for finish command
-			err := <-errChan
+			err := <-errCh
 			if err != nil {
 				// TODO expected error or not
 				if err.Error() != tt.errMsg {
