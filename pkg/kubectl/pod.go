@@ -30,17 +30,7 @@ func (k *Kubectl) getPods(ns string) ([]*Pod, error) {
 		return nil, err
 	}
 
-	outCh := resp.Readline()
-	rawHeaders := <-outCh
-
 	var pods []*Pod
-	for line := range outCh {
-		pod := new(Pod)
-		if err := MakeResourceStruct(line, rawHeaders, pod); err != nil {
-			return pods, err
-		}
-		pods = append(pods, pod)
-	}
-
-	return pods, nil
+	err = makeResourceStructSlice(resp, &pods)
+	return pods, err
 }

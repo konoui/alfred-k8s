@@ -30,15 +30,52 @@ func GetNameNamespace(i interface{}) (name, ns string) {
 	return name, ns
 }
 
+func makeResourceStructSlice(resp *Response, slicePtr interface{}) error {
+	if reflect.ValueOf(slicePtr).Type().Kind() != reflect.Ptr {
+		return errors.New("argument is not pointer")
+	}
+
+	rv := reflect.Indirect(reflect.ValueOf(slicePtr))
+	rt := rv.Type()
+	if rt.Kind() != reflect.Slice {
+		return errors.New("argument param is not a slice")
+	}
+
+	elemPtrType := rt.Elem()
+	if elemPtrType.Kind() != reflect.Ptr {
+		return errors.New("element is not pointer")
+	}
+	elemType := elemPtrType.Elem()
+
+	dataCh := resp.Readline()
+	indexMap := makeIndexMap(<-dataCh)
+	for line := range dataCh {
+		item := reflect.New(elemType)
+		if err := makeResourceStruct(line, indexMap, item.Elem()); err != nil {
+			return err
+		}
+		rv.Set(reflect.Append(rv, item))
+	}
+	return nil
+}
+
 // MakeResourceStruct sets struct fields of `res` to corresponding line value with header location.
-func MakeResourceStruct(line, rawHeaders string, res interface{}) error {
+func MakeResourceStruct(line string, indexMap map[string]int, res interface{}) error {
 	rv := reflect.Indirect(reflect.ValueOf(res))
 	rt := rv.Type()
 	if rt.Kind() != reflect.Struct {
 		return errors.New("argument is not struct")
 	}
 
-	indexMap := makeIndexMap(rawHeaders)
+	return makeResourceStruct(line, indexMap, rv)
+}
+
+func makeResourceStruct(line string, indexMap map[string]int, rv reflect.Value) error {
+	rt := rv.Type()
+	if rt.Kind() != reflect.Struct {
+		return errors.New("argument is not struct")
+	}
+
 	for i := 0; i < rt.NumField(); i++ {
 		f := rt.Field(i)
 		if f.Type.Kind() != reflect.String {

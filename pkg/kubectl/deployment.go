@@ -31,17 +31,7 @@ func (k *Kubectl) getDeployments(ns string) ([]*Deployment, error) {
 		return nil, err
 	}
 
-	outCh := resp.Readline()
-	rawHeaders := <-outCh
-
 	var deps []*Deployment
-	for line := range outCh {
-		dep := new(Deployment)
-		if err := MakeResourceStruct(line, rawHeaders, dep); err != nil {
-			return deps, err
-		}
-		deps = append(deps, dep)
-	}
-
-	return deps, nil
+	err = makeResourceStructSlice(resp, &deps)
+	return deps, err
 }

@@ -26,17 +26,7 @@ func (k *Kubectl) getBaseResources(name, ns string) ([]*BaseResource, error) {
 		return nil, err
 	}
 
-	outCh := resp.Readline()
-	rawHeaders := <-outCh
-
 	var r []*BaseResource
-	for line := range outCh {
-		a := new(BaseResource)
-		if err := MakeResourceStruct(line, rawHeaders, a); err != nil {
-			return r, err
-		}
-		r = append(r, a)
-	}
-
-	return r, nil
+	err = makeResourceStructSlice(resp, &r)
+	return r, err
 }

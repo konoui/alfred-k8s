@@ -31,16 +31,7 @@ func (k *Kubectl) getIngress(ns string) ([]*Ingress, error) {
 		return nil, err
 	}
 
-	outCh := resp.Readline()
-	rawHeaders := <-outCh
-
 	var ingresses []*Ingress
-	for line := range outCh {
-		ing := new(Ingress)
-		if err := MakeResourceStruct(line, rawHeaders, ing); err != nil {
-			return ingresses, err
-		}
-		ingresses = append(ingresses, ing)
-	}
-	return ingresses, nil
+	err = makeResourceStructSlice(resp, &ingresses)
+	return ingresses, err
 }

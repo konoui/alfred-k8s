@@ -22,14 +22,15 @@ func (k *Kubectl) GetContexts() ([]*Context, error) {
 
 	outCh := resp.Readline()
 	rawHeaders := <-outCh
+	indexMap := makeIndexMap(rawHeaders)
 	var contexts []*Context
 	for line := range outCh {
 		l := new(struct{ Current string })
 		c := new(Context)
-		if err := MakeResourceStruct(line, rawHeaders, l); err != nil {
+		if err := MakeResourceStruct(line, indexMap, l); err != nil {
 			return contexts, err
 		}
-		if err := MakeResourceStruct(line, rawHeaders, c); err != nil {
+		if err := MakeResourceStruct(line, indexMap, c); err != nil {
 			return contexts, err
 		}
 

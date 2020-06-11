@@ -17,17 +17,7 @@ func (k *Kubectl) GetNodes() ([]*Node, error) {
 		return nil, err
 	}
 
-	outCh := resp.Readline()
-	rawHeaders := <-outCh
-
 	var nodes []*Node
-	for line := range outCh {
-		n := new(Node)
-		if err := MakeResourceStruct(line, rawHeaders, n); err != nil {
-			return nodes, err
-		}
-		nodes = append(nodes, n)
-	}
-
-	return nodes, nil
+	err = makeResourceStructSlice(resp, &nodes)
+	return nodes, err
 }

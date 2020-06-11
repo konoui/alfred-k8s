@@ -32,17 +32,7 @@ func (k *Kubectl) getServices(ns string) ([]*Service, error) {
 		return nil, err
 	}
 
-	outCh := resp.Readline()
-	rawHeaders := <-outCh
-
 	var svcs []*Service
-	for line := range outCh {
-		svc := new(Service)
-		if err := MakeResourceStruct(line, rawHeaders, svc); err != nil {
-			return svcs, err
-		}
-		svcs = append(svcs, svc)
-	}
-
-	return svcs, nil
+	err = makeResourceStructSlice(resp, &svcs)
+	return svcs, err
 }
