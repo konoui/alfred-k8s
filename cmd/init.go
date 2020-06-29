@@ -17,7 +17,7 @@ var (
 	cacheTime         time.Duration
 	cacheDir          = os.TempDir()
 	experimental      = false
-	getPortForwardMod func(string, interface{}) alfred.Mod
+	getPortForwardMod func(string, interface{}) *alfred.Mod
 )
 
 const (

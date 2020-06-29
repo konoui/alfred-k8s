@@ -52,7 +52,7 @@ func collectNamespaces(cmd *cobra.Command, args []string) (err error) {
 			Title:    title,
 			Subtitle: fmt.Sprintf("status [%s] age [%s]", ns.Status, ns.Age),
 			Arg:      ns.Name,
-			Mods: map[alfred.ModKey]alfred.Mod{
+			Mods: map[alfred.ModKey]*alfred.Mod{
 				alfred.ModCtrl: getUseMod("ns", ns),
 			},
 		})

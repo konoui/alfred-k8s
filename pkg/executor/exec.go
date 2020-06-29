@@ -6,7 +6,7 @@ import (
 
 // Executor is interface of command execution
 type Executor interface {
-	Exec(args ...string) (*Response, error)
+	Exec(args, env []string) (*Response, error)
 }
 
 // Response is command execution response

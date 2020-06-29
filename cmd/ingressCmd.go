@@ -38,7 +38,7 @@ func collectIngresses(cmd *cobra.Command, args []string) (err error) {
 			Title:    title,
 			Subtitle: fmt.Sprintf("host [%s] address [%s] ports [%s] ", i.Hosts, i.Address, i.Ports),
 			Arg:      i.Name,
-			Mods: map[alfred.ModKey]alfred.Mod{
+			Mods: map[alfred.ModKey]*alfred.Mod{
 				alfred.ModCtrl: {
 					Subtitle: "copy ingress Address",
 					Arg:      i.Address,

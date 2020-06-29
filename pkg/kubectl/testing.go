@@ -26,7 +26,7 @@ type FakeFunc func(t *testing.T, args ...string) (*executor.Response, error)
 
 // Exec is mock for test
 // Exec return executor.Response and error in FakeFunc
-func (e *FakeExecutor) Exec(args ...string) (*executor.Response, error) {
+func (e *FakeExecutor) Exec(args, env []string) (*executor.Response, error) {
 	return e.Impl(e.t, args...)
 }
 

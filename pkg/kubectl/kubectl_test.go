@@ -18,6 +18,7 @@ func TestNewKubectl(t *testing.T) {
 			want: &Kubectl{
 				cmd:        newCommand("/usr/local/bin/kubectl"),
 				pluginPath: "/usr/local/bin/",
+				env:        setPathEnv("/usr/local/bin/"),
 			},
 		},
 		{
@@ -29,6 +30,7 @@ func TestNewKubectl(t *testing.T) {
 			want: &Kubectl{
 				cmd:        newCommand(knownBinary),
 				pluginPath: knownBinPath,
+				env:        setPathEnv(knownBinPath),
 			},
 			// TODO unexptected bin path case.
 		},

@@ -44,7 +44,7 @@ func collectPods(cmd *cobra.Command, args []string) error {
 			Title:    title,
 			Subtitle: fmt.Sprintf("ready [%s] status [%s] restarts [%s] ", p.Ready, p.Status, p.Restarts),
 			Arg:      p.Name,
-			Mods: map[alfred.ModKey]alfred.Mod{
+			Mods: map[alfred.ModKey]*alfred.Mod{
 				alfred.ModCtrl:  getDeleteMod(cmd.Name(), p),
 				alfred.ModShift: getSternMod(p),
 				alfred.ModAlt:   getPortForwardMod(cmd.Name(), p),

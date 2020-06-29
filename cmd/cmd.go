@@ -12,7 +12,6 @@ import (
 var (
 	outStream io.Writer = os.Stdout
 	errStream io.Writer = os.Stderr
-	jobStream io.Writer = os.Stdout
 	version             = "*"
 	revision            = "*"
 )

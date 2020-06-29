@@ -38,7 +38,7 @@ func collectServices(cmd *cobra.Command, args []string) (err error) {
 			Title:    title,
 			Subtitle: fmt.Sprintf("cluster-ip [%s] external-ip [%s] ports [%s]", s.ClusterIP, s.ExternalIP, s.Ports),
 			Arg:      s.Name,
-			Mods: map[alfred.ModKey]alfred.Mod{
+			Mods: map[alfred.ModKey]*alfred.Mod{
 				alfred.ModShift: getSternMod(s),
 				alfred.ModAlt:   getPortForwardMod(cmd.Name(), s),
 			},

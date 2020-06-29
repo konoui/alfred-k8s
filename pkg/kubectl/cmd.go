@@ -4,9 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"context"
-	"fmt"
 	"io"
-	"os"
 	"os/exec"
 	"time"
 
@@ -19,6 +17,10 @@ import (
 type Command struct {
 	bin     string
 	timeout time.Duration
+}
+
+func (c *Command) String() string {
+	return c.bin
 }
 
 // Response is output of kubectl command
@@ -42,22 +44,12 @@ func (k *Kubectl) Execute(arg string) (*Response, error) {
 		return &Response{}, err
 	}
 
-	appendPathEnv(k.pluginPath)
-	resp, err := k.cmd.Exec(args...)
+	resp, err := k.cmd.Exec(args, k.env)
 	return &Response{
 		exitCode: resp.ExitCode,
 		stdout:   resp.Stdout,
 		stderr:   resp.Stderr,
 	}, errors.Wrapf(err, resp.Stderr.String())
-}
-
-func appendPathEnv(addPath string) {
-	path := os.Getenv("PATH")
-	if path == "" {
-		os.Setenv("PATH", addPath)
-		return
-	}
-	os.Setenv("PATH", fmt.Sprintf("%s:%s", addPath, path))
 }
 
 // Readline return stdout chan
@@ -97,12 +89,12 @@ func (r *Response) ReadlineContext(ctx context.Context) <-chan string {
 }
 
 // Exec is implementation of command execution
-func (c *Command) Exec(args ...string) (*executor.Response, error) {
+func (c *Command) Exec(args, env []string) (*executor.Response, error) {
 	var stdout, stderr bytes.Buffer
 	ctx, cancel := context.WithTimeout(context.Background(), c.timeout)
 	defer cancel()
 	cmd := exec.CommandContext(ctx, c.bin, args...)
-	cmd.Env = os.Environ()
+	cmd.Env = env
 	cmd.Stdout = &stdout
 	cmd.Stderr = &stderr
 

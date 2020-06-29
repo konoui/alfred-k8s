@@ -70,7 +70,7 @@ func collectContexts(cmd *cobra.Command, args []string) (err error) {
 		awf.Append(&alfred.Item{
 			Title: title,
 			Arg:   c.Name,
-			Mods: map[alfred.ModKey]alfred.Mod{
+			Mods: map[alfred.ModKey]*alfred.Mod{
 				alfred.ModCtrl:  useMod,
 				alfred.ModShift: deleteMod,
 			},

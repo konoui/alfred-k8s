@@ -1,8 +1,10 @@
 package kubectl
 
 import (
+	"fmt"
 	"os"
 	"os/exec"
+	"strings"
 
 	"github.com/konoui/alfred-k8s/pkg/executor"
 )
@@ -15,6 +17,7 @@ const (
 type Kubectl struct {
 	cmd        executor.Executor
 	pluginPath string
+	env        []string
 }
 
 // Option is the type to replace default parameters.
@@ -36,6 +39,7 @@ func New(opts ...Option) (*Kubectl, error) {
 		}
 	}
 
+	k.env = setPathEnv(k.pluginPath)
 	return k, nil
 }
 
@@ -59,4 +63,18 @@ func OptionPluginPath(path string) Option {
 		k.pluginPath = os.ExpandEnv(path)
 		return nil
 	}
+}
+
+func setPathEnv(pluginPath string) []string {
+	key := "PATH"
+	path := os.Getenv(key)
+	if path == "" {
+		os.Setenv(key, pluginPath)
+		return os.Environ()
+	}
+	if strings.Contains(path, pluginPath) {
+		return os.Environ()
+	}
+	os.Setenv(key, fmt.Sprintf("%s:%s", pluginPath, path))
+	return os.Environ()
 }
