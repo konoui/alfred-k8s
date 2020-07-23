@@ -29,11 +29,14 @@ func collectNodes(cmd *cobra.Command, args []string) (err error) {
 		return
 	}
 	for _, n := range nodes {
-		awf.Append(&alfred.Item{
-			Title:    n.Name,
-			Subtitle: fmt.Sprintf("status [%s] version [%s]", n.Status, n.Version),
-			Arg:      n.Name,
-		})
+		awf.Append(
+			alfred.NewItem().
+				SetTitle(n.Name).
+				SetSubtitle(
+					fmt.Sprintf("status [%s] version [%s]", n.Status, n.Version),
+				).
+				SetArg(n.Name),
+		)
 	}
 	return
 }

@@ -33,18 +33,20 @@ func collectIngresses(cmd *cobra.Command, args []string) (err error) {
 		return
 	}
 	for _, i := range ingresses {
-		title := getNamespaceResourceTitle(i)
-		awf.Append(&alfred.Item{
-			Title:    title,
-			Subtitle: fmt.Sprintf("host [%s] address [%s] ports [%s] ", i.Hosts, i.Address, i.Ports),
-			Arg:      i.Name,
-			Mods: map[alfred.ModKey]*alfred.Mod{
-				alfred.ModCtrl: {
-					Subtitle: "copy ingress Address",
-					Arg:      i.Address,
-				},
-			},
-		})
+		title := getNamespacedResourceTitle(i)
+		awf.Append(
+			alfred.NewItem().
+				SetTitle(title).
+				SetSubtitle(
+					fmt.Sprintf("host [%s] address [%s] ports [%s] ", i.Hosts, i.Address, i.Ports),
+				).
+				SetArg(i.Name).
+				SetMod(alfred.ModCtrl,
+					alfred.NewMod().
+						SetSubtitle("copy ingress Address").
+						SetArg(i.Address),
+				),
+		)
 	}
 	return
 }

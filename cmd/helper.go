@@ -133,10 +133,9 @@ func getSternMod(i interface{}) *alfred.Mod {
 	if ns != "" {
 		arg = fmt.Sprintf("%s --namespace %s", arg, ns)
 	}
-	return &alfred.Mod{
-		Subtitle: "copy simple stern command",
-		Arg:      arg,
-	}
+	return alfred.NewMod().
+		SetSubtitle("copy simple stern command").
+		SetArg(arg)
 }
 
 func getDeleteMod(cmdName string, i interface{}) *alfred.Mod {
@@ -145,13 +144,11 @@ func getDeleteMod(cmdName string, i interface{}) *alfred.Mod {
 	if ns != "" {
 		arg = fmt.Sprintf("%s --%s %s", arg, namespaceFlag, ns)
 	}
-	return &alfred.Mod{
-		Subtitle: "delete it",
-		Arg:      arg,
-		Variables: map[string]string{
-			nextActionKey: nextActionShell,
-		},
-	}
+	return alfred.NewMod().
+		SetSubtitle("delete it").
+		SetArg(arg).
+		SetVariable(nextActionKey, nextActionShell)
+
 }
 
 func getUseMod(cmdName string, i interface{}) *alfred.Mod {
@@ -160,13 +157,10 @@ func getUseMod(cmdName string, i interface{}) *alfred.Mod {
 	if ns != "" {
 		arg = fmt.Sprintf("%s --%s %s", arg, namespaceFlag, ns)
 	}
-	return &alfred.Mod{
-		Subtitle: "switch to it",
-		Arg:      arg,
-		Variables: map[string]string{
-			nextActionKey: nextActionShell,
-		},
-	}
+	return alfred.NewMod().
+		SetSubtitle("switch to it").
+		SetArg(arg).
+		SetVariable(nextActionKey, nextActionShell)
 }
 
 func getCopyPortForwardMod(res string, i interface{}) *alfred.Mod {
@@ -180,9 +174,8 @@ func getCopyPortForwardMod(res string, i interface{}) *alfred.Mod {
 	}
 	ports := k.GetPorts(res, name, ns)
 	if len(ports) == 0 {
-		return &alfred.Mod{
-			Subtitle: "the resource has no ports",
-		}
+		return alfred.NewMod().
+			SetSubtitle("the resource has no ports")
 	}
 
 	arg := fmt.Sprintf("kubectl port-forward %s/%s %s", res, name, strings.Join(ports, " "))
@@ -190,10 +183,9 @@ func getCopyPortForwardMod(res string, i interface{}) *alfred.Mod {
 		arg = fmt.Sprintf("%s --namespace %s", arg, ns)
 	}
 
-	return &alfred.Mod{
-		Subtitle: "copy " + arg,
-		Arg:      arg,
-	}
+	return alfred.NewMod().
+		SetSubtitle("copy " + arg).
+		SetArg(arg)
 }
 
 func getExecPortForwardMod(res string, i interface{}) *alfred.Mod {
@@ -203,16 +195,13 @@ func getExecPortForwardMod(res string, i interface{}) *alfred.Mod {
 		arg = fmt.Sprintf("%s --%s %s", arg, namespaceFlag, ns)
 	}
 
-	return &alfred.Mod{
-		Subtitle: "port-forward in background",
-		Arg:      arg,
-		Variables: map[string]string{
-			nextActionKey: nextActionJob,
-		},
-	}
+	return alfred.NewMod().
+		SetSubtitle("port-forward in background").
+		SetArg(arg).
+		SetVariable(nextActionKey, nextActionJob)
 }
 
-func getNamespaceResourceTitle(i interface{}) string {
+func getNamespacedResourceTitle(i interface{}) string {
 	name, ns := kubectl.GetNameNamespace(i)
 	if ns == "" {
 		return name
@@ -224,9 +213,9 @@ func getNamespaceResourceTitle(i interface{}) string {
 // 1st arg is resource name. 2nd arg means whether namespaced resource or not
 func getCacheKey(name string, namespaced bool) string {
 	if namespaced {
-		return fmt.Sprintf("%s-%s", cacheNamespacedPrefix, name)
+		return fmt.Sprintf("namespaced-%s", name)
 	}
-	return fmt.Sprintf("%s-%s", cacheNonNamespacedPrefix, name)
+	return fmt.Sprintf("non-namespaced-%s", name)
 }
 
 func getQuery(args []string, idx int) string {
@@ -239,7 +228,6 @@ func getQuery(args []string, idx int) string {
 func exitWith(err error) {
 	if err != nil {
 		fatal(err)
-		os.Exit(255)
 	}
 }
 

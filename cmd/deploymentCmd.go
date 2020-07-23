@@ -32,16 +32,17 @@ func collectDeployments(cmd *cobra.Command, args []string) (err error) {
 		return
 	}
 	for _, d := range deps {
-		title := getNamespaceResourceTitle(d)
-		awf.Append(&alfred.Item{
-			Title:    title,
-			Subtitle: fmt.Sprintf("ready [%s] up-to-date [%s] available [%s]", d.Ready, d.UpToDate, d.Available),
-			Arg:      d.Name,
-			Mods: map[alfred.ModKey]*alfred.Mod{
-				alfred.ModShift: getSternMod(d),
-				alfred.ModAlt:   getPortForwardMod(cmd.Name(), d),
-			},
-		})
+		title := getNamespacedResourceTitle(d)
+		awf.Append(
+			alfred.NewItem().
+				SetTitle(title).
+				SetSubtitle(
+					fmt.Sprintf("ready [%s] up-to-date [%s] available [%s]", d.Ready, d.UpToDate, d.Available),
+				).
+				SetArg(d.Name).
+				SetMod(alfred.ModShift, getSternMod(d)).
+				SetMod(alfred.ModAlt, getPortForwardMod(cmd.Name(), d)),
+		)
 	}
 	return
 }

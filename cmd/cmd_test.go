@@ -28,7 +28,7 @@ func SetupCmd(t *testing.T, cmd *cobra.Command, args []string) (outBuf, errBuf *
 	cacheTime = 0 * time.Second
 	k = kubectl.SetupKubectl(t, nil)
 	awf = alfred.NewWorkflow()
-	awf.EmptyWarning("There are no resources", "No matching")
+	awf.EmptyWarning(emptyTitle, emptySubTitle)
 
 	outBuf, errBuf = new(bytes.Buffer), new(bytes.Buffer)
 	outStream, errStream = outBuf, errBuf

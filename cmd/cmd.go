@@ -70,15 +70,14 @@ func collectAvailableSubCmds(cmd *cobra.Command, args []string) (err error) {
 			subtitle = fmt.Sprintf("%s, opts [-%s: %s]", c.Short, f.Shorthand, f.Usage)
 		}
 
-		awf.Append(&alfred.Item{
-			Title:        c.Name(),
-			Subtitle:     subtitle,
-			Autocomplete: c.Name(),
-			Variables: map[string]string{
-				nextActionKey: nextActionCmd,
-			},
-			Arg: c.Name(),
-		})
+		awf.Append(
+			alfred.NewItem().
+				SetTitle(c.Name()).
+				SetSubtitle(subtitle).
+				SetAutocomplete(c.Name()).
+				SetVariable(nextActionKey, nextActionCmd).
+				SetArg(c.Name()),
+		)
 	}
 	return
 }

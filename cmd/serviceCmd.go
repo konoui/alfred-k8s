@@ -33,16 +33,17 @@ func collectServices(cmd *cobra.Command, args []string) (err error) {
 		return
 	}
 	for _, s := range svcs {
-		title := getNamespaceResourceTitle(s)
-		awf.Append(&alfred.Item{
-			Title:    title,
-			Subtitle: fmt.Sprintf("cluster-ip [%s] external-ip [%s] ports [%s]", s.ClusterIP, s.ExternalIP, s.Ports),
-			Arg:      s.Name,
-			Mods: map[alfred.ModKey]*alfred.Mod{
-				alfred.ModShift: getSternMod(s),
-				alfred.ModAlt:   getPortForwardMod(cmd.Name(), s),
-			},
-		})
+		title := getNamespacedResourceTitle(s)
+		awf.Append(
+			alfred.NewItem().
+				SetTitle(title).
+				SetSubtitle(
+					fmt.Sprintf("cluster-ip [%s] external-ip [%s] ports [%s]", s.ClusterIP, s.ExternalIP, s.Ports),
+				).
+				SetArg(s.Name).
+				SetMod(alfred.ModShift, getSternMod(s)).
+				SetMod(alfred.ModAlt, getPortForwardMod(cmd.Name(), s)),
+		)
 	}
 	return
 }

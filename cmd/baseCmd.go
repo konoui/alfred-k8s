@@ -34,12 +34,13 @@ func collectBaseResources(cmd *cobra.Command, args []string) (err error) {
 	}
 
 	for _, r := range reses {
-		title := getNamespaceResourceTitle(r)
-		awf.Append(&alfred.Item{
-			Title:    title,
-			Subtitle: fmt.Sprintf("age [%s]", r.Age),
-			Arg:      r.Name,
-		})
+		title := getNamespacedResourceTitle(r)
+		awf.Append(
+			alfred.NewItem().
+				SetTitle(title).
+				SetSubtitle(fmt.Sprintf("age [%s]", r.Age)).
+				SetArg(r.Name),
+		)
 	}
 	return
 }

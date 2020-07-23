@@ -27,10 +27,10 @@ func (k *Kubectl) GetContexts() ([]*Context, error) {
 	for line := range outCh {
 		l := new(struct{ Current string })
 		c := new(Context)
-		if err := MakeResourceStruct(line, indexMap, l); err != nil {
+		if err := makeResourceStruct(line, indexMap, l); err != nil {
 			return contexts, err
 		}
-		if err := MakeResourceStruct(line, indexMap, c); err != nil {
+		if err := makeResourceStruct(line, indexMap, c); err != nil {
 			return contexts, err
 		}
 

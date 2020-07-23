@@ -26,22 +26,17 @@ func (k *Kubectl) GetNamespaces() ([]*Namespace, error) {
 		return nil, err
 	}
 
-	outCh := resp.Readline()
-	rawHeaders := <-outCh
-	indexMap := makeIndexMap(rawHeaders)
 	var namespaces []*Namespace
-	for line := range outCh {
-		ns := new(Namespace)
-		if err := MakeResourceStruct(line, indexMap, ns); err != nil {
-			return namespaces, err
-		}
+	err = makeResourceStructSlice(resp, &namespaces)
+	if err != nil {
+		return nil, err
+	}
 
+	for _, ns := range namespaces {
 		if strings.EqualFold(ns.Name, current) {
 			ns.Current = true
 		}
-		namespaces = append(namespaces, ns)
 	}
-
 	return namespaces, nil
 }
 

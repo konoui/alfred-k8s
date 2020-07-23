@@ -67,14 +67,13 @@ func collectContexts(cmd *cobra.Command, args []string) (err error) {
 		deleteMod.Arg = fmt.Sprintf("%s %s --%s", name, c.Name, deleteFlag)
 		useMod := getUseMod(name, c)
 		useMod.Arg = fmt.Sprintf("%s %s --%s", name, c.Name, useFalg)
-		awf.Append(&alfred.Item{
-			Title: title,
-			Arg:   c.Name,
-			Mods: map[alfred.ModKey]*alfred.Mod{
-				alfred.ModCtrl:  useMod,
-				alfred.ModShift: deleteMod,
-			},
-		})
+		awf.Append(
+			alfred.NewItem().
+				SetTitle(title).
+				SetArg(c.Name).
+				SetMod(alfred.ModCtrl, useMod).
+				SetMod(alfred.ModShift, deleteMod),
+		)
 	}
 	return
 }

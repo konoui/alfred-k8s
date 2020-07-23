@@ -48,14 +48,15 @@ func collectNamespaces(cmd *cobra.Command, args []string) (err error) {
 		if ns.Current {
 			title = fmt.Sprintf("[*] %s", ns.Name)
 		}
-		awf.Append(&alfred.Item{
-			Title:    title,
-			Subtitle: fmt.Sprintf("status [%s] age [%s]", ns.Status, ns.Age),
-			Arg:      ns.Name,
-			Mods: map[alfred.ModKey]*alfred.Mod{
-				alfred.ModCtrl: getUseMod("ns", ns),
-			},
-		})
+		awf.Append(
+			alfred.NewItem().
+				SetTitle(title).
+				SetSubtitle(
+					fmt.Sprintf("status [%s] age [%s]", ns.Status, ns.Age),
+				).
+				SetArg(ns.Name).
+				SetMod(alfred.ModCtrl, getUseMod("ns", ns)),
+		)
 	}
 	return
 }

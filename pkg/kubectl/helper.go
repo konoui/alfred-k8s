@@ -51,7 +51,7 @@ func makeResourceStructSlice(resp *Response, slicePtr interface{}) error {
 	indexMap := makeIndexMap(<-dataCh)
 	for line := range dataCh {
 		item := reflect.New(elemType)
-		if err := makeResourceStruct(line, indexMap, item.Elem()); err != nil {
+		if err := makeResourceStructFromReflectValue(line, indexMap, item.Elem()); err != nil {
 			return err
 		}
 		rv.Set(reflect.Append(rv, item))
@@ -59,18 +59,18 @@ func makeResourceStructSlice(resp *Response, slicePtr interface{}) error {
 	return nil
 }
 
-// MakeResourceStruct sets struct fields of `res` to corresponding line value with header location.
-func MakeResourceStruct(line string, indexMap map[string]int, res interface{}) error {
+// makeResourceStruct sets struct fields of `res` to corresponding line value with header location.
+func makeResourceStruct(line string, indexMap map[string]int, res interface{}) error {
 	rv := reflect.Indirect(reflect.ValueOf(res))
 	rt := rv.Type()
 	if rt.Kind() != reflect.Struct {
 		return errors.New("argument is not struct")
 	}
 
-	return makeResourceStruct(line, indexMap, rv)
+	return makeResourceStructFromReflectValue(line, indexMap, rv)
 }
 
-func makeResourceStruct(line string, indexMap map[string]int, rv reflect.Value) error {
+func makeResourceStructFromReflectValue(line string, indexMap map[string]int, rv reflect.Value) error {
 	rt := rv.Type()
 	if rt.Kind() != reflect.Struct {
 		return errors.New("argument is not struct")

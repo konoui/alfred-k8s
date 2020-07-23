@@ -21,11 +21,9 @@ var (
 )
 
 const (
-	cacheSuffix              = "-alfred-k8s.cache"
-	cacheNamespacedPrefix    = "namespaced-"
-	cacheNonNamespacedPrefix = "non-namespaced-"
-	emptyTitle               = "There are no resources"
-	emptySubTitle            = "No matching"
+	cacheSuffix   = "-alfred-k8s.cache"
+	emptyTitle    = "There are no resources"
+	emptySubTitle = "No matching"
 )
 
 // decide next action for workflow filter
@@ -50,13 +48,13 @@ func init() {
 
 	initAlfredMod()
 
-	var binOpt, pluginPathOpt kubectl.Option
+	var opts []kubectl.Option
 	if c.Kubectl.Bin != "" {
-		binOpt = kubectl.OptionBinary(c.Kubectl.Bin)
+		opts = append(opts, kubectl.OptionBinary(c.Kubectl.Bin))
 	}
 	if paths := c.Kubectl.PluginPaths; len(paths) > 0 {
 		path := strings.Join(paths, ":")
-		pluginPathOpt = kubectl.OptionPluginPath(path)
+		opts = append(opts, kubectl.OptionPluginPath(path))
 	}
 	// if minus value, disable cache. if zero value, set default cache time
 	maxAge := c.CacheTimeSecond
@@ -69,7 +67,7 @@ func init() {
 		cacheTime = time.Duration(maxAge) * time.Second
 	}
 
-	k, err = kubectl.New(binOpt, pluginPathOpt)
+	k, err = kubectl.New(opts...)
 	exitWith(err)
 }
 

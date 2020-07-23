@@ -44,9 +44,10 @@ func NewPortForwardCmd() *cobra.Command {
 func listJobs() error {
 	jobs := awf.ListJobs()
 	for _, job := range jobs {
-		awf.Append(&alfred.Item{
-			Title: job.Name(),
-		})
+		awf.Append(
+			alfred.NewItem().
+				SetTitle(job.Name()),
+		)
 	}
 	awf.Output()
 	return nil

@@ -39,17 +39,18 @@ func collectPods(cmd *cobra.Command, args []string) error {
 		return err
 	}
 	for _, p := range pods {
-		title := getNamespaceResourceTitle(p)
-		awf.Append(&alfred.Item{
-			Title:    title,
-			Subtitle: fmt.Sprintf("ready [%s] status [%s] restarts [%s] ", p.Ready, p.Status, p.Restarts),
-			Arg:      p.Name,
-			Mods: map[alfred.ModKey]*alfred.Mod{
-				alfred.ModCtrl:  getDeleteMod(cmd.Name(), p),
-				alfred.ModShift: getSternMod(p),
-				alfred.ModAlt:   getPortForwardMod(cmd.Name(), p),
-			},
-		})
+		title := getNamespacedResourceTitle(p)
+		awf.Append(
+			alfred.NewItem().
+				SetTitle(title).
+				SetSubtitle(
+					fmt.Sprintf("ready [%s] status [%s] restarts [%s] ", p.Ready, p.Status, p.Restarts),
+				).
+				SetArg(p.Name).
+				SetMod(alfred.ModCtrl, getDeleteMod(cmd.Name(), p)).
+				SetMod(alfred.ModShift, getSternMod(p)).
+				SetMod(alfred.ModAlt, getPortForwardMod(cmd.Name(), p)),
+		)
 	}
 	return nil
 }
