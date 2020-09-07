@@ -60,6 +60,13 @@ func TestListExecution(t *testing.T) {
 			},
 		},
 		{
+			name: "list-invalid-flag",
+			args: []string{
+				"node",
+				"-z",
+			},
+		},
+		{
 			name: "list-available-commands-for-fuzzy",
 			args: []string{
 				"no",

@@ -1,0 +1,13 @@
+{
+    "items": [
+        {
+            "variables": {
+                "nextAction": "cmd"
+            },
+            "title": "node",
+            "subtitle": "list nodes",
+            "arg": "node",
+            "autocomplete": "node"
+        }
+    ]
+}
