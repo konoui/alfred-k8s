@@ -10,17 +10,16 @@ import (
 
 	"github.com/konoui/alfred-k8s/pkg/kubectl"
 	"github.com/konoui/go-alfred"
-	"github.com/spf13/cobra"
 )
 
 func ExecuteDefaultCmd(t *testing.T, args []string) (outBuf, errBuf *bytes.Buffer) {
+	outBuf, errBuf = SetupCmd(t, args)
 	rootCmd := NewDefaultCmd()
-	outBuf, errBuf = SetupCmd(t, rootCmd, args)
 	Execute(rootCmd)
 	return outBuf, errBuf
 }
 
-func SetupCmd(t *testing.T, cmd *cobra.Command, args []string) (outBuf, errBuf *bytes.Buffer) {
+func SetupCmd(t *testing.T, args []string) (outBuf, errBuf *bytes.Buffer) {
 	t.Helper()
 
 	// set global variables on behalf init()
@@ -32,11 +31,8 @@ func SetupCmd(t *testing.T, cmd *cobra.Command, args []string) (outBuf, errBuf *
 
 	outBuf, errBuf = new(bytes.Buffer), new(bytes.Buffer)
 	outStream, errStream = outBuf, errBuf
-	cmd.SetOut(outStream)
-	cmd.SetErr(errStream)
 	awf.SetOut(outStream)
 
-	cmd.SetArgs(args)
 	os.Args = append([]string{"dummy"}, args...)
 	return outBuf, errBuf
 }
@@ -88,7 +84,7 @@ func TestListExecution(t *testing.T) {
 			name: "list-pods-in-all-ns",
 			args: []string{
 				"pod",
-				"--all",
+				"-a",
 			},
 		},
 		{
@@ -101,7 +97,7 @@ func TestListExecution(t *testing.T) {
 			name: "list-deployments-in-all-ns",
 			args: []string{
 				"deploy",
-				"--all",
+				"-a",
 			},
 		},
 		{
@@ -114,7 +110,7 @@ func TestListExecution(t *testing.T) {
 			name: "list-services-in-all-ns",
 			args: []string{
 				"svc",
-				"--all",
+				"-a",
 			},
 		},
 		{
@@ -127,7 +123,7 @@ func TestListExecution(t *testing.T) {
 			name: "list-ingresses-in-all-ns",
 			args: []string{
 				"ingress",
-				"--all",
+				"-a",
 			},
 		},
 		{
@@ -153,16 +149,16 @@ func TestListExecution(t *testing.T) {
 			name: "list-base-pods-in-all-ns",
 			args: []string{
 				"obj",
-				"po",
-				"--all",
+				"-a",
+				"pod",
 			},
 		},
 		{
 			name: "list-base-pods-in-all-ns-with-fuzzy",
 			args: []string{
 				"obj",
-				"po",
-				"--all",
+				"-a",
+				"pod",
 				"DUMMY-ARG",
 			},
 		},
@@ -232,7 +228,7 @@ func TestUseDeleteExecution(t *testing.T) {
 			name: "delete-dummy-pod-in-all-ns",
 			args: []string{
 				"pod",
-				"--all",
+				"-a",
 				"--delete",
 				"dummy",
 			},

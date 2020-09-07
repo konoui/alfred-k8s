@@ -1,4 +1,4 @@
-package cmd
+package config
 
 import (
 	"testing"
@@ -23,7 +23,7 @@ func TestNewConfig(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		c, err := newConfig()
+		c, err := New()
 		if err != nil {
 			t.Fatal(err)
 		}

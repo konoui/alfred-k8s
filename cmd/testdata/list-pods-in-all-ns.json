@@ -12,7 +12,7 @@
                     "variables": {
                         "nextAction": "shell"
                     },
-                    "arg": "pod test1-pod --delete --namespace test1-namespace",
+                    "arg": "pod --namespace test1-namespace --delete test1-pod",
                     "subtitle": "delete it"
                 },
                 "shift": {
@@ -33,7 +33,7 @@
                     "variables": {
                         "nextAction": "shell"
                     },
-                    "arg": "pod test2-pod --delete --namespace test2-namespace",
+                    "arg": "pod --namespace test2-namespace --delete test2-pod",
                     "subtitle": "delete it"
                 },
                 "shift": {

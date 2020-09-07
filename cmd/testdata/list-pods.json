@@ -12,7 +12,7 @@
                     "variables": {
                         "nextAction": "shell"
                     },
-                    "arg": "pod test1-pod --delete",
+                    "arg": "pod --delete test1-pod",
                     "subtitle": "delete it"
                 },
                 "shift": {
@@ -33,7 +33,7 @@
                     "variables": {
                         "nextAction": "shell"
                     },
-                    "arg": "pod test2-pod --delete",
+                    "arg": "pod --delete test2-pod",
                     "subtitle": "delete it"
                 },
                 "shift": {

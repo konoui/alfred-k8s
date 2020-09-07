@@ -1,101 +1,89 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"os"
 
+	"github.com/konoui/alfred-k8s/cmd/basecmd"
+	"github.com/konoui/alfred-k8s/cmd/contextcmd"
+	"github.com/konoui/alfred-k8s/cmd/deploymentcmd"
+	"github.com/konoui/alfred-k8s/cmd/ingresscmd"
+	"github.com/konoui/alfred-k8s/cmd/namespacecmd"
+	"github.com/konoui/alfred-k8s/cmd/nodecmd"
+	"github.com/konoui/alfred-k8s/cmd/podcmd"
+	"github.com/konoui/alfred-k8s/cmd/portforwardcmd"
+	"github.com/konoui/alfred-k8s/cmd/rootcmd"
+	"github.com/konoui/alfred-k8s/cmd/servicecmd"
+	"github.com/konoui/alfred-k8s/cmd/utils"
+	"github.com/konoui/alfred-k8s/cmd/versioncmd"
 	"github.com/konoui/go-alfred"
-	"github.com/spf13/cobra"
+	"github.com/peterbourgon/ff/v3/ffcli"
 )
 
 var (
 	outStream io.Writer = os.Stdout
 	errStream io.Writer = os.Stderr
-	version             = "*"
-	revision            = "*"
 )
 
 // Execute root cmd
-func Execute(rootCmd *cobra.Command) {
-	rootCmd.SetErr(errStream)
-	rootCmd.SetOut(outStream)
-	if err := rootCmd.Execute(); err != nil {
-		_ = cacheOutputMiddleware(collectAvailableSubCmds)(rootCmd, []string{getQuery(os.Args, 1)})
+func Execute(rootCmd *ffcli.Command) {
+	if err := rootCmd.ParseAndRun(context.Background(), os.Args[1:]); err != nil {
+		_ = collectAvailableSubCmds(
+			subCmds(),
+			os.Args[1:],
+		)
+	}
+}
+
+func subCmds() []*ffcli.Command {
+	rootConfig := rootcmd.NewConfig(outStream, errStream, k, awf)
+	return []*ffcli.Command{
+		versioncmd.New(rootConfig),
+		contextcmd.New(rootConfig),
+		podcmd.New(rootConfig),
+		namespacecmd.New(rootConfig),
+		nodecmd.New(rootConfig),
+		deploymentcmd.New(rootConfig),
+		servicecmd.New(rootConfig),
+		ingresscmd.New(rootConfig),
+		basecmd.New(rootConfig),
+		portforwardcmd.New(rootConfig),
 	}
 }
 
 // NewDefaultCmd create sub commands
-func NewDefaultCmd() *cobra.Command {
-	rootCmd := NewRootCmd()
-	rootCmd.AddCommand(NewVersionCmd())
-	rootCmd.AddCommand(NewPodCmd())
-	rootCmd.AddCommand(NewContextCmd())
-	rootCmd.AddCommand(NewNamespaceCmd())
-	rootCmd.AddCommand(NewDeploymentCmd())
-	rootCmd.AddCommand(NewServiceCmd())
-	rootCmd.AddCommand(NewNodeCmd())
-	rootCmd.AddCommand(NewIngressCmd())
-	rootCmd.AddCommand(NewBaseCmd())
-	rootCmd.AddCommand(NewPortForwardCmd())
+func NewDefaultCmd() *ffcli.Command {
+	rootCmd := rootcmd.New()
+	rootCmd.Subcommands = subCmds()
 	return rootCmd
 }
 
-// NewRootCmd create a new cmd for root
-func NewRootCmd() *cobra.Command {
-	rootCmd := &cobra.Command{
-		Short: "list available commands",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			return cacheOutputMiddleware(collectAvailableSubCmds)(cmd, args)
-		},
-		DisableSuggestions: true,
-		SilenceUsage:       true,
-		SilenceErrors:      true,
-	}
-	rootCmd.SetHelpCommand(&cobra.Command{
-		Use:    "no-help",
-		Hidden: true,
-	})
-	return rootCmd
-}
-
-func collectAvailableSubCmds(cmd *cobra.Command, args []string) (err error) {
-	for _, c := range cmd.Commands() {
-		if !c.IsAvailableCommand() {
-			continue
+func collectAvailableSubCmds(cmds []*ffcli.Command, args []string) error {
+	for _, c := range cmds {
+		subtitle := c.ShortHelp
+		if f := c.FlagSet.Lookup(utils.AllNamespacesFlag); f != nil {
+			subtitle = fmt.Sprintf("%s, opts [-%s: %s]", c.ShortHelp, f.Name, f.Usage)
 		}
 
-		subtitle := c.Short
-		if f := c.Flag("all"); f != nil {
-			subtitle = fmt.Sprintf("%s, opts [-%s: %s]", c.Short, f.Shorthand, f.Usage)
+		if c.Name == versioncmd.CmdName {
+			continue
+		}
+		if c.Name == portforwardcmd.CmdName {
+			continue
 		}
 
 		awf.Append(
 			alfred.NewItem().
-				SetTitle(c.Name()).
+				SetTitle(c.Name).
 				SetSubtitle(subtitle).
-				SetAutocomplete(c.Name()).
-				SetVariable(nextActionKey, nextActionCmd).
-				SetArg(c.Name()),
+				SetAutocomplete(c.Name).
+				SetVariable(utils.NextActionKey, utils.NextActionCmd).
+				SetArg(c.Name),
 		)
 	}
-	return
-}
 
-// NewVersionCmd create a new cmd for version
-func NewVersionCmd() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "version",
-		Short: "print alfred-k8s version",
-		Args:  cobra.MinimumNArgs(0),
-		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Fprintf(outStream, "alfred-k8s %s (%s)\n", version, revision)
-		},
-		// hide version command for available command
-		Hidden:             true,
-		DisableSuggestions: true,
-		SilenceUsage:       true,
-		SilenceErrors:      true,
-	}
-	return cmd
+	awf.Filter(utils.GetQuery(args, 0)).Output()
+	return nil
 }

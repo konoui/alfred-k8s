@@ -1,8 +1,12 @@
-package cmd
+package config
 
 import (
+	"time"
+
 	"github.com/spf13/viper"
 )
+
+const defaulCacheValue = 70
 
 // Config configuration
 type Config struct {
@@ -16,8 +20,8 @@ type Kubectl struct {
 	PluginPaths []string `mapstructure:"plugin_paths"`
 }
 
-// NewConfig return alfred k8s configuration
-func newConfig() (*Config, error) {
+// New return alfred k8s configuration
+func New() (*Config, error) {
 	v := viper.New()
 	v.SetConfigType("yaml")
 	v.SetConfigName(".alfred-k8s")
@@ -46,4 +50,18 @@ func newConfig() (*Config, error) {
 	}
 
 	return &c, nil
+}
+
+func (cfg *Config) TTL() time.Duration {
+	var cacheTime time.Duration
+	maxAge := cfg.CacheTimeSecond
+	switch {
+	case maxAge == 0:
+		cacheTime = defaulCacheValue * time.Second
+	case maxAge < 0:
+		cacheTime = 0 * time.Second
+	default:
+		cacheTime = time.Duration(maxAge) * time.Second
+	}
+	return cacheTime
 }
