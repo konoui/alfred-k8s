@@ -67,14 +67,26 @@ func (cfg *Config) collectNamespaces() (err error) {
 		if ns.Current {
 			title = fmt.Sprintf("[*] %s", ns.Name)
 		}
+
+		modMap := map[rootcmd.KeyMapKey]*alfred.Mod{
+			rootcmd.CopyResourceKey: utils.GetCopyMod(
+				fmt.Sprintf("status [%s] age [%s]", ns.Status, ns.Age),
+				ns.Name,
+			),
+			rootcmd.UseResourceKey: utils.GetUseMod("ns", ns),
+		}
+
+		enterMod, mods := rootcmd.MakeMods(&cfg.rootConfig.KeyMaps.NamespaceKeyMap, modMap)
+		arg := enterMod.Arg
+		subtitle := enterMod.Subtitle
+		vals := enterMod.Variables
 		cfg.rootConfig.Awf().Append(
 			alfred.NewItem().
 				SetTitle(title).
-				SetSubtitle(
-					fmt.Sprintf("status [%s] age [%s]", ns.Status, ns.Age),
-				).
-				SetArg(ns.Name).
-				SetMod(alfred.ModCtrl, utils.GetUseMod("ns", ns)),
+				SetSubtitle(subtitle).
+				SetArg(arg).
+				SetVariables(vals).
+				SetMods(mods),
 		)
 	}
 

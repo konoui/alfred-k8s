@@ -36,6 +36,12 @@ func GetSternMod(i interface{}) *alfred.Mod {
 		SetArg(arg)
 }
 
+func GetCopyMod(subtitle, arg string) *alfred.Mod {
+	return alfred.NewMod().
+		SetSubtitle(subtitle).
+		SetArg(arg)
+}
+
 func GetDeleteMod(cmdName string, i interface{}) *alfred.Mod {
 	name, ns := kubectl.GetNameNamespace(i)
 	arg := fmt.Sprintf("--%s %s", DeleteFlag, name)

@@ -1,0 +1,22 @@
+kubectl:
+    kubectl_absolute_path: "/bin/ls"
+    plugin_paths:
+    - "/bin"
+    - "/usr/bin"
+cache_time_second: 2
+key_maps:
+    context_key_map:
+        enter: "copy"
+        ctrl: "use"
+        cmd: "delete"
+    namespace_key_map:
+        enter: "copy"
+        ctrl: "use"
+    pod_key_map:
+        enter: "copy"
+        ctrl: "delete"
+        shift: "stern"
+    deployment_key_map:
+        enter: "copy"
+    service_key_map:
+        enter: "copy"

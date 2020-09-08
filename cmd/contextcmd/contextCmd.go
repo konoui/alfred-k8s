@@ -89,12 +89,24 @@ func (cfg *Config) collectContexts() (err error) {
 		deleteMod.Arg = fmt.Sprintf("%s --%s %s", CmdName, utils.DeleteFlag, c.Name)
 		useMod := utils.GetUseMod(CmdName, c)
 		useMod.Arg = fmt.Sprintf("%s --%s %s", CmdName, utils.UseFlag, c.Name)
+		copyMod := utils.GetCopyMod("", c.Name)
+
+		modMap := map[rootcmd.KeyMapKey]*alfred.Mod{
+			rootcmd.CopyResourceKey:   copyMod,
+			rootcmd.UseResourceKey:    useMod,
+			rootcmd.DeleteResourceKey: deleteMod,
+		}
+		enterMod, mods := rootcmd.MakeMods(&cfg.rootConfig.KeyMaps.ContextKeyMap, modMap)
+		arg := enterMod.Arg
+		subtitle := enterMod.Subtitle
+		vals := enterMod.Variables
 		cfg.rootConfig.Awf().Append(
 			alfred.NewItem().
 				SetTitle(title).
-				SetArg(c.Name).
-				SetMod(alfred.ModCtrl, useMod).
-				SetMod(alfred.ModShift, deleteMod),
+				SetSubtitle(subtitle).
+				SetArg(arg).
+				SetVariables(vals).
+				SetMods(mods),
 		)
 	}
 

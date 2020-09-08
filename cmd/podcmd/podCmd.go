@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 
+	"github.com/konoui/alfred-k8s/cmd/portforwardcmd"
 	"github.com/konoui/alfred-k8s/cmd/rootcmd"
 	"github.com/konoui/alfred-k8s/cmd/utils"
 	"github.com/konoui/go-alfred"
@@ -58,16 +59,27 @@ func (cfg *Config) collectPods() error {
 	}
 	for _, p := range pods {
 		title := utils.GetNamespacedResourceTitle(p)
+		modMap := map[rootcmd.KeyMapKey]*alfred.Mod{
+			rootcmd.CopyResourceKey: utils.GetCopyMod(
+				fmt.Sprintf("ready [%s] status [%s] restarts [%s] ", p.Ready, p.Status, p.Restarts),
+				p.Name,
+			),
+			rootcmd.DeleteResourceKey:  utils.GetDeleteMod(CmdName, p),
+			rootcmd.CopySternKey:       utils.GetSternMod(p),
+			rootcmd.CopyPortForwardKey: portforwardcmd.GetCopyPortForwardMod(cfg.rootConfig.Kubeclt(), CmdName, p),
+			rootcmd.ExecPortForwardKey: portforwardcmd.GetExecPortForwardMod(cfg.rootConfig.Kubeclt(), CmdName, p),
+		}
+		enterMod, mods := rootcmd.MakeMods(&cfg.rootConfig.KeyMaps.PodKeyMap, modMap)
+		subtitle := enterMod.Subtitle
+		arg := enterMod.Arg
+		vals := enterMod.Variables
 		cfg.rootConfig.Awf().Append(
 			alfred.NewItem().
 				SetTitle(title).
-				SetSubtitle(
-					fmt.Sprintf("ready [%s] status [%s] restarts [%s] ", p.Ready, p.Status, p.Restarts),
-				).
-				SetArg(p.Name).
-				SetMod(alfred.ModCtrl, utils.GetDeleteMod(CmdName, p)).
-				SetMod(alfred.ModShift, utils.GetSternMod(p)).
-				SetMod(alfred.ModAlt, utils.GetPortForwardMod(cfg.rootConfig.Kubeclt(), CmdName, p)),
+				SetSubtitle(subtitle).
+				SetArg(arg).
+				SetVariables(vals).
+				SetMods(mods),
 		)
 	}
 

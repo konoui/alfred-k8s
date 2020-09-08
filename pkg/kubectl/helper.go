@@ -95,9 +95,10 @@ func getFieldNameValueFromRawLineWithIndexMap(fieldName, line string, indexMap m
 		return ""
 	}
 
-	if begin > len(line) {
+	if begin >= len(line) {
 		return ""
 	}
+
 	return strings.Fields(line[begin:])[0]
 }
 

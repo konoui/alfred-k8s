@@ -6,8 +6,8 @@ import (
 	"io/ioutil"
 	"os"
 	"testing"
-	"time"
 
+	"github.com/konoui/alfred-k8s/cmd/rootcmd"
 	"github.com/konoui/alfred-k8s/pkg/kubectl"
 	"github.com/konoui/go-alfred"
 )
@@ -24,14 +24,11 @@ func SetupCmd(t *testing.T, args []string) (outBuf, errBuf *bytes.Buffer) {
 
 	// set global variables on behalf init()
 	kubectl.TestDataBaseDir = "../pkg/kubectl/"
-	cacheTime = 0 * time.Second
-	k = kubectl.SetupKubectl(t, nil)
-	awf = alfred.NewWorkflow()
-	awf.EmptyWarning(emptyTitle, emptySubTitle)
 
 	outBuf, errBuf = new(bytes.Buffer), new(bytes.Buffer)
-	outStream, errStream = outBuf, errBuf
-	awf.SetOut(outStream)
+	// overwrite global config
+	rootConfig = rootcmd.NewConfig(outBuf, errBuf)
+	rootConfig.SetKubeCtl(kubectl.SetupKubectl(t, nil))
 
 	os.Args = append([]string{"dummy"}, args...)
 	return outBuf, errBuf

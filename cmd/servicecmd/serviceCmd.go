@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 
+	"github.com/konoui/alfred-k8s/cmd/portforwardcmd"
 	"github.com/konoui/alfred-k8s/cmd/rootcmd"
 	"github.com/konoui/alfred-k8s/cmd/utils"
 	"github.com/konoui/go-alfred"
@@ -51,15 +52,27 @@ func (cfg *Config) collectServices() (err error) {
 	}
 	for _, s := range svcs {
 		title := utils.GetNamespacedResourceTitle(s)
+
+		modMap := map[rootcmd.KeyMapKey]*alfred.Mod{
+			rootcmd.CopyResourceKey: utils.GetCopyMod(
+				fmt.Sprintf("cluster-ip [%s] external-ip [%s] ports [%s]", s.ClusterIP, s.ExternalIP, s.Ports),
+				s.Name,
+			),
+			rootcmd.CopySternKey:       utils.GetSternMod(s),
+			rootcmd.CopyPortForwardKey: portforwardcmd.GetCopyPortForwardMod(cfg.rootConfig.Kubeclt(), CmdName, s),
+			rootcmd.ExecPortForwardKey: portforwardcmd.GetExecPortForwardMod(cfg.rootConfig.Kubeclt(), CmdName, s),
+		}
+		enterMod, mods := rootcmd.MakeMods(&cfg.rootConfig.KeyMaps.ServiceKeyMap, modMap)
+		subtitle := enterMod.Subtitle
+		arg := enterMod.Arg
+		vals := enterMod.Variables
 		cfg.rootConfig.Awf().Append(
 			alfred.NewItem().
 				SetTitle(title).
-				SetSubtitle(
-					fmt.Sprintf("cluster-ip [%s] external-ip [%s] ports [%s]", s.ClusterIP, s.ExternalIP, s.Ports),
-				).
-				SetArg(s.Name).
-				SetMod(alfred.ModShift, utils.GetSternMod(s)).
-				SetMod(alfred.ModAlt, utils.GetPortForwardMod(cfg.rootConfig.Kubeclt(), CmdName, s)),
+				SetSubtitle(subtitle).
+				SetArg(arg).
+				SetVariables(vals).
+				SetMods(mods),
 		)
 	}
 

@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 
+	"github.com/konoui/alfred-k8s/cmd/portforwardcmd"
 	"github.com/konoui/alfred-k8s/cmd/rootcmd"
 	"github.com/konoui/alfred-k8s/cmd/utils"
 	"github.com/konoui/go-alfred"
@@ -51,15 +52,27 @@ func (cfg *Config) collectDeployments() (err error) {
 	}
 	for _, d := range deps {
 		title := utils.GetNamespacedResourceTitle(d)
+
+		modMap := map[rootcmd.KeyMapKey]*alfred.Mod{
+			rootcmd.CopyResourceKey: utils.GetCopyMod(
+				fmt.Sprintf("ready [%s] up-to-date [%s] available [%s]", d.Ready, d.UpToDate, d.Available),
+				d.Name,
+			),
+			rootcmd.CopySternKey:       utils.GetSternMod(d),
+			rootcmd.CopyPortForwardKey: portforwardcmd.GetCopyPortForwardMod(cfg.rootConfig.Kubeclt(), CmdName, d),
+			rootcmd.ExecPortForwardKey: portforwardcmd.GetExecPortForwardMod(cfg.rootConfig.Kubeclt(), CmdName, d),
+		}
+		enterMod, mods := rootcmd.MakeMods(&cfg.rootConfig.KeyMaps.DeploymentKeyMap, modMap)
+		subtitle := enterMod.Subtitle
+		arg := enterMod.Arg
+		vals := enterMod.Variables
 		cfg.rootConfig.Awf().Append(
 			alfred.NewItem().
 				SetTitle(title).
-				SetSubtitle(
-					fmt.Sprintf("ready [%s] up-to-date [%s] available [%s]", d.Ready, d.UpToDate, d.Available),
-				).
-				SetArg(d.Name).
-				SetMod(alfred.ModShift, utils.GetSternMod(d)).
-				SetMod(alfred.ModAlt, utils.GetPortForwardMod(cfg.rootConfig.Kubeclt(), CmdName, d)),
+				SetSubtitle(subtitle).
+				SetArg(arg).
+				SetVariables(vals).
+				SetMods(mods),
 		)
 	}
 

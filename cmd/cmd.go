@@ -3,7 +3,6 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"io"
 	"os"
 
 	"github.com/konoui/alfred-k8s/cmd/basecmd"
@@ -23,9 +22,12 @@ import (
 )
 
 var (
-	outStream io.Writer = os.Stdout
-	errStream io.Writer = os.Stderr
+	rootConfig *rootcmd.Config
 )
+
+func init() {
+	rootConfig = rootcmd.NewConfig(os.Stdout, os.Stderr)
+}
 
 // Execute root cmd
 func Execute(rootCmd *ffcli.Command) {
@@ -38,7 +40,6 @@ func Execute(rootCmd *ffcli.Command) {
 }
 
 func subCmds() []*ffcli.Command {
-	rootConfig := rootcmd.NewConfig(outStream, errStream, k, awf)
 	return []*ffcli.Command{
 		versioncmd.New(rootConfig),
 		contextcmd.New(rootConfig),
@@ -74,7 +75,7 @@ func collectAvailableSubCmds(cmds []*ffcli.Command, args []string) error {
 			continue
 		}
 
-		awf.Append(
+		rootConfig.Awf().Append(
 			alfred.NewItem().
 				SetTitle(c.Name).
 				SetSubtitle(subtitle).
@@ -84,6 +85,6 @@ func collectAvailableSubCmds(cmds []*ffcli.Command, args []string) error {
 		)
 	}
 
-	awf.Filter(utils.GetQuery(args, 0)).Output()
+	rootConfig.Awf().Filter(utils.GetQuery(args, 0)).Output()
 	return nil
 }
