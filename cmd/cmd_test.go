@@ -174,7 +174,7 @@ func TestListExecution(t *testing.T) {
 
 			f := fmt.Sprintf("testdata/%s.json", tt.name)
 			if tt.update {
-				if err := ioutil.WriteFile(f, outGotData, 0644); err != nil {
+				if err := ioutil.WriteFile(f, outGotData, 0600); err != nil {
 					t.Fatal(err)
 				}
 			}
@@ -246,7 +246,7 @@ func TestUseDeleteExecution(t *testing.T) {
 
 			f := fmt.Sprintf("testdata/%s.txt", tt.name)
 			if tt.update {
-				if err := ioutil.WriteFile(f, outGotData, 0644); err != nil {
+				if err := ioutil.WriteFile(f, outGotData, 0600); err != nil {
 					t.Fatal(err)
 				}
 			}

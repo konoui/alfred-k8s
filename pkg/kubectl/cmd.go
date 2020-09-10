@@ -93,7 +93,7 @@ func (c *Command) Exec(args, env []string) (*executor.Response, error) {
 	var stdout, stderr bytes.Buffer
 	ctx, cancel := context.WithTimeout(context.Background(), c.timeout)
 	defer cancel()
-	cmd := exec.CommandContext(ctx, c.bin, args...)
+	cmd := exec.CommandContext(ctx, c.bin, args...) //nolint:gosec //nolint:gocritic
 	cmd.Env = env
 	cmd.Stdout = &stdout
 	cmd.Stderr = &stderr

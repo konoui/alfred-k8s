@@ -6,16 +6,16 @@ BINARY := bin/$(BIN_NAME)
 ASSETS_DIR := assets
 ASSETS := $(ASSETS_DIR)/* $(BINARY) README.md
 ARTIFACT_DIR := .artifact
-ARTIFACT_NAME := $(ARTIFACT_DIR)/$(BIN_NAME).alfredworkflow
+ARTIFACT_NAME := $(BIN_NAME).alfredworkflow
 
 ## For version command
-CMD_PACKAGE_DIR := github.com/konoui/alfred-k8s/cmd
+CMD_PACKAGE_DIR := github.com/konoui/alfred-k8s/cmd/versioncmd
 LDFLAGS := -X '$(CMD_PACKAGE_DIR).version=$(VERSION)' -X '$(CMD_PACKAGE_DIR).revision=$(REVISION)'
 
 ## For local test
 WORKFLOW_DIR := "$${HOME}/Library/Application Support/Alfred/Alfred.alfredpreferences/workflows/user.workflow.2FA36703-F09E-4B6F-9CE1-F0E3944B7DDB"
 
-GOLANGCI_LINT_VERSION := v1.24.0
+GOLANGCI_LINT_VERSION := v1.30.0
 export GO111MODULE=on
 
 ## Build binaries on your environment
@@ -44,12 +44,15 @@ test:
 install: build
 	@(cp -r $(ASSETS)  $(WORKFLOW_DIR)/)
 
-## GitHub Release and uploads artifacts
-release: darwin
-	@(if ! type ghr >/dev/null 2>&1; then go get -u github.com/tcnksm/ghr ;fi)
+## Create workflow artifact
+package: darwin
 	@(if [ ! -e $(ARTIFACT_DIR) ]; then mkdir $(ARTIFACT_DIR) ; fi)
-	@(cp $(ASSETS) $(ARTIFACT_DIR))
+	@(cp -r $(ASSETS) $(ARTIFACT_DIR))
 	@(zip -j $(ARTIFACT_NAME) $(ARTIFACT_DIR)/*)
+
+## GitHub Release and uploads artifacts
+release: package
+	@(if ! type ghr >/dev/null 2>&1; then go get -u github.com/tcnksm/ghr ;fi)
 	@ghr -replace $(VERSION) $(ARTIFACT_NAME)
 
 ## Clean Binary
