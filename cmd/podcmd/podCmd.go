@@ -56,6 +56,7 @@ func New(rootConfig *rootcmd.Config) *ffcli.Command {
 func (cfg *Config) registerFlags() {
 	cfg.fs.BoolVar(&cfg.delete, utils.DeleteFlag, false, "delete it")
 	cfg.fs.BoolVar(&cfg.all, utils.AllNamespacesFlag, false, "in all namespaces")
+	cfg.fs.StringVar(&cfg.namespace, utils.NamespaceFlag, "", "namespace")
 
 }
 

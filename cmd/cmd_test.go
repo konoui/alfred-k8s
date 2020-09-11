@@ -226,7 +226,8 @@ func TestUseDeleteExecution(t *testing.T) {
 			name: "delete-dummy-pod-in-all-ns",
 			args: []string{
 				"pod",
-				"-a",
+				"--namespace",
+				"test",
 				"--delete",
 				"dummy",
 			},

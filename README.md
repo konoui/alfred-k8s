@@ -8,7 +8,7 @@ Alfred workflow to operate Kubernetes resources.
 
 
 ## Install
-- nDownload the workflow form [latest release](https://github.com/konoui/alfred-k8s/releases).
+- Download the workflow form [latest release](https://github.com/konoui/alfred-k8s/releases).
 - Build Workflow on your computer.
 ```
 $ make package
