@@ -23,7 +23,7 @@ const CmdName = "context"
 // New create a new cmd for context resource
 func New(rootConfig *rootcmd.Config) *ffcli.Command {
 	fs := flag.NewFlagSet(CmdName, flag.ContinueOnError)
-	cfg := Config{
+	cfg := &Config{
 		rootConfig: rootConfig,
 		fs:         fs,
 	}
@@ -35,12 +35,23 @@ func New(rootConfig *rootcmd.Config) *ffcli.Command {
 		FlagSet:   fs,
 		Exec: func(ctx context.Context, args []string) error {
 			if cfg.delete {
-				return cfg.deleteContext()
+				return cfg.rootConfig.DeleteOutput(
+					cfg,
+					cfg.GetQuery(),
+				)
 			}
 			if cfg.use {
-				return cfg.useContext()
+				return cfg.rootConfig.UseOutput(
+					cfg,
+					cfg.GetQuery(),
+				)
 			}
-			return cfg.collectContexts()
+
+			return cfg.rootConfig.CollectOutput(
+				cfg,
+				cfg.GetQuery(),
+				utils.GetCacheKey(CmdName, false),
+			)
 		},
 	}
 
@@ -52,30 +63,22 @@ func (cfg *Config) registerFlags() {
 	cfg.fs.BoolVar(&cfg.delete, utils.DeleteFlag, false, "delete it")
 }
 
-func (cfg *Config) useContext() (err error) {
+func (cfg *Config) Use() (err error) {
 	contextName := cfg.fs.Arg(0)
-	if err = cfg.rootConfig.Kubeclt().UseContext(contextName); err != nil {
-		fmt.Fprintf(cfg.rootConfig.Stdout(), "Failed due to %s\n", err)
-		return nil
-	}
-	fmt.Fprintf(cfg.rootConfig.Stdout(), "Success!!\n")
-	return
+	_ = cfg.rootConfig.Kubeclt().UseContext(contextName)
+	return nil
 }
 
-func (cfg *Config) deleteContext() (err error) {
+func (cfg *Config) Delete() (err error) {
 	contextName := cfg.fs.Arg(0)
-	if _, err = cfg.rootConfig.Kubeclt().Execute(fmt.Sprintf("config delete-context %s", contextName)); err != nil {
-		fmt.Fprintf(cfg.rootConfig.Stdout(), "Failed due to %s\n", err)
-		return nil
-	}
-	fmt.Fprintf(cfg.rootConfig.Stdout(), "Success!!\n")
-	return
+	_, _ = cfg.rootConfig.Kubeclt().Execute(fmt.Sprintf("config delete-context %s", contextName))
+	return nil
 }
 
-func (cfg *Config) collectContexts() (err error) {
+func (cfg *Config) Collect() error {
 	contexts, err := cfg.rootConfig.Kubeclt().GetContexts()
 	if err != nil {
-		return
+		return err
 	}
 
 	for _, c := range contexts {
@@ -110,6 +113,9 @@ func (cfg *Config) collectContexts() (err error) {
 		)
 	}
 
-	cfg.rootConfig.Awf().Filter(cfg.fs.Arg(0)).Output()
-	return
+	return nil
+}
+
+func (cfg *Config) GetQuery() string {
+	return cfg.fs.Arg(0)
 }

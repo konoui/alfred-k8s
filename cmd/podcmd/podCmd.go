@@ -37,9 +37,16 @@ func New(rootConfig *rootcmd.Config) *ffcli.Command {
 		FlagSet:   fs,
 		Exec: func(ctx context.Context, args []string) error {
 			if cfg.delete {
-				return cfg.deleteResource()
+				return cfg.rootConfig.DeleteOutput(
+					cfg,
+					cfg.GetQuery(),
+				)
 			}
-			return cfg.collectPods()
+			return cfg.rootConfig.CollectOutput(
+				cfg,
+				cfg.GetQuery(),
+				utils.GetCacheKey(CmdName, cfg.all),
+			)
 		},
 	}
 
@@ -52,7 +59,7 @@ func (cfg *Config) registerFlags() {
 
 }
 
-func (cfg *Config) collectPods() error {
+func (cfg *Config) Collect() error {
 	pods, err := cfg.rootConfig.Kubeclt().GetPods(cfg.all)
 	if err != nil {
 		return err
@@ -83,21 +90,19 @@ func (cfg *Config) collectPods() error {
 		)
 	}
 
-	cfg.rootConfig.Awf().Filter(cfg.fs.Arg(0)).Output()
 	return nil
 }
 
-func (cfg *Config) deleteResource() error {
+func (cfg *Config) Delete() error {
 	pod := cfg.fs.Arg(0)
 	arg := fmt.Sprintf("delete %s %s", CmdName, pod)
 	if cfg.namespace != "" {
 		arg = fmt.Sprintf("%s --namespace %s", arg, cfg.namespace)
 	}
-	if _, err := cfg.rootConfig.Kubeclt().Execute(arg); err != nil {
-		fmt.Fprintf(cfg.rootConfig.Stdout(), "Failed due to %s\n", err)
-		return nil
-	}
-
-	fmt.Fprintf(cfg.rootConfig.Stdout(), "Success!!\n")
+	_, _ = cfg.rootConfig.Kubeclt().Execute(arg)
 	return nil
+}
+
+func (cfg *Config) GetQuery() string {
+	return cfg.fs.Arg(0)
 }

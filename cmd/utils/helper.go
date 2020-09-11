@@ -22,7 +22,12 @@ const (
 	NextActionJob   = "job"
 )
 
-var GetPortForwardMod func(*kubectl.Kubectl, string, interface{}) *alfred.Mod
+func GetCacheKey(name string, namespaced bool) string {
+	if namespaced {
+		return fmt.Sprintf("namespace-%s", name)
+	}
+	return fmt.Sprintf("non-namespace-%s", name)
+}
 
 func GetSternMod(i interface{}) *alfred.Mod {
 	name, ns := kubectl.GetNameNamespace(i)

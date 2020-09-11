@@ -25,16 +25,18 @@ type Config struct {
 	k         *kubectl.Kubectl
 	awf       *alfred.Workflow
 	cacheTTL  time.Duration
+	cacheDir  string
 	KeyMaps   *KeyMaps
 }
 
 func NewConfig(out, errOut io.Writer) *Config {
+	cacheDir := os.TempDir()
 	awf := alfred.NewWorkflow()
 	awf.SetOut(out)
 	awf.SetErr(errOut)
 	awf.EmptyWarning(emptyTitle, emptySubTitle)
 	awf.SetCacheSuffix(cacheSuffix)
-	err := awf.SetCacheDir(os.TempDir())
+	err := awf.SetCacheDir(cacheDir)
 	if err != nil {
 		awf.Fatal("Fatal error occurs on initialization", err.Error())
 	}
@@ -63,6 +65,7 @@ func NewConfig(out, errOut io.Writer) *Config {
 		errStream: errOut,
 		k:         k,
 		awf:       awf,
+		cacheDir:  cacheDir,
 		cacheTTL:  cfgFile.cacheTTL(),
 		KeyMaps:   &cfgFile.KeyMaps,
 	}
@@ -90,6 +93,10 @@ func (cfg *Config) Awf() *alfred.Workflow {
 
 func (cfg *Config) CacheTTL() time.Duration {
 	return cfg.cacheTTL
+}
+
+func (cfg *Config) SetCacheTTL(t time.Duration) {
+	cfg.cacheTTL = t
 }
 
 // New create a new cmd for root

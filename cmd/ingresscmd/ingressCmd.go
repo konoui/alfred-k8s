@@ -17,12 +17,12 @@ type Config struct {
 	rootConfig *rootcmd.Config
 }
 
-const cmdName = "ingress"
+const CmdName = "ingress"
 
 // New create a new cmd for ingress resource
 func New(rootConfig *rootcmd.Config) *ffcli.Command {
 
-	fs := flag.NewFlagSet(cmdName, flag.ContinueOnError)
+	fs := flag.NewFlagSet(CmdName, flag.ContinueOnError)
 	cfg := &Config{
 		rootConfig: rootConfig,
 		fs:         fs,
@@ -30,11 +30,15 @@ func New(rootConfig *rootcmd.Config) *ffcli.Command {
 	cfg.registerFlags()
 
 	cmd := &ffcli.Command{
-		Name:      cmdName,
+		Name:      CmdName,
 		ShortHelp: "list ingresses",
 		FlagSet:   fs,
 		Exec: func(ctx context.Context, args []string) error {
-			return cfg.collectIngresses()
+			return cfg.rootConfig.CollectOutput(
+				cfg,
+				cfg.GetQuery(),
+				utils.GetCacheKey(CmdName, cfg.all),
+			)
 		},
 	}
 
@@ -45,7 +49,7 @@ func (cfg *Config) registerFlags() {
 	cfg.fs.BoolVar(&cfg.all, utils.AllNamespacesFlag, false, "in all namespaces")
 }
 
-func (cfg *Config) collectIngresses() (err error) {
+func (cfg *Config) Collect() (err error) {
 	ingresses, err := cfg.rootConfig.Kubeclt().GetIngresses(cfg.all)
 	if err != nil {
 		return
@@ -67,6 +71,9 @@ func (cfg *Config) collectIngresses() (err error) {
 		)
 	}
 
-	cfg.rootConfig.Awf().Filter(cfg.fs.Arg(0)).Output()
 	return
+}
+
+func (cfg *Config) GetQuery() string {
+	return cfg.fs.Arg(0)
 }

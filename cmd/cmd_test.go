@@ -28,6 +28,7 @@ func SetupCmd(t *testing.T, args []string) (outBuf, errBuf *bytes.Buffer) {
 	outBuf, errBuf = new(bytes.Buffer), new(bytes.Buffer)
 	// overwrite global config
 	rootConfig = rootcmd.NewConfig(outBuf, errBuf)
+	rootConfig.SetCacheTTL(0)
 	rootConfig.SetKubeCtl(kubectl.SetupKubectl(t, nil))
 
 	os.Args = append([]string{"dummy"}, args...)

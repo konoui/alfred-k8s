@@ -34,7 +34,11 @@ func New(rootConfig *rootcmd.Config) *ffcli.Command {
 		ShortHelp: "list services",
 		FlagSet:   fs,
 		Exec: func(ctx context.Context, args []string) error {
-			return cfg.collectServices()
+			return cfg.rootConfig.CollectOutput(
+				cfg,
+				cfg.GetQuery(),
+				utils.GetCacheKey(CmdName, cfg.all),
+			)
 		},
 	}
 
@@ -45,7 +49,7 @@ func (cfg *Config) registerFlags() {
 	cfg.fs.BoolVar(&cfg.all, utils.AllNamespacesFlag, false, "in all namespaces")
 }
 
-func (cfg *Config) collectServices() (err error) {
+func (cfg *Config) Collect() (err error) {
 	svcs, err := cfg.rootConfig.Kubeclt().GetServices(cfg.all)
 	if err != nil {
 		return
@@ -66,6 +70,7 @@ func (cfg *Config) collectServices() (err error) {
 		subtitle := enterMod.Subtitle
 		arg := enterMod.Arg
 		vals := enterMod.Variables
+
 		cfg.rootConfig.Awf().Append(
 			alfred.NewItem().
 				SetTitle(title).
@@ -76,6 +81,9 @@ func (cfg *Config) collectServices() (err error) {
 		)
 	}
 
-	cfg.rootConfig.Awf().Filter(cfg.fs.Arg(0)).Output()
 	return
+}
+
+func (cfg *Config) GetQuery() string {
+	return cfg.fs.Arg(0)
 }

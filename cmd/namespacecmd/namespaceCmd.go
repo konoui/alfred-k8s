@@ -34,9 +34,16 @@ func New(rootConfig *rootcmd.Config) *ffcli.Command {
 		FlagSet:   fs,
 		Exec: func(ctx context.Context, args []string) error {
 			if cfg.use {
-				return cfg.useNamespace()
+				return cfg.rootConfig.UseOutput(
+					cfg,
+					cfg.GetQuery(),
+				)
 			}
-			return cfg.collectNamespaces()
+			return cfg.rootConfig.CollectOutput(
+				cfg,
+				cfg.GetQuery(),
+				utils.GetCacheKey(CmdName, false),
+			)
 		},
 	}
 
@@ -47,17 +54,13 @@ func (cfg *Config) registerFlags() {
 	cfg.fs.BoolVar(&cfg.use, utils.UseFlag, false, "use it")
 }
 
-func (cfg *Config) useNamespace() (err error) {
+func (cfg *Config) Use() (err error) {
 	ns := cfg.fs.Arg(0)
-	if err = cfg.rootConfig.Kubeclt().UseNamespace(ns); err != nil {
-		fmt.Fprintf(cfg.rootConfig.Stdout(), "Failed due to %s\n", err)
-		return nil
-	}
-	fmt.Fprintf(cfg.rootConfig.Stdout(), "Success!!\n")
-	return
+	_ = cfg.rootConfig.Kubeclt().UseNamespace(ns)
+	return nil
 }
 
-func (cfg *Config) collectNamespaces() (err error) {
+func (cfg *Config) Collect() (err error) {
 	namespaces, err := cfg.rootConfig.Kubeclt().GetNamespaces()
 	if err != nil {
 		return
@@ -90,6 +93,9 @@ func (cfg *Config) collectNamespaces() (err error) {
 		)
 	}
 
-	cfg.rootConfig.Awf().Filter(cfg.fs.Arg(0)).Output()
 	return
+}
+
+func (cfg *Config) GetQuery() string {
+	return cfg.fs.Arg(0)
 }
