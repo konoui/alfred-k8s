@@ -78,3 +78,11 @@ func setPathEnv(pluginPath string) []string {
 	os.Setenv(key, fmt.Sprintf("%s:%s", pluginPath, path))
 	return os.Environ()
 }
+
+// GetKubectlCommandEnv return commands and env
+func (k *Kubectl) GetKubectlCommandEnv(args []string) (cmds, env []string) {
+	bin := fmt.Sprintf("%s", k.cmd)
+	cmds = append([]string{bin}, args...)
+	env = k.env
+	return
+}

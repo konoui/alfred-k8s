@@ -71,9 +71,6 @@ func collectAvailableSubCmds(cmds []*ffcli.Command, args []string) error {
 		if c.Name == versioncmd.CmdName {
 			continue
 		}
-		if c.Name == portforwardcmd.CmdName {
-			continue
-		}
 
 		rootConfig.Awf().Append(
 			alfred.NewItem().

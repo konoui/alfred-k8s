@@ -4,7 +4,6 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"os"
 	"strings"
 
 	"github.com/konoui/alfred-k8s/cmd/rootcmd"
@@ -15,16 +14,17 @@ import (
 )
 
 type Config struct {
-	cmdName    string
-	fs         *flag.FlagSet
-	use        bool
-	delete     bool
-	resource   string
-	namespace  string
-	rootConfig *rootcmd.Config
+	fs           *flag.FlagSet
+	use          bool
+	delete       bool
+	resourceType string
+	name         string
+	namespace    string
+	rootConfig   *rootcmd.Config
 }
 
 const CmdName = "port-forward"
+const typeFlag = "type"
 
 // New create a new cmd for port-forward
 func New(rootConfig *rootcmd.Config) *ffcli.Command {
@@ -41,6 +41,9 @@ func New(rootConfig *rootcmd.Config) *ffcli.Command {
 		ShortHelp:  "list port-forwarded resources",
 		FlagSet:    fs,
 		Exec: func(ctx context.Context, args []string) error {
+			// TODO
+			// Note set resource name after flag.Parse
+			cfg.name = cfg.fs.Arg(0)
 			if err := cfg.rootConfig.Awf().SetJobDir(getDataDir()); err != nil {
 				return err
 			}
@@ -60,16 +63,26 @@ func New(rootConfig *rootcmd.Config) *ffcli.Command {
 func (cfg *Config) registerFlags() {
 	cfg.fs.BoolVar(&cfg.use, utils.UseFlag, false, "use it")
 	cfg.fs.BoolVar(&cfg.delete, utils.DeleteFlag, false, "stop it")
-	cfg.fs.StringVar(&cfg.resource, "type", "", "resource type e.g) svc, pod, deploy")
+	cfg.fs.StringVar(&cfg.resourceType, typeFlag, "", "resource type e.g) svc, pod, deploy")
 	cfg.fs.StringVar(&cfg.namespace, utils.NamespaceFlag, "", "resource namespace")
 }
 
 func (cfg *Config) listJobs() error {
 	jobs := cfg.rootConfig.Awf().ListJobs()
 	for _, job := range jobs {
+		resType, name, ns := cfg.getValuesFromJobName(job.Name())
 		cfg.rootConfig.Awf().Append(
 			alfred.NewItem().
-				SetTitle(job.Name()),
+				SetTitle(job.Name()).
+				SetMod(
+					alfred.ModCtrl,
+					alfred.NewMod().
+						SetSubtitle("stop port forward").
+						SetArg(
+							fmt.Sprintf("%s --%s %s --%s %s --%s %s", CmdName, typeFlag, resType, utils.NamespaceFlag, ns, utils.DeleteFlag, name),
+						).
+						SetVariable(utils.NextActionKey, utils.NextActionShell),
+				),
 		)
 	}
 	cfg.rootConfig.Awf().Output()
@@ -80,30 +93,24 @@ func (cfg *Config) startPortForward() error {
 	cfg.rootConfig.Awf().Append(&alfred.Item{
 		Title: "Starting port forwarding",
 	})
-	cfg.rootConfig.Awf().Job(cfg.getJobName()).Logging().
-		StartWithExit(os.Args[0], os.Args[1:]...).
-		Clear()
 
-	res, name, ns := cfg.resource, cfg.fs.Arg(0), cfg.namespace
-	ports := cfg.rootConfig.Kubeclt().GetPorts(res, name, ns)
+	resType, name, ns := cfg.resourceType, cfg.name, cfg.namespace
+	ports := cfg.rootConfig.Kubeclt().GetPorts(resType, name, ns)
 	if len(ports) == 0 {
-		return fmt.Errorf("%s/%s has no ports", res, name)
+		return fmt.Errorf("%s/%s has no ports", resType, name)
 	}
 
 	kargs := append([]string{
 		"port-forward",
-		res + "/" + name,
+		resType + "/" + name,
 		"--namespace",
 		ns,
 	}, ports...)
-	resp, err := cfg.rootConfig.Kubeclt().Execute(strings.Join(kargs, " "))
-	if err != nil {
-		fmt.Println(err)
-		return nil
-	}
-	for l := range resp.Readline() {
-		fmt.Println(l)
-	}
+
+	cmds, _ := cfg.rootConfig.Kubeclt().GetKubectlCommandEnv(kargs)
+	cfg.rootConfig.Awf().Job(cfg.getJobName()).Logging().
+		StartWithExit(cmds[0], cmds[1:]...).
+		Clear()
 
 	return nil
 }
@@ -113,8 +120,22 @@ func (cfg *Config) stopPortForward() error {
 }
 
 func (cfg *Config) getJobName() string {
-	res, name, ns := cfg.resource, cfg.fs.Arg(0), cfg.namespace
-	return cfg.cmdName + "-" + res + "-" + name + "-" + ns
+	res, name, ns := cfg.resourceType, cfg.name, cfg.namespace
+	return CmdName + "_" + res + "_" + name + "_" + ns
+}
+
+func (cfg *Config) getValuesFromJobName(jobName string) (res, name, namespace string) {
+	values := strings.SplitN(jobName, "_", 4)
+	if len(values) != 4 {
+		return
+	}
+	res = values[1]
+	name = values[2]
+	namespace = values[3]
+	cfg.resourceType = res
+	cfg.name = name
+	cfg.namespace = namespace
+	return
 }
 
 func getDataDir() string {

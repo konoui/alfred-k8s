@@ -34,7 +34,6 @@ type KeyMap struct {
 	Ctrl  KeyMapKey `mapstructure:"ctrl"`
 	Cmd   KeyMapKey `mapstructure:"cmd"`
 	Alt   KeyMapKey `mapstructure:"alt"`
-	Test  KeyMapKey `mapstructure:"test"`
 }
 
 type KeyMapKey string

@@ -13,28 +13,10 @@
             "variables": {
                 "nextAction": "cmd"
             },
-            "title": "deploy",
-            "subtitle": "list deployments, opts [-a: in all namespaces]",
-            "arg": "deploy",
-            "autocomplete": "deploy"
-        },
-        {
-            "variables": {
-                "nextAction": "cmd"
-            },
-            "title": "ingress",
-            "subtitle": "list ingresses, opts [-a: in all namespaces]",
-            "arg": "ingress",
-            "autocomplete": "ingress"
-        },
-        {
-            "variables": {
-                "nextAction": "cmd"
-            },
-            "title": "node",
-            "subtitle": "list nodes",
-            "arg": "node",
-            "autocomplete": "node"
+            "title": "pod",
+            "subtitle": "list pods, opts [-a: in all namespaces]",
+            "arg": "pod",
+            "autocomplete": "pod"
         },
         {
             "variables": {
@@ -49,19 +31,19 @@
             "variables": {
                 "nextAction": "cmd"
             },
-            "title": "obj",
-            "subtitle": "list specific resources, opts [-a: in all namespaces]",
-            "arg": "obj",
-            "autocomplete": "obj"
+            "title": "node",
+            "subtitle": "list nodes",
+            "arg": "node",
+            "autocomplete": "node"
         },
         {
             "variables": {
                 "nextAction": "cmd"
             },
-            "title": "pod",
-            "subtitle": "list pods, opts [-a: in all namespaces]",
-            "arg": "pod",
-            "autocomplete": "pod"
+            "title": "deploy",
+            "subtitle": "list deployments, opts [-a: in all namespaces]",
+            "arg": "deploy",
+            "autocomplete": "deploy"
         },
         {
             "variables": {
@@ -71,6 +53,33 @@
             "subtitle": "list services, opts [-a: in all namespaces]",
             "arg": "svc",
             "autocomplete": "svc"
+        },
+        {
+            "variables": {
+                "nextAction": "cmd"
+            },
+            "title": "ingress",
+            "subtitle": "list ingresses, opts [-a: in all namespaces]",
+            "arg": "ingress",
+            "autocomplete": "ingress"
+        },
+        {
+            "variables": {
+                "nextAction": "cmd"
+            },
+            "title": "obj",
+            "subtitle": "list specific resources, opts [-a: in all namespaces]",
+            "arg": "obj",
+            "autocomplete": "obj"
+        },
+        {
+            "variables": {
+                "nextAction": "cmd"
+            },
+            "title": "port-forward",
+            "subtitle": "list port-forwarded resources",
+            "arg": "port-forward",
+            "autocomplete": "port-forward"
         }
     ]
 }
