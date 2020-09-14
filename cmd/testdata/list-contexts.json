@@ -1,64 +1,64 @@
 {
-    "items": [
-        {
-            "title": "test1-name",
-            "arg": "test1-name",
-            "mods": {
-                "ctrl": {
-                    "variables": {
-                        "nextAction": "shell"
-                    },
-                    "arg": "context --use test1-name",
-                    "subtitle": "switch to it"
-                },
-                "shift": {
-                    "variables": {
-                        "nextAction": "shell"
-                    },
-                    "arg": "context --delete test1-name",
-                    "subtitle": "delete it"
-                }
-            }
+  "items": [
+    {
+      "title": "test1-name",
+      "arg": "test1-name",
+      "mods": {
+        "ctrl": {
+          "variables": {
+            "nextAction": "shell"
+          },
+          "arg": "context --use test1-name",
+          "subtitle": "switch to it"
         },
-        {
-            "title": "test2-name",
-            "arg": "test2-name",
-            "mods": {
-                "ctrl": {
-                    "variables": {
-                        "nextAction": "shell"
-                    },
-                    "arg": "context --use test2-name",
-                    "subtitle": "switch to it"
-                },
-                "shift": {
-                    "variables": {
-                        "nextAction": "shell"
-                    },
-                    "arg": "context --delete test2-name",
-                    "subtitle": "delete it"
-                }
-            }
-        },
-        {
-            "title": "[*] test3-name",
-            "arg": "test3-name",
-            "mods": {
-                "ctrl": {
-                    "variables": {
-                        "nextAction": "shell"
-                    },
-                    "arg": "context --use test3-name",
-                    "subtitle": "switch to it"
-                },
-                "shift": {
-                    "variables": {
-                        "nextAction": "shell"
-                    },
-                    "arg": "context --delete test3-name",
-                    "subtitle": "delete it"
-                }
-            }
+        "shift": {
+          "variables": {
+            "nextAction": "shell"
+          },
+          "arg": "context --delete test1-name",
+          "subtitle": "delete it"
         }
-    ]
+      }
+    },
+    {
+      "title": "test2-name",
+      "arg": "test2-name",
+      "mods": {
+        "ctrl": {
+          "variables": {
+            "nextAction": "shell"
+          },
+          "arg": "context --use test2-name",
+          "subtitle": "switch to it"
+        },
+        "shift": {
+          "variables": {
+            "nextAction": "shell"
+          },
+          "arg": "context --delete test2-name",
+          "subtitle": "delete it"
+        }
+      }
+    },
+    {
+      "title": "[*] test3-name",
+      "arg": "test3-name",
+      "mods": {
+        "ctrl": {
+          "variables": {
+            "nextAction": "shell"
+          },
+          "arg": "context --use test3-name",
+          "subtitle": "switch to it"
+        },
+        "shift": {
+          "variables": {
+            "nextAction": "shell"
+          },
+          "arg": "context --delete test3-name",
+          "subtitle": "delete it"
+        }
+      }
+    }
+  ]
 }

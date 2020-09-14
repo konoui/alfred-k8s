@@ -1,32 +1,32 @@
 {
-    "items": [
-        {
-            "title": "[test1-namespace] deployment-test1",
-            "subtitle": "ready [1/1] up-to-date [1] available [1]",
-            "arg": "deployment-test1",
-            "mods": {
-                "alt": {
-                    "subtitle": "the resource has no ports"
-                },
-                "shift": {
-                    "arg": "stern deployment-test1 --namespace test1-namespace",
-                    "subtitle": "copy simple stern command"
-                }
-            }
+  "items": [
+    {
+      "title": "[test1-namespace] deployment-test1",
+      "subtitle": "ready [1/1] up-to-date [1] available [1]",
+      "arg": "deployment-test1",
+      "mods": {
+        "alt": {
+          "subtitle": "the resource has no ports"
         },
-        {
-            "title": "[test2-namespace] deployment-test2",
-            "subtitle": "ready [2/2] up-to-date [2] available [1]",
-            "arg": "deployment-test2",
-            "mods": {
-                "alt": {
-                    "subtitle": "the resource has no ports"
-                },
-                "shift": {
-                    "arg": "stern deployment-test2 --namespace test2-namespace",
-                    "subtitle": "copy simple stern command"
-                }
-            }
+        "shift": {
+          "arg": "stern deployment-test1 --namespace test1-namespace",
+          "subtitle": "copy simple stern command"
         }
-    ]
+      }
+    },
+    {
+      "title": "[test2-namespace] deployment-test2",
+      "subtitle": "ready [2/2] up-to-date [2] available [1]",
+      "arg": "deployment-test2",
+      "mods": {
+        "alt": {
+          "subtitle": "the resource has no ports"
+        },
+        "shift": {
+          "arg": "stern deployment-test2 --namespace test2-namespace",
+          "subtitle": "copy simple stern command"
+        }
+      }
+    }
+  ]
 }

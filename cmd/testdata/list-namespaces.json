@@ -1,60 +1,60 @@
 {
-    "items": [
-        {
-            "title": "test1-namepsace",
-            "subtitle": "status [Active] age [11d]",
-            "arg": "test1-namepsace",
-            "mods": {
-                "ctrl": {
-                    "variables": {
-                        "nextAction": "shell"
-                    },
-                    "arg": "ns --use test1-namepsace",
-                    "subtitle": "switch to it"
-                }
-            }
-        },
-        {
-            "title": "test2-namepsace",
-            "subtitle": "status [Active] age [11d]",
-            "arg": "test2-namepsace",
-            "mods": {
-                "ctrl": {
-                    "variables": {
-                        "nextAction": "shell"
-                    },
-                    "arg": "ns --use test2-namepsace",
-                    "subtitle": "switch to it"
-                }
-            }
-        },
-        {
-            "title": "[*] test3-namespace",
-            "subtitle": "status [Active] age [11d]",
-            "arg": "test3-namespace",
-            "mods": {
-                "ctrl": {
-                    "variables": {
-                        "nextAction": "shell"
-                    },
-                    "arg": "ns --use test3-namespace",
-                    "subtitle": "switch to it"
-                }
-            }
-        },
-        {
-            "title": "default",
-            "subtitle": "status [Active] age [11d]",
-            "arg": "default",
-            "mods": {
-                "ctrl": {
-                    "variables": {
-                        "nextAction": "shell"
-                    },
-                    "arg": "ns --use default",
-                    "subtitle": "switch to it"
-                }
-            }
+  "items": [
+    {
+      "title": "test1-namepsace",
+      "subtitle": "status [Active] age [11d]",
+      "arg": "test1-namepsace",
+      "mods": {
+        "ctrl": {
+          "variables": {
+            "nextAction": "shell"
+          },
+          "arg": "ns --use test1-namepsace",
+          "subtitle": "switch to it"
         }
-    ]
+      }
+    },
+    {
+      "title": "test2-namepsace",
+      "subtitle": "status [Active] age [11d]",
+      "arg": "test2-namepsace",
+      "mods": {
+        "ctrl": {
+          "variables": {
+            "nextAction": "shell"
+          },
+          "arg": "ns --use test2-namepsace",
+          "subtitle": "switch to it"
+        }
+      }
+    },
+    {
+      "title": "[*] test3-namespace",
+      "subtitle": "status [Active] age [11d]",
+      "arg": "test3-namespace",
+      "mods": {
+        "ctrl": {
+          "variables": {
+            "nextAction": "shell"
+          },
+          "arg": "ns --use test3-namespace",
+          "subtitle": "switch to it"
+        }
+      }
+    },
+    {
+      "title": "default",
+      "subtitle": "status [Active] age [11d]",
+      "arg": "default",
+      "mods": {
+        "ctrl": {
+          "variables": {
+            "nextAction": "shell"
+          },
+          "arg": "ns --use default",
+          "subtitle": "switch to it"
+        }
+      }
+    }
+  ]
 }

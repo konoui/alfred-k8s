@@ -1,46 +1,46 @@
 {
-    "items": [
-        {
-            "title": "[test1-namespace] test1-pod",
-            "subtitle": "ready [1/1] status [Running] restarts [0] ",
-            "arg": "test1-pod",
-            "mods": {
-                "alt": {
-                    "subtitle": "the resource has no ports"
-                },
-                "ctrl": {
-                    "variables": {
-                        "nextAction": "shell"
-                    },
-                    "arg": "pod --namespace test1-namespace --delete test1-pod",
-                    "subtitle": "delete it"
-                },
-                "shift": {
-                    "arg": "stern test1-pod --namespace test1-namespace",
-                    "subtitle": "copy simple stern command"
-                }
-            }
+  "items": [
+    {
+      "title": "[test1-namespace] test1-pod",
+      "subtitle": "ready [1/1] status [Running] restarts [0] ",
+      "arg": "test1-pod",
+      "mods": {
+        "alt": {
+          "subtitle": "the resource has no ports"
         },
-        {
-            "title": "[test2-namespace] test2-pod",
-            "subtitle": "ready [2/2] status [Running] restarts [1] ",
-            "arg": "test2-pod",
-            "mods": {
-                "alt": {
-                    "subtitle": "the resource has no ports"
-                },
-                "ctrl": {
-                    "variables": {
-                        "nextAction": "shell"
-                    },
-                    "arg": "pod --namespace test2-namespace --delete test2-pod",
-                    "subtitle": "delete it"
-                },
-                "shift": {
-                    "arg": "stern test2-pod --namespace test2-namespace",
-                    "subtitle": "copy simple stern command"
-                }
-            }
+        "ctrl": {
+          "variables": {
+            "nextAction": "shell"
+          },
+          "arg": "pod --namespace test1-namespace --delete test1-pod",
+          "subtitle": "delete it"
+        },
+        "shift": {
+          "arg": "stern test1-pod --namespace test1-namespace",
+          "subtitle": "copy simple stern command"
         }
-    ]
+      }
+    },
+    {
+      "title": "[test2-namespace] test2-pod",
+      "subtitle": "ready [2/2] status [Running] restarts [1] ",
+      "arg": "test2-pod",
+      "mods": {
+        "alt": {
+          "subtitle": "the resource has no ports"
+        },
+        "ctrl": {
+          "variables": {
+            "nextAction": "shell"
+          },
+          "arg": "pod --namespace test2-namespace --delete test2-pod",
+          "subtitle": "delete it"
+        },
+        "shift": {
+          "arg": "stern test2-pod --namespace test2-namespace",
+          "subtitle": "copy simple stern command"
+        }
+      }
+    }
+  ]
 }
