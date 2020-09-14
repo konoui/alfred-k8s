@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	AllNamespacesFlag = "a"
+	AllNamespacesFlag = "A"
 	UseFlag           = "use"
 	DeleteFlag        = "delete"
 	NamespaceFlag     = "namespace"

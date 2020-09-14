@@ -1,85 +1,85 @@
 {
-    "items": [
-        {
-            "variables": {
-                "nextAction": "cmd"
-            },
-            "title": "context",
-            "subtitle": "list contexts",
-            "arg": "context",
-            "autocomplete": "context"
-        },
-        {
-            "variables": {
-                "nextAction": "cmd"
-            },
-            "title": "pod",
-            "subtitle": "list pods, opts [-a: in all namespaces]",
-            "arg": "pod",
-            "autocomplete": "pod"
-        },
-        {
-            "variables": {
-                "nextAction": "cmd"
-            },
-            "title": "ns",
-            "subtitle": "list namespaces",
-            "arg": "ns",
-            "autocomplete": "ns"
-        },
-        {
-            "variables": {
-                "nextAction": "cmd"
-            },
-            "title": "node",
-            "subtitle": "list nodes",
-            "arg": "node",
-            "autocomplete": "node"
-        },
-        {
-            "variables": {
-                "nextAction": "cmd"
-            },
-            "title": "deploy",
-            "subtitle": "list deployments, opts [-a: in all namespaces]",
-            "arg": "deploy",
-            "autocomplete": "deploy"
-        },
-        {
-            "variables": {
-                "nextAction": "cmd"
-            },
-            "title": "svc",
-            "subtitle": "list services, opts [-a: in all namespaces]",
-            "arg": "svc",
-            "autocomplete": "svc"
-        },
-        {
-            "variables": {
-                "nextAction": "cmd"
-            },
-            "title": "ingress",
-            "subtitle": "list ingresses, opts [-a: in all namespaces]",
-            "arg": "ingress",
-            "autocomplete": "ingress"
-        },
-        {
-            "variables": {
-                "nextAction": "cmd"
-            },
-            "title": "obj",
-            "subtitle": "list specific resources, opts [-a: in all namespaces]",
-            "arg": "obj",
-            "autocomplete": "obj"
-        },
-        {
-            "variables": {
-                "nextAction": "cmd"
-            },
-            "title": "port-forward",
-            "subtitle": "list port-forwarded resources",
-            "arg": "port-forward",
-            "autocomplete": "port-forward"
-        }
-    ]
+  "items": [
+    {
+      "variables": {
+        "nextAction": "cmd"
+      },
+      "title": "context",
+      "subtitle": "list contexts",
+      "arg": "context",
+      "autocomplete": "context"
+    },
+    {
+      "variables": {
+        "nextAction": "cmd"
+      },
+      "title": "pod",
+      "subtitle": "list pods, opts [-A: in all namespaces]",
+      "arg": "pod",
+      "autocomplete": "pod"
+    },
+    {
+      "variables": {
+        "nextAction": "cmd"
+      },
+      "title": "ns",
+      "subtitle": "list namespaces",
+      "arg": "ns",
+      "autocomplete": "ns"
+    },
+    {
+      "variables": {
+        "nextAction": "cmd"
+      },
+      "title": "node",
+      "subtitle": "list nodes",
+      "arg": "node",
+      "autocomplete": "node"
+    },
+    {
+      "variables": {
+        "nextAction": "cmd"
+      },
+      "title": "deploy",
+      "subtitle": "list deployments, opts [-A: in all namespaces]",
+      "arg": "deploy",
+      "autocomplete": "deploy"
+    },
+    {
+      "variables": {
+        "nextAction": "cmd"
+      },
+      "title": "svc",
+      "subtitle": "list services, opts [-A: in all namespaces]",
+      "arg": "svc",
+      "autocomplete": "svc"
+    },
+    {
+      "variables": {
+        "nextAction": "cmd"
+      },
+      "title": "ingress",
+      "subtitle": "list ingresses, opts [-A: in all namespaces]",
+      "arg": "ingress",
+      "autocomplete": "ingress"
+    },
+    {
+      "variables": {
+        "nextAction": "cmd"
+      },
+      "title": "obj",
+      "subtitle": "list specific resources, opts [-A: in all namespaces]",
+      "arg": "obj",
+      "autocomplete": "obj"
+    },
+    {
+      "variables": {
+        "nextAction": "cmd"
+      },
+      "title": "port-forward",
+      "subtitle": "list port-forwarded resources",
+      "arg": "port-forward",
+      "autocomplete": "port-forward"
+    }
+  ]
 }

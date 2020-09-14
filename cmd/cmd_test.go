@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -82,7 +83,7 @@ func TestListExecution(t *testing.T) {
 			name: "list-pods-in-all-ns",
 			args: []string{
 				"pod",
-				"-a",
+				"-A",
 			},
 		},
 		{
@@ -95,7 +96,7 @@ func TestListExecution(t *testing.T) {
 			name: "list-deployments-in-all-ns",
 			args: []string{
 				"deploy",
-				"-a",
+				"-A",
 			},
 		},
 		{
@@ -108,7 +109,7 @@ func TestListExecution(t *testing.T) {
 			name: "list-services-in-all-ns",
 			args: []string{
 				"svc",
-				"-a",
+				"-A",
 			},
 		},
 		{
@@ -121,7 +122,7 @@ func TestListExecution(t *testing.T) {
 			name: "list-ingresses-in-all-ns",
 			args: []string{
 				"ingress",
-				"-a",
+				"-A",
 			},
 		},
 		{
@@ -147,7 +148,7 @@ func TestListExecution(t *testing.T) {
 			name: "list-base-pods-in-all-ns",
 			args: []string{
 				"obj",
-				"-a",
+				"-A",
 				"pod",
 			},
 		},
@@ -155,7 +156,7 @@ func TestListExecution(t *testing.T) {
 			name: "list-base-pods-in-all-ns-with-fuzzy",
 			args: []string{
 				"obj",
-				"-a",
+				"-A",
 				"pod",
 				"DUMMY-ARG",
 			},
@@ -168,7 +169,7 @@ func TestListExecution(t *testing.T) {
 
 			f := fmt.Sprintf("testdata/%s.json", tt.name)
 			if tt.update {
-				if err := ioutil.WriteFile(f, outGotData, 0600); err != nil {
+				if err := writeFile(f, outGotData); err != nil {
 					t.Fatal(err)
 				}
 			}
@@ -182,6 +183,18 @@ func TestListExecution(t *testing.T) {
 			}
 		})
 	}
+}
+
+func writeFile(filename string, data []byte) error {
+	pretty := new(bytes.Buffer)
+	if err := json.Indent(pretty, data, "", "  "); err != nil {
+		return err
+	}
+
+	if err := ioutil.WriteFile(filename, pretty.Bytes(), 0600); err != nil {
+		return err
+	}
+	return nil
 }
 
 func TestUseDeleteExecution(t *testing.T) {
