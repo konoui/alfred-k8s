@@ -25,8 +25,8 @@ Please type `kube <resource-name>`.
 e.g.) `kube pod`
 
 ### List resources in all namespaces
-Please add `-a` option.  
-e.g.) `kube pod -a`
+Please add `-A` option.  
+e.g.) `kube pod -A`
 
 ### List specific resources
 `kube obj <resource-name>` is for other resources not supported.  

@@ -69,5 +69,11 @@ func (cfg *Config) Collect() (err error) {
 }
 
 func (cfg *Config) GetQuery() string {
+	// Note to support kube base pod -A
+	if cfg.fs.Arg(1) == "-"+utils.AllNamespacesFlag {
+		cfg.all = true
+		return ""
+	}
+
 	return cfg.fs.Arg(1)
 }

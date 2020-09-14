@@ -153,6 +153,14 @@ func TestListExecution(t *testing.T) {
 			},
 		},
 		{
+			name: "list-base-pods-in-all-ns",
+			args: []string{
+				"obj",
+				"pod",
+				"-A",
+			},
+		},
+		{
 			name: "list-base-pods-in-all-ns-with-fuzzy",
 			args: []string{
 				"obj",
