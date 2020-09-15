@@ -63,16 +63,13 @@ var (
 		Enter: CopyResourceKey,
 		Ctrl:  DeleteResourceKey,
 		Shift: CopySternKey,
-		Alt:   CopyPortForwardKey,
 	}
 	defaultDeploymentKeyMap = KeyMap{
 		Enter: CopyResourceKey,
-		Alt:   CopyPortForwardKey,
 		Shift: CopySternKey,
 	}
 	defaultServiceKeyMap = KeyMap{
 		Enter: CopyResourceKey,
-		Alt:   CopyPortForwardKey,
 		Shift: CopySternKey,
 	}
 )

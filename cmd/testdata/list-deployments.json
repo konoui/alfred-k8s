@@ -5,9 +5,6 @@
       "subtitle": "ready [1/1] up-to-date [1] available [1]",
       "arg": "deployment-test1",
       "mods": {
-        "alt": {
-          "subtitle": "the resource has no ports"
-        },
         "shift": {
           "arg": "stern deployment-test1",
           "subtitle": "copy simple stern command"
@@ -19,9 +16,6 @@
       "subtitle": "ready [2/2] up-to-date [2] available [1]",
       "arg": "deployment-test2",
       "mods": {
-        "alt": {
-          "subtitle": "the resource has no ports"
-        },
         "shift": {
           "arg": "stern deployment-test2",
           "subtitle": "copy simple stern command"
