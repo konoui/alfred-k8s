@@ -63,14 +63,12 @@ func (cfg *Config) registerFlags() {
 	cfg.fs.BoolVar(&cfg.delete, utils.DeleteFlag, false, "delete it")
 }
 
-func (cfg *Config) Use() (err error) {
-	contextName := cfg.fs.Arg(0)
+func (cfg *Config) Use(contextName string) (err error) {
 	_ = cfg.rootConfig.Kubeclt().UseContext(contextName)
 	return nil
 }
 
-func (cfg *Config) Delete() (err error) {
-	contextName := cfg.fs.Arg(0)
+func (cfg *Config) Delete(contextName string) (err error) {
 	_, _ = cfg.rootConfig.Kubeclt().Execute(fmt.Sprintf("config delete-context %s", contextName))
 	return nil
 }

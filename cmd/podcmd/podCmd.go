@@ -94,8 +94,7 @@ func (cfg *Config) Collect() error {
 	return nil
 }
 
-func (cfg *Config) Delete() error {
-	pod := cfg.fs.Arg(0)
+func (cfg *Config) Delete(pod string) error {
 	arg := fmt.Sprintf("delete %s %s", CmdName, pod)
 	if cfg.namespace != "" {
 		arg = fmt.Sprintf("%s --namespace %s", arg, cfg.namespace)

@@ -54,8 +54,7 @@ func (cfg *Config) registerFlags() {
 	cfg.fs.BoolVar(&cfg.use, utils.UseFlag, false, "use it")
 }
 
-func (cfg *Config) Use() (err error) {
-	ns := cfg.fs.Arg(0)
+func (cfg *Config) Use(ns string) (err error) {
 	_ = cfg.rootConfig.Kubeclt().UseNamespace(ns)
 	return nil
 }

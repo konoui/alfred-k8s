@@ -13,11 +13,11 @@ type Collector interface {
 }
 
 type User interface {
-	Use() error
+	Use(s string) error
 }
 
 type Deleter interface {
-	Delete() error
+	Delete(s string) error
 }
 
 func (cfg *Config) CollectOutput(c Collector, query, cacheKey string) error {
@@ -40,7 +40,7 @@ func (cfg *Config) UseOutput(u User, query string) (err error) {
 		return
 	}
 
-	err = u.Use()
+	err = u.Use(query)
 	if err != nil {
 		fmt.Fprintf(cfg.Stdout(), "Failed due to %s\n", err)
 		return
@@ -56,7 +56,7 @@ func (cfg *Config) DeleteOutput(d Deleter, query string) (err error) {
 		return
 	}
 
-	err = d.Delete()
+	err = d.Delete(query)
 	if err != nil {
 		fmt.Fprintf(cfg.Stdout(), "Failed due to %s\n", err)
 		return
