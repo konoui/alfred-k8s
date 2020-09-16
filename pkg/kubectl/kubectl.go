@@ -15,9 +15,8 @@ const (
 
 // Kubectl is configuration of binary paths
 type Kubectl struct {
-	cmd        executor.Executor
-	pluginPath string
-	env        []string
+	cmd executor.Executor
+	env []string
 }
 
 // Option is the type to replace default parameters.
@@ -26,8 +25,8 @@ type Option func(k *Kubectl) error
 // New create kubectl instance
 func New(opts ...Option) (*Kubectl, error) {
 	k := &Kubectl{
-		cmd:        newCommand("/usr/local/bin/kubectl"),
-		pluginPath: "/usr/local/bin/",
+		cmd: newCommand("/usr/local/bin/kubectl"),
+		env: setPathEnv("/usr/local/bin/"),
 	}
 
 	for _, opt := range opts {
@@ -39,7 +38,6 @@ func New(opts ...Option) (*Kubectl, error) {
 		}
 	}
 
-	k.env = setPathEnv(k.pluginPath)
 	return k, nil
 }
 
@@ -55,12 +53,16 @@ func OptionBinary(bin string) Option {
 	}
 }
 
-// OptionPluginPath is configuration of kubectl plugin path.
+// OptionPluginPaths is configuration of kubectl plugin path.
 // e.g.) authentication command path
-func OptionPluginPath(path string) Option {
+func OptionPluginPaths(paths []string) Option {
 	return func(k *Kubectl) error {
-		// Replace ${HOME} with abs path
-		k.pluginPath = os.ExpandEnv(path)
+		for _, path := range paths {
+			// Replace ${HOME} with abs path
+			setPathEnv(os.ExpandEnv(path))
+		}
+		k.env = os.Environ()
+
 		return nil
 	}
 }

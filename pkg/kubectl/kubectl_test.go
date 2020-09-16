@@ -3,6 +3,7 @@ package kubectl
 import (
 	"os"
 	"reflect"
+	"strings"
 	"testing"
 )
 
@@ -16,21 +17,19 @@ func TestNewKubectl(t *testing.T) {
 		{
 			name: "default value",
 			want: &Kubectl{
-				cmd:        newCommand("/usr/local/bin/kubectl"),
-				pluginPath: "/usr/local/bin/",
-				env:        setPathEnv("/usr/local/bin/"),
+				cmd: newCommand("/usr/local/bin/kubectl"),
+				env: setPathEnv("/usr/local/bin/"),
 			},
 		},
 		{
 			name: "options value",
 			options: []Option{
 				OptionBinary(knownBinary),
-				OptionPluginPath(knownBinPath),
+				OptionPluginPaths([]string{knownBinPath}),
 			},
 			want: &Kubectl{
-				cmd:        newCommand(knownBinary),
-				pluginPath: knownBinPath,
-				env:        setPathEnv(knownBinPath),
+				cmd: newCommand(knownBinary),
+				env: setPathEnv(knownBinPath),
 			},
 			// TODO unexptected bin path case.
 		},
@@ -49,23 +48,34 @@ func TestNewKubectl(t *testing.T) {
 	}
 }
 
-func TestOptionPluginPath(t *testing.T) {
-	path := "/usr/local:/bin/usr"
+func TestOptionPluginPaths(t *testing.T) {
+	path := "/usr/local/test"
 	key := "TEST_USER"
 	value := "test"
 	input := "$" + key + path
 	want := value + path
 	t.Run("expand env test", func(t *testing.T) {
+		// Note before set ENV
 		if err := os.Setenv(key, value); err != nil {
 			t.Fatal(err)
 		}
 
-		k, err := New(OptionPluginPath(input))
+		k, err := New(OptionPluginPaths([]string{input}))
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		got := k.pluginPath
+		var got string
+		for _, e := range k.env {
+			key := strings.SplitN(e, "=", 2)[0]
+			value := strings.SplitN(e, "=", 2)[1]
+			if key == "PATH" {
+				first := strings.SplitN(value, ":", 2)[0]
+				got = first
+				break
+			}
+		}
+
 		if got != want {
 			t.Errorf("unexpected want: %v\ngot: %v", want, got)
 		}

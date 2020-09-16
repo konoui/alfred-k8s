@@ -5,7 +5,6 @@ import (
 	"errors"
 	"io"
 	"os"
-	"strings"
 	"time"
 
 	"github.com/konoui/alfred-k8s/pkg/kubectl"
@@ -51,8 +50,7 @@ func NewConfig(out, errOut io.Writer) *Config {
 		opts = append(opts, kubectl.OptionBinary(cfgFile.Kubectl.Bin))
 	}
 	if paths := cfgFile.Kubectl.PluginPaths; len(paths) > 0 {
-		path := strings.Join(paths, ":")
-		opts = append(opts, kubectl.OptionPluginPath(path))
+		opts = append(opts, kubectl.OptionPluginPaths(paths))
 	}
 
 	k, err := kubectl.New(opts...)
