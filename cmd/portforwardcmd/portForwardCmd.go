@@ -90,9 +90,10 @@ func (cfg *Config) listJobs() error {
 }
 
 func (cfg *Config) startPortForward() error {
-	cfg.rootConfig.Awf().Append(&alfred.Item{
-		Title: "Starting port forwarding",
-	})
+	cfg.rootConfig.Awf().Append(
+		alfred.NewItem().
+			SetTitle("Starting port forward"),
+	)
 
 	resType, name, ns := cfg.resourceType, cfg.name, cfg.namespace
 	ports := cfg.rootConfig.Kubeclt().GetPorts(resType, name, ns)
