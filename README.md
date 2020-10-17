@@ -7,7 +7,11 @@ Alfred workflow to operate Kubernetes resources.
 - Switch Context/Namespace
 
 ## Install
-- Download the workflow form [latest release](https://github.com/konoui/alfred-k8s/releases).
+- Download and open the workflow with terminal.
+```
+$ curl -O -L https://github.com/konoui/alfred-k8s/releases/latest/download/alfred-k8s.alfredworkflow && open alfred-k8s.alfredworkflow
+```
+
 - Build Workflow on your computer.
 ```
 $ make package
